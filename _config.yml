@@ -1,10 +1,12 @@
-title: Cayman Blog Theme
-description: Cayman Blog Theme is a clean, responsive blogging theme for Jekyll and GitHub Pages, with social/SEO features.
+﻿title: 瓦力博客
+description: 成长不只有痛苦，也有乐趣
 show_downloads: true
 
 
-baseurl: "/" # change this to the subpath of your site, e.g. /blog. Leave it empty if you don't need it.
+baseurl: "/"    #网站的根路径 
 url: "https://lorepirri.github.io" # change this to the base hostname & protocol for your site
+Encoding: utf-8
+
 
 google_analytics:
 # cayman-blog date format
