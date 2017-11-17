@@ -1,7 +1,7 @@
 ﻿#默认配置
 title: 瓦力博客  
 description: 成长不只有痛苦，也有乐趣   #描述
-show_downloads: true   
+show_downloads: false   
 exclude: ['filestruct.txt']  #排除某个文件
 include: [] #强制包含某些文件
 keep_files: []  #当生成站点时，保留选择的文件
