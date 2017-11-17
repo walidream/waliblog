@@ -1,11 +1,20 @@
-﻿title: 瓦力博客
-description: 成长不只有痛苦，也有乐趣
-show_downloads: true
+﻿#默认配置
+title: 瓦力博客  
+description: 成长不只有痛苦，也有乐趣   #描述
+show_downloads: true   
+exclude: ['filestruct.txt']  #排除某个文件
+include: [] #强制包含某些文件
+keep_files: []  #当生成站点时，保留选择的文件
+Encoding: utf-8   #编码
 
 
+
+
+#服务器配置
+host: 127.0.0.1
+port: 4002
 baseurl: "/"    #网站的根路径 
 url: "https://lorepirri.github.io" # change this to the base hostname & protocol for your site
-Encoding: utf-8
 
 
 google_analytics:
@@ -16,7 +25,7 @@ cayman-blog:
 
 theme: # leave it empty
 
-# social
+#个人信息
 author: "waliDream"
 image: /thumbnail-jumbo.png
 twitter:
@@ -28,3 +37,13 @@ facebook:
   app_id: 1798910940422432 # cayman-blog
   #authors: lorepirri
 #  admins:
+
+
+
+
+
+
+
+
+
+
