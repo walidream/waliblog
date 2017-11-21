@@ -8,7 +8,7 @@ keep_files: []  #当生成站点时，保留选择的文件
 Encoding: utf-8   #编码
 
 #插件分页
-gems: [pager,pagination]
+gems: [jekyll-paginate,pager,pagination]
 
 paginate: 7
 paginate_path: "blog/page:num"  #首页分页
