@@ -15,6 +15,7 @@
 |--- _layouts	 布局   
 |--- _plugins    插件
 |--- _posts		 文章   年-月-日-文章标题.md
+|--- category    #文章分类 与post 对应
 |--- _site 		 本地server（需要加入 .gitignore）
 |--- _data		 数据文件
 |--- _sass       sass文件 css中引入
