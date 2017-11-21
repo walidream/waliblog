@@ -1,4 +1,4 @@
-官网：https://jekyllrb.com/
+中文官网：http://jekyllcn.com/docs/pagination/
 
 模板风格：http://jekyllthemes.org/
 
@@ -13,6 +13,7 @@
 |--- _drafts	 草稿箱   运行时 jekyll server --drafts [可以看到草稿箱的内容]
 |--- _includes	 重用模块
 |--- _layouts	 布局   
+|--- _plugins    插件
 |--- _posts		 文章   年-月-日-文章标题.md
 |--- _site 		 本地server（需要加入 .gitignore）
 |--- _data		 数据文件
@@ -72,7 +73,16 @@ url: "https://lorepirri.github.io" # change this to the base hostname & protocol
 
 #个人信息
 
+========================================
+头信息自定义
 
+title:      #标题
+tagline:    #描述
+category:   #分类
+author:     #作者
+tag:        #标签
+ghurl:      #github url
+ghurl_zip:  #github zip下载
 
 ======================================
 常用编辑

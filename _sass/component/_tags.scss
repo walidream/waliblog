@@ -1,0 +1,21 @@
+@charset "utf-8";
+
+#{$wali}-tags{
+  position: relative;
+  margin:0 10px 10px 0;
+  display: inline-block;
+  font-size: 14px;
+  color: #666;
+  transition: all 0.2s;
+}
+#{$wali}-tags:hover{
+  font-weight: bold;
+  color: #34495E;
+  transform: scale(1.6);
+}
+
+//颜色
+#{$wali}-tags-default{
+  color: #fff;
+  background-color: #DD514C;
+}

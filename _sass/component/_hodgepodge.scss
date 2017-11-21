@@ -1,0 +1,68 @@
+@charset "utf-8";
+
+//下划线从右
+[underline]{
+  position: relative;
+  cursor:pointer;
+}
+[underline-rigth]:after{
+  content:'';
+  display:block;
+  width:0;
+  height:3px;
+  position:absolute;
+  left:0;
+  background:#000;
+  transition:all 0.3s ease-in-out;
+}
+[underline-rigth]:hover:after{
+  width:100%;
+}
+//下划线从右到左
+[underline-left]:after{
+  content:'';
+  display:block;
+  width:0;
+  height:3px;
+  position:absolute;
+  right:0;   /*区别就是开始时在右边*/
+  background:#000;
+  transition:all 0.3s ease-in-out;
+}
+[underline-left]:hover:after{
+  width:100%;
+}
+//下划线中间向两端
+[underline-side]:after{
+  content:'';
+  display:block;
+  width:100%;
+  height:3px;
+  position:absolute;
+  background:#000;
+  transition:all 0.2s ease-in-out;
+  transform: scale3d(0,1,1);
+  transform-origin:50% 0;
+}
+[underline-side]:hover::after{
+  transform:scale3d(1,1,1);
+}
+
+
+//阴影
+//谷歌阴影
+.google-shadow{
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
+}
+.google-shadow:hover{
+  box-shadow: 0 3px 8px 0 rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.08);
+}
+
+
+
+
+
+
+
+
+
