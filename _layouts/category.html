@@ -1,0 +1,51 @@
+---
+layout: default
+---
+<aside class="main-left">
+    <div class="article-cat google-shadow">
+        <h3 class="article-title"><span><i class="iconfont wali-icon-fenlei"></i></span> 文章分类</h3>
+        <div class="article-content">
+            {% assign cat = page.url | split: "/" | last %}
+            {% for category in site.categories %}
+                {% assign pcat = category | first %}
+                {% if pcat == cat %}
+                <a href="/category/{{ category | first }}/" class="wali-tags wali-tags-active">{{ category | first }} ({{ category | last | size }})</a>
+                {% else %}
+                <a href="/category/{{ category | first }}/" class="wali-tags">{{ category | first }} ({{ category | last | size }})</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="comment">
+        <h3 class="comment-title"><span><i class="iconfont wali-icon-pinglun"></i></span> 最新评论</h3>
+        <div class="comment-content">
+            <ul>
+
+            </ul>
+        </div>
+    </div>
+</aside>
+<section class="content">
+    <h2><span><i class="iconfont wali-icon-wenzhang"></i></span> 最新帖子</h2>
+    <!--帖子-->
+    <div class="post-content">
+        {% assign cats = page.url | split: "/" | last %}
+        {% for post in site.categories[cats]  %}
+            <div class="list-type-1">
+            <h4 class="post-title"><a href="{{ post.url | relative_url }}" title="{{ post.title }}" underline underline-side class="post-link">{{ post.title | escape }}</a></h4>
+            <div class="post-abstract">
+                {{ post.excerpt | markdownify | truncatewords: 25 }}
+                <a href="{{ post.url | relative_url }}">阅读全文</a>
+            </div>
+            <div class="post-info">
+                {% assign date_format = site.cayman-blog.date_format | default: "%b %-d, %Y" %}
+                <span class="post-timer"><i class="iconfont wali-icon-riqi"></i><em>{{ post.date | date: date_format }}</em></span>
+                <span class="post-visit"><i class="iconfont wali-icon-fangwenliang"></i><em>访问量 <strong>(10)</strong></em></span>
+                <span class="post-discuss"><i class="iconfont wali-icon-pinglun1"></i><em>评论数 <strong>(0)</strong></em></span>
+                <span class="post-tag"><i class="iconfont wali-icon-biaoqian"></i><em> #{{post.tag}}</em></span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+

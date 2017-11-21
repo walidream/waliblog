@@ -15,7 +15,7 @@
 |--- _layouts	 布局   
 |--- _plugins    插件
 |--- _posts		 文章   年-月-日-文章标题.md
-|--- category    #文章分类 与post 对应
+|--- category    #文章分类 与posts 对应
 |--- _site 		 本地server（需要加入 .gitignore）
 |--- _data		 数据文件
 |--- _sass       sass文件 css中引入
@@ -159,6 +159,10 @@ end
 
 
 8.去掉about.html 
+
+9.换行 <br>
+10. 缩进 切换中文
+
 ---
 permalink: /about
 ----
@@ -173,7 +177,17 @@ content     #被 layout 包裹的那些 Post 或者 Page 渲染生成的内容。但是又没定义在 
 paginator   #分页
 
 
-
+===============================================================
+正常的博客   √
+分页   √
+分类(分类中没有分页)  √
+静态资源加速
+加绿标 https   
+评论
+访问量
+评论数
+打标签   √
+搜索 
 
 
 

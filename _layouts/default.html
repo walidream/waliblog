@@ -2,7 +2,7 @@
 layout: compress
 ---
 <!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+<html lang="{{ page.lang | default: site.lang | default: 'en' }}">
 
   <head>
     <!-- Non social metatags -->
@@ -38,7 +38,6 @@ layout: compress
   <body>
 
     {% include site-header.html %}
-
     {% if page.layout == 'home' %}
       {% assign page-tagline = site.description | default: site.github.project_tagline | escape %}
     {% endif %}
@@ -50,16 +49,21 @@ layout: compress
     {% endif %}
 
     <section class="page-header">
+      <!--判断是否是主页-->
       {% if page.layout == 'home' %}
       <h1 class="project-name">
         <img class="portrait" src="{{ site.url}}/assets/image/wali/wali_logo.png ">
         <span class="title">{{ page-title }}</span>
       </h1>
+      <!--判断是否是分类页-->
+      {% elsif page.layout == 'category' %}
+      <h1 class="project-name">{{ page.url | split: "/" | last |  escape }} 分类</h1>
       {% else %}
       <h1 class="project-name">{{ page-title }}</h1>
       {% endif %}
-
+      <!--简短的描述-->
       <h2 class="project-tagline">{{ page-tagline }}</h2>
+      <!--github下载-->
       {% if page.layout == 'home' or site.github.is_project_page %}
           <a href="{{ site.github.repository_url }}" class="btn wali-btn-download">View on GitHub</a>
         {% if site.show_downloads %}
@@ -69,14 +73,16 @@ layout: compress
       {% endif %}
 
 
-      <!-- Post tagline -->
+      <!-- 帖子 -->
       {% if page.layout == 'post' %}
+        <!--判断github是否有项目-->
         {% if page.ghurl %}
             <a href="{{ page.ghurl }}" class="btn wali-btn-download">View on GitHub</a>
             {% if site.show_downloads %}
             <a href="{{ page.ghurl_zip }}" class="btn wali-btn-download">Download .zip</a>
             <a href="{{ page.ghurl_zip }}" class="btn wali-btn-download">Download .tar.gz</a>
             {% endif %}
+        <!--没有项目就显示日期-->
         {% else %}
           <h2 class="project-date">
             <time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
@@ -90,20 +96,24 @@ layout: compress
           </h2>
         {% endif %}
       {% endif %}
-      <!-- End: Post tagline -->
     </section>
 
+    <!--main start-->
     <section class="main-content clearfix">
       {{ content }}
     </section>
+    <!--main end-->
 
+    <!--尾部 start-->
     <footer class="site-footer">
         <div class="attention">
           <a href="" class="wali-icon"><i class="iconfont wali-icon-github"></i></a>
           <a href="" class="wali-icon"><i class="iconfont wali-icon-weixin"></i></a>
+          <a href="" class="wali-icon"><i class="iconfont wali-icon-zhifubao"></i></a>
           <a href="" class="wali-icon"><i class="iconfont wali-icon-weibo"></i></a>
         </div>
     </footer>
+    <!--尾部 end-->
 
     {% if site.google_analytics %}
       <script type="text/javascript">

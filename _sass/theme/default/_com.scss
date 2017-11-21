@@ -93,7 +93,8 @@ body{
   margin: 20px auto;
   width: 1200px;
   min-width: 1200px;
-  //border:1px solid red;
+  word-wrap: break-word;
+
 }
 
 //footer
@@ -133,6 +134,10 @@ body{
     .wali-icon-weibo:hover{
       transform: scale(1.5);
       color: #FF0000;
+    }
+    .wali-icon-zhifubao:hover{
+      transform: scale(1.5);
+      color: #07A0F8;
     }
   }
 }

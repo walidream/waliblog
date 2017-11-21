@@ -6,7 +6,7 @@ layout: default
     <h3 class="article-title"><span><i class="iconfont wali-icon-fenlei"></i></span> 文章分类</h3>
     <div class="article-content">
       {% for category in site.categories %}
-      <a href="/{{ category | first }}/page1" class="wali-tags">{{ category | first }} ({{ category | last | size }})</a>
+      <a href="/category/{{ category | first }}/" class="wali-tags">{{ category | first }} ({{ category | last | size }})</a>
       {% endfor %}
     </div>
   </div>
@@ -53,11 +53,11 @@ layout: default
 
         {% for page in (1..paginator.total_pages) %}
             {% if page == paginator.page %}
-            <li><a href="" class="page-num page-active page-disable">{{ page }}=</a></li>
+            <li><a href="" class="page-num page-active page-disable">{{ page }}</a></li>
             {% elsif page == 1 %}
-            <li><a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}" class="page-num page-disable">{{ page }}-</a></li>
+            <li><a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}" class="page-num page-disable">{{ page }}</a></li>
             {% else %}
-            <li><a href="{{ site.paginate_path | prepend: site.baseurl | replace: '//', '/' | replace: ':num', page }}" class="page-num ">{{ page }}!</a></li>
+            <li><a href="{{ site.paginate_path | prepend: site.baseurl | replace: '//', '/' | replace: ':num', page }}" class="page-num ">{{ page }}</a></li>
             {% endif %}
         {% endfor %}
 
