@@ -4,3 +4,18 @@ layout: default
 <article id="articleBody" itemscope itemtype="http://waliblog.com/">
     {{ content }}
 </article>
+
+<div id="container"></div>
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: '页面 ID', // 可选。默认为 location.href
+  owner: 'walidream',
+  repo: 'https://github.com/walidream/waliblog',
+  oauth: {
+    client_id: '2aca65f9ebab6b5c3e09',
+    client_secret: '4bf197958b22d7d9e91d77258860bf2ff3606e8a',
+  },
+})
+gitment.render('container')
+</script>
