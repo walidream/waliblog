@@ -2,6 +2,27 @@
 layout: default
 ---
 <article id="articleBody" itemscope itemtype="http://waliblog.com/">
+
+
+
+<div id="gitmentContainer"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+    owner: 'walidream',
+    repo: 'https://github.com/walidream/waliblog/',
+    oauth: {
+        client_id: '201885b48f0735b368b5',
+        client_secret: '756567e6bec515440c3c3488352f13dd844f50b6',
+    },
+});
+gitment.render('gitmentContainer');
+</script>
+
+
+
+===========================
     {{ content }}
 </article>
 
