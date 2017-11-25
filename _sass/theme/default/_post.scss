@@ -5,6 +5,59 @@
   margin: 30px auto 30px auto;
   width: 990px;
   overflow: hidden;
+  li{
+    list-style: disc !important;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: normal;
+    color: #333;
+  }
+  p {
+	margin-top:.5em;
+    margin-bottom: 1em;
+  }
+  a{
+    color: #42A8E1;
+    text-decoration: underline;
+  }
+  a:hover{
+    color: #2a6496;
+  }
+  
+  pre {
+	padding: 0.8rem;    
+    font-size: 0.9rem;
+    line-height: 1.45;
+    border-radius: 0.3rem;
+	font: 1rem Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    color: #567482;
+    word-wrap: normal;
+    background-color: #f3f6fa;
+    border: solid 1px #dce6f0;
+	overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  code {
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 0.9rem;
+    color: $code-text-color;
+    background-color: $code-bg-color;
+    border-radius: 0.3rem;
+  }
+  blockquote{
+	padding: 0 1rem;
+    margin-left: 0;
+    color: #819198;
+    border-left: 0.3rem solid #dce6f0;
+  }
+
 }
 
 #discuss{
