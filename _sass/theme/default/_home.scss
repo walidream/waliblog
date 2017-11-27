@@ -39,6 +39,24 @@
     font-size: 16px;
     border-bottom: 1px solid #999;
   }
+  .comment-content{
+    padding: 15px 12px;
+    .comment-item{
+      margin: 5px 0;
+      max-height: 38px;
+      line-height:18px;
+      overflow: hidden;
+    }
+    .comment-user{
+      font-size: 16px;
+      color: #3c8dbc;
+    }
+    .comment-link{
+      font-size: 14px;
+      color: #999;
+      word-break: break-all;
+    }
+  }
 }
 .content{
   margin:0 0 0 20px;

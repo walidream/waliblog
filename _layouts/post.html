@@ -2,27 +2,28 @@
 layout: post_default
 ---
 <article id="articleBody" itemscope itemtype="http://waliblog.com/">
-    {{ content }}
+    {% if page.post_nav %}
+    <div class="article-nav">
+        <ul class="article-nav-list">
+            {% for title in page.post_nav %}
+            <li><a href="{{ title | remove: '.' | remove: '、' |prepend:'#' }}">{{ title }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="article-content ">
+        {{ content }}
+    </div>
+    {% else %}
+    <div class="article-content article-nav-no">
+        {{ content }}
+    </div>
+    {% endif %}
 </article>
-
-
-{% if false %}
+<!--评论-->
 <div id="discuss">
     <div id="gitmentContainer"></div>
 </div>
 
-<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
-<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
-<script>
-var gitment = new Gitment({
-	id:'24291821',
-    owner: 'walidream',
-    repo: 'waliblog',
-    oauth: {
-        client_id: '201885b48f0735b368b5',
-        client_secret: '756567e6bec515440c3c3488352f13dd844f50b6',
-    },
-});
-gitment.render('gitmentContainer');
-</script>
-{% endif %}
+
+
+

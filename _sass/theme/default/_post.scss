@@ -1,19 +1,48 @@
 @charset "utf-8";
 
 //文章内容
-#articleBody{
+#articleBody {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: flex-start;
   margin: 30px auto 30px auto;
-  width: 990px;
+  width: 1200px;
   overflow: hidden;
-  li{
-    list-style: disc !important;
+  .article-nav {
+    display: block;
+    width: 260px;
   }
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  .article-nav-list {
+    display: none;
+    position: fixed;
+    top:110px;
+    left: 50px;
+    padding: 10px;
+    list-style: none;
+    width: 190px;
+    box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08);
+    border-radius: 5px;
+    background-color: #fff;
+    overflow: hidden;
+    z-index: 9999;
+    li {
+      list-style: none;
+      margin: 5px 0;
+    }
+    a {
+      font-size: 14px;
+    }
+  }
+  .article-content {
+    display: block;
+    width: 940px;
+  }
+  .article-nav-no{
+    width: 1200px !important;
+  }
+
+  h1,h2,h3,h4,h5,h6 {
     margin-top: 2rem;
     margin-bottom: 1rem;
     font-weight: normal;
@@ -57,8 +86,8 @@
     color: #819198;
     border-left: 0.3rem solid #dce6f0;
   }
-
 }
+
 
 #discuss{
   position: relative;
@@ -67,6 +96,5 @@
   width: 990px;
   min-width: 990px;
 }
-
 
 

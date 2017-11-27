@@ -197,7 +197,35 @@ html css压缩  √
 评论数    √
 访问量  √
 打标签   √
-搜索  
+
+单页帖子访问量
+单页帖子评论数
+获取评论数
+优化性能 img,js
+
+bug
+css
+js
+
+常用整理
+
+
+
+=======================================================
+gtihub API
+
+获取评论
+https://api.github.com/repos/walidream/waliblog/issues
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -64,7 +64,7 @@ layout: compress
       <!--简短的描述-->
       <h2 class="project-tagline">{{ page-tagline }}</h2>
       <!--github下载-->
-      {% if page.layout == 'home' or site.github.is_project_page %}
+      {% if false and page.layout == 'home' and site.github.is_project_page %}
           <a href="{{ site.github.repository_url }}" class="btn wali-btn-download">View on GitHub</a>
         {% if site.show_downloads %}
           <a href="{{ site.github.zip_url }}" class="btn wali-btn-download">Download .zip</a>
@@ -107,17 +107,23 @@ layout: compress
     <!--尾部 start-->
     <footer class="site-footer">
         <div class="attention">
-          <a href="" class="wali-icon"><i class="iconfont wali-icon-github"></i></a>
-          <a href="" class="wali-icon"><i class="iconfont wali-icon-weixin"></i></a>
-          <a href="" class="wali-icon"><i class="iconfont wali-icon-zhifubao"></i></a>
-          <a href="" class="wali-icon"><i class="iconfont wali-icon-weibo"></i></a>
+          <a href="https://github.com/walidream" class="wali-icon"><i class="iconfont wali-icon-github"></i></a>
+          <a href="javascript:void(0)" class="wali-icon pay-wechat"><i class="iconfont wali-icon-weixin"></i></a>
+          <a href="javascript:void(0)" class="wali-icon pay-zhifubao"><i class="iconfont wali-icon-zhifubao"></i></a>
+          <a href="javascript:void(0)" class="wali-icon"><i class="iconfont wali-icon-weibo"></i></a>
         </div>
+       <div class="current-pageNum">
+         <p>总浏览量 <span data-hk-page="current"> - </span></p>
+       </div>
     </footer>
     <!--尾部 end-->
-	当前页面访问量<span data-hk-page="current"> - </span>
-	
+
+    <!--返回顶部-->
+    <div id="back-top" class="back-top"></div>
+
   </body>
 </html>
+
 {% if site.google_analytics %}
   <script type="text/javascript">
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -129,7 +135,10 @@ layout: compress
 	ga('send', 'pageview');
   </script>
 {% endif %}
-<script src="https://cdn1.lncld.net/static/js/av-mini-0.6.10.js"></script>
-<script src="http://jerry-cdn.b0.upaiyun.com/hit-kounter/hit-kounter-lc-0.2.0.js"></script>
+<script src="{{ '/assets/lib/av-mini-0.6.10.js?v=' | append: site.github.build_revision | relative_url }}"></script>
+<script src="{{ '/assets/lib/hit-kounter-lc-0.2.0.js?v=' | append: site.github.build_revision | relative_url }} "></script>
 
-
+<script src="{{ '/assets/lib/jquery.min.js?v=' | append: site.github.build_revision | relative_url }} "></script>
+<script src="{{ '/assets/js/config.js?v=' | append: site.github.build_revision | relative_url}}"></script>
+<script src="{{ '/assets/js/commethod.js?v=' | append: site.github.build_revision | relative_url }}"></script>
+<script src="{{ '/assets/js/main.js?v=' | append: site.github.build_revision | relative_url }}"></script>

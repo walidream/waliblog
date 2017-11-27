@@ -99,13 +99,13 @@ body{
 
 //footer
 .site-footer{
-  margin: 20px auto;
-  padding:20px 0;
+  margin:0 auto 0 auto ;
+  padding: 20px 0 0 0;
   width: 100%;
   min-width: 1200px;
   background-color: #fff;
   text-align: center;
-  border-top:1px solid #000;
+  border-top:1px solid #E2E2E2;
   .attention{
     display: block;
     width: 100%;
@@ -113,6 +113,7 @@ body{
     background-color: #fff;
   }
   .wali-icon{
+    position: relative;
     display: inline-block;
     margin: 0 8px;
     color: #666;
@@ -140,6 +141,89 @@ body{
       color: #07A0F8;
     }
   }
+  .pay-wechat:hover:before{
+    position: absolute;
+    top:-409px;
+    left: -144px;
+    content: '';
+    display: block;
+    width: 300px;
+    height: 400px;
+    background:url('/assets/image/wali/pay_wechat.jpg')no-repeat center;
+    background-size:cover;
+    border-radius: 5px;
+    box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+  .pay-wechat:hover:after{
+    content: '';
+    display: block;
+    position: absolute;
+    top: -9px;
+    left: 6px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 10px 0 10px;
+    border-color: #e0b741 transparent transparent transparent;
+  }
+  .pay-zhifubao:hover:before{
+    position: absolute;
+    top:-409px;
+    left: -144px;
+    content: '';
+    display: block;
+    width: 300px;
+    height: 400px;
+    background:url('/assets/image/wali/pay_zhifubao.jpg')no-repeat center;
+    background-size:cover;
+    border-radius: 5px;
+    box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+  .pay-zhifubao:hover:after{
+    content: '';
+    display: block;
+    position: absolute;
+    top: -9px;
+    left: 6px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 10px 0 10px;
+    border-color: #019fe8 transparent transparent transparent;
+  }
+
+}
+.current-pageNum{
+  margin: 20px 0 ;
+}
+
+
+//返回顶部
+.back-top{
+  position: fixed;
+  right: 20px;
+  bottom: 50px;
+  display: block;
+  width: 70px;
+  height: 70px;
+  line-height:70px;
+  border: 1px solid #999;
+  text-align: center;
+  border-radius: 50%;
+  background-color: #fff;
+  cursor: pointer;
+}
+.back-top:before{
+  content:'\e601';
+  display: block;
+  font-family:"iconfont" !important;
+  font-size:60px;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.back-top:hover:before{
+  color: #C3002F;
 }
 
 
