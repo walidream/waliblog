@@ -121,11 +121,8 @@ layout: compress
     ga('send', 'pageview');
 </script>
 {% endif %}
+<!-- 插件 -->
 <script src="{{ '/assets/lib/av-mini-0.6.10.js?v=' | append: site.github.build_revision | relative_url }}"></script>
 <script src="{{ '/assets/lib/hit-kounter-lc-0.2.0.js?v=' | append: site.github.build_revision | relative_url }} "></script>
-<script src="{{ '/assets/lib/gitment.browser.js?v=' | append: site.github.build_revision | relative_url }} "></script>
 
-<script src="{{ '/assets/lib/jquery.min.js?v=' | append: site.github.build_revision | relative_url }} "></script>
-<script src="{{ '/assets/js/config.js?v=' | append: site.github.build_revision | relative_url}}"></script>
-<script src="{{ '/assets/js/commethod.js?v=' | append: site.github.build_revision | relative_url }}"></script>
-<script src="{{ '/assets/js/post.js?v=' | append: site.github.build_revision | relative_url }}"></script>
+<script src="{{ '/assets/js/post.bundle.js?v=' | append: site.github.build_revision | relative_url }}"></script>

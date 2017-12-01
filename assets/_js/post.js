@@ -1,6 +1,10 @@
 /**
  * Created by Administrator on 2017/11/26.
  */
+ 
+import Gitment from '../../_wp/node_modules/gitment/dist/gitment.js'
+import {navFade,backTop} from './_commethod';
+import $ from '../../_wp/node_modules/jquery/dist/jquery.js';
 
 $(function(){
 	//post导航淡入淡出
@@ -8,7 +12,7 @@ $(function(){
 	//返回顶部
     backTop();
 	
-	/*var gitment = new Gitment({
+	var gitment = new Gitment({
 		id:'24291821',
 		owner: 'walidream',
 		repo: 'waliblog',
@@ -17,5 +21,5 @@ $(function(){
 			client_secret: '756567e6bec515440c3c3488352f13dd844f50b6',
 			},
 	});
-	gitment.render('gitmentContainer');*/
+	gitment.render('gitmentContainer');
 });
