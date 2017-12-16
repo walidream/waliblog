@@ -1,9 +1,11 @@
 ---
 layout: page
-title: About
+title: 关于
 tagline: A few more words about this theme
 permalink: /about
 ---
+
+正文
 
 This is the _Cayman Blog_ Jekyll theme. You can find out more info about customizing this theme, as well as basic usage documentation, and source code at: [cayman-blog](https://github.com/lorepirri/cayman-blog)
 

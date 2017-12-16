@@ -1,0 +1,24 @@
+---
+layout: page
+title: 赞赏者
+tagline: 感谢每一位支持我的人
+---
+
+{% for patron in site.data.sponsor.patron %}
+	<div class="sponsor">
+		<img class="sponsor-portrait" src="{{patron.portrait | escape}}" alt="">
+		{% if patron.type == 'wechat' %}
+		<span class="sponsor-name wechat"> {{patron.name | escape}}</span>
+		{% else %}
+		<span class="sponsor-name zhifubao"> {{patron.name | escape}}</span>
+		{% endif %}
+	</div>
+{% endfor %}
+
+
+
+
+
+
+
+
