@@ -12,7 +12,6 @@ gems: [jekyll-paginate,pager,pagination]
 
 paginate: 7
 paginate_path: "blog/page:num"  #首页分页
-paginatepath: ["aaaa/page/:num","bbbb/page/:num","cccc/page/:num","jekyll/page/:num"]
 
 compress_html:    #html配置
   clippings: all
