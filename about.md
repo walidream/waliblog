@@ -5,11 +5,12 @@ tagline: A few more words about this theme
 permalink: /about
 ---
 
-正文
-
-This is the _Cayman Blog_ Jekyll theme. You can find out more info about customizing this theme, as well as basic usage documentation, and source code at: [cayman-blog](https://github.com/lorepirri/cayman-blog)
-
-You can find the source code for _Jekyll_ at [jekyll](https://github.com/jekyll/jekyll)
+瓦力的博客主要就是记录下小菜遇到的问题，为给以后自己方便查找。由于小菜水平还属于菜鸟级别，所以肯定会有很多描述不是很准确或者是错误，望看到的朋友勿喷，留言指正，小菜会加以纠正。
 
 
-[Go to the Home Page]({{ site.url }}{{ site.baseurl }})
+
+
+
+
+
+
