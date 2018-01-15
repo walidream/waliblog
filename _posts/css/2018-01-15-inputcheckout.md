@@ -15,7 +15,7 @@ post_nav: false
 
 # 1.checkbox样式
 
-<script async src="//jsfiddle.net/waliblog/777jsrsw/embed/result,html,css/"></script>
+<script async src="//jsfiddle.net/waliblog/orxvab5c/embed/result,html,css/"></script>
 
 
 
