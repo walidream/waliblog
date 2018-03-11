@@ -6,7 +6,7 @@ layout: post_default
     <div class="article-nav">
         <ul class="article-nav-list">
             {% for title in page.post_nav %}
-            <li><a href="{{ title | remove: '.' | remove: '、' |prepend:'#' }}" title="{{title}}">{{ title }}</a></li>
+            <li><a href="{{ title | remove: '.' |remove: '('|remove: ')'| remove: '、' |prepend:'#'|replace:' ','-' |downcase }}" title="{{title}}">{{ title }}</a></li>
             {% endfor %}
         </ul>
     </div>
