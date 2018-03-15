@@ -77,21 +77,192 @@ fmt.Println(arr[:])   //0,1,2,3,4,5,6,7
 
 ```
 
+### 01.slice扩展
+
+```javascript
+arr := [...]int{0,1,2,3,4,5,6,7}
+
+s1 := arr[2:6]  //[2,3,4,5](6,7) len长度4,cap容量6
+                // 0,1,2,3, 4,5
+s2 := s1[3:5]   //[5,6] len长度2,cap容量3
+
+fmt.Println(s1[4]) //报错，取不到下标为4，切片是对数组view，数组能取到的值就是小于len下标
+
+```
+slice可以向后扩展，但不能向前扩展。扩展条件 `len < cap`。
+
+s[i]不可以超越len(s),向后扩展不可以超越底层数组cap(s)
 
 
+### 02.make函数
 
+内置的make函数创建一个指定元素类型、长度和容量的slice。容量部分可以省略，在这种情况下，容量将等于长度。
 
+> 语法：make([]T,len,cap)
 
+```javascript
+sli := make([]int, 3,10)
 
+fmt.Printf("sli=%v,len = %d,cap=%d",sli,len(sli),cap(sli))  //sli=[0,0,0], len = 3,cap = 10
+```
 
+### 03.slice比较
 
+slice唯一合法的比较操作是和`nil`比较
 
+```javascript
+if summer == nil { /* ... */}
+```
 
+一个零值的slice等于nil。一个nil值的slice并没有底层数组。一个nil值的slice的长度和容量都是0，但是也有非nil值的slice的长度和容量也是0的，例如[]int{}或make([]int, 3)[3:]。与任意类型的nil值一样，我们可以用[]int(nil)类型转换表达式来生成一个对应类型slice的nil值
 
+```javascript
+var s []int    // len(s) == 0, s == nil
+s = nil        // len(s) == 0, s == nil
+s = []int(nil) // len(s) == 0, s == nil
+s = []int{}    // len(s) == 0, s != nil
+```
 
+如果你需要测试一个slice是否是空的，使用len(s) == 0来判断，而不应该用s == nil来判断。除了和nil相等比较外，一个nil值的slice的行为和其它任意0长度的slice一样；例如reverse(nil)也是安全的。除了文档已经明确说明的地方，所有的Go语言函数应该以相同的方式对待nil值的slice和0长度的slice。
 
+### 04.append函数向slice追加元素
 
+```javascript
+var sli []int
 
+fmt.Printf("sli = %v, len = %d, cap = %d",sli,len(sli),cap(sli))  //[], len = 0,cap = 0
+sli = append(sli,1,2,3,4)
+fmt.Printf("sli = %v, len = %d, cap = %d",sli,len(sli),cap(sli))  //[1,2,3,4], len = 4,cap = 4
+
+//append追加多个值，甚至可以是slice
+sli = append(sli,9,8,7,6)
+
+```
+
+### 05.append追加原理
+
+```javascript
+func appendInt(x []int, y int) [] int{
+    var z []int
+	zlen := len(x) + 1
+	if zlen <= cap(x){ 
+	   z = x[:zlen]
+	}else{
+	   zcap := zlen
+	   if zcap < 2*len(x){
+	     zcap = 2 * len(x)
+	   }
+	   z = make([]int, zlen, zcap)	   
+	   copy(z,x)
+	}
+	z[len(x)] = y
+	
+	return z
+}
+
+func main(){
+   var x,y []int
+   for i := 0; i < 10; i++{
+     y = appendInt(x,i)
+	 fmt.Printf("%d cap=%d\t%v\n",i,cap(y),y)
+	 x = y
+   }
+}
+//输出：
+//0  cap=1    [0]
+//1  cap=2    [0 1]
+//2  cap=4    [0 1 2]
+//3  cap=4    [0 1 2 3]
+//4  cap=8    [0 1 2 3 4]
+//5  cap=8    [0 1 2 3 4 5]
+//6  cap=8    [0 1 2 3 4 5 6]
+//7  cap=8    [0 1 2 3 4 5 6 7]
+//8  cap=16   [0 1 2 3 4 5 6 7 8]
+//9  cap=16   [0 1 2 3 4 5 6 7 8 9]
+```
+
+优化后，向appendInt中传入可变参数
+
+```javascript
+func appendInt(x []int, y ...int) [] int{
+    var z []int
+    zlen := len(x) + len(y)
+    if zlen <= cap(x){ 
+       z = x[:zlen]
+    }else{
+       zcap := zlen
+       if zcap < 2*len(x){
+    	 zcap = 2 * len(x)
+       }
+       z = make([]int, zlen, zcap)	   
+       copy(z,x)
+    }
+    copy(z[len(x):], y)
+    
+    return z
+}
+
+func main() {
+   var y []int
+
+   y = appendInt(y,1,2,3,4,5,6,7)	
+   fmt.Printf("cap=%d\t%v\n",cap(y),y)
+}
+//输出：cap=7   [1 2 3 4 5 6 7]
+```
+
+### 06.slice对数组
+
+```javascript
+arr := [6]int{0,1,2,3,4,5}
+
+s := arr[2:]
+s1 := append(s,6)
+s2 := append(s1,7)
+s3 := append(s2,8)
+s4 := append(s3,9)
+
+fmt.Println(s)   //[2,3,4,5]
+fmt.Println(s1)  //[2,3,4,5,6]
+fmt.Println(s2)  //[2,3,4,5,6,7]
+fmt.Println(s3)  //[2,3,4,5,6,7,8]
+fmt.Println(s4)  //[2,3,4,5,6,7,8,9]
+fmt.Println(arr) //[0,1,2,3,4,5]
+```
+
+slice虽然是对数组操作，但是当超出数组边界时，此刻s1,s2,s3,s4都不在对`arr`进行view，而是重新在底层`new Array`，这步是GO操作的。添加元素时，如果超越cap，系统会重新分配更大的底层数组。现在只有s是对arr的一种view
+
+由于值传递的关系，必须接收append的返回值。
+
+### 07.slice push,pop,copy
+
+```javascript
+//向切片push一个值
+stack = append(stack,v)  //push v
+
+//弹出栈顶元素
+top := stack[len(stack) - 1]
+
+//返回弹出后元素slice
+stack = stack[:len(stack) - 1]
+
+//将s2拷贝到s1
+copy(s1,s2)
+```
+
+### 08.slice移除
+
+```javascript
+func remove(slice []int, i int) []int {
+   copy(slice[i:], slice[i+1:])
+   return slice[:len(slice)-1]
+}
+
+func main() {
+   s := []int{5, 6, 7, 8, 9}
+   fmt.Println(remove(s, 2)) // "[5 6 8 9]"
+}
+```
 
 
 
