@@ -264,23 +264,129 @@ func main() {
 }
 ```
 
+# 3.Map
 
+> Map中的key值是无序的。map[K]V，复合结构map[k1]map[k2]v
 
+哈希表是一种巧妙并且实用的数据结构。它是一个`无序`的key/value对的集合，其中所有的key都是不同的，然后通过给定的key可以在常数时间复杂度内检索、更新或删除对应的value。
 
+在Go语言中，一个map就是一个`哈希表`的引用，map类型可以写为`map[K]V`，其中`K`和`V`分别对应`key`和`value`。map中所有的key都有相同的类型，所有的value也有着相同的类型，但是key和value之间可以是不同的数据类型。
 
+### 01.创建map
 
+```javascript
+//第一种
+var ages map[string]int
 
+//第二种
+ages := make(map[string]int)
+ages["alice"] = 31
+ages["charlie"] = 34
 
+//第三种
+ages := map[string]int{
+    "alice":   31,
+    "charlie": 34,
+}
 
+fmt.Println(ages)  //map[alice:31 charlie:34]
+```
 
+### 02.删除map
 
+```javascript
+delete(ages, "alice")
 
+fmt.Println(ages) //map[charlie:34]
+```
 
+对map操作中，即使某个元素不存在也没有关系;如果一个查找失败将返回value类型对应的`零值`
 
+```javascript
+ages["kkk"] = ages["kkk"] + 1
+fmt.Println(ages) //map[charlie:34 kkk:1]
 
+delete(ages, "test")
+fmt.Println(ages) //map[charlie:34 kkk:1]
+```
 
+当map不存在时，会返回value类型对应的`零值`，如果value的类型为`int`，对应的零值`0`，就和真正的零值分不开。可以这样操作
 
+```javascript
+ages,ok := ages["kkk"]
+if !ok {
+//...
+}
+```
 
+### 03.简短赋值
+
+```javascript
+ages["kkk"] += 1
+//或
+ages["kkk"]++
+
+//但是绝对不能这样
+ages["test"] = ages["kkk"]++   //写法错误，go中赋值右侧是表达式，自增是语句不是表达式
+
+ages["kkk"]++
+ages["test"] = ages["kkk"]     //写法正确
+```
+
+> map中的元素并不是一个变量，不能对map的元素进行取地址操作： _ = &ages["kkk"]
+
+### 04.map遍历
+
+```javascript
+name := map[int]string{
+    3: "张三",
+	1: "李四",
+	5: "王五",
+	8: "李二麻子",
+}
+
+for k,v := range name{
+  fmt.Printf("%d\t%s\n",k,v)
+}
+//输出：
+//3       张三
+//1       李四
+//5       王五
+//8       李二麻子
+```
+
+由于map的`key`是无序的，所以想要map输出有顺序，就必须手动排序
+
+```javascript
+import (
+   "fmt"
+   "sort"
+)
+
+name := map[int]string{
+    3: "张三",
+    1: "李四",
+    5: "王五",
+    8: "李二麻子",
+}
+
+var names = make([]int,0, len(name))
+for k := range name{
+   names = append(names,k)
+}
+sort.Ints(names)
+fmt.Println(names)
+
+for k,v := range name{
+  fmt.Printf("%d\t%s\n",k,v)
+}
+//输出：
+//[1 3 6 9]
+//3       张三
+//1       李四
+//6       王五
+//9       李二麻子
+```
 
 
 
