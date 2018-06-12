@@ -1,6 +1,6 @@
 ﻿---
 layout: post
-title: webstrom 
+title: webstrom配置vue环境
 tagline: webstrom下面识别VUE文件
 category: vue      #分类
 author: wali    #作者
