@@ -8,7 +8,7 @@ tag: Go     #标签
 ghurl:        #github url
 ghurl_zip:   #github zip下载
 
-post_nav: ["1.数组", "2.Slice", "3.Map"]
+post_nav: ["1.数组", "2.Slice", "3.Map", "4.struct"]
 ---
 
 复合数据类型小菜主要讨论，记录五种类型一一数组、slice、map、结构体、JSON。数组和结构体是聚合类型，他们的值由许多元素或成员字段的值组成。数组是由同构的元素组成-每个数组元素都是完全相同的类型。结构体则是由异构的元素组成的。数组和结构体都是有固定内存大小的数据结构。相比之下，slice和map则是动态的数据结构，它们将根据需要动态增长。
@@ -388,9 +388,18 @@ for k,v := range name{
 //9       李二麻子
 ```
 
+# 4.struct
 
+### 01.定义
 
+```javascript
 
+type TreeNode Struct{
+	left, Right *TreeNode
+	Value int
+}
+
+```
 
 
 
