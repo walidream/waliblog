@@ -15,7 +15,7 @@ post_nav: false
 
 远程登录阿里云服务器，小菜这里用的是`putty`，大家看着用，反正只要登录上去就可以。 
 
-![ssl](http://p4mxf46uj.bkt.clouddn.com/nginx/nginx_1.jpg)
+![ssl](http://pi6ah6koe.bkt.clouddn.com/nginx/nginx_1.jpg)
 
 # 2.创建配置文件
 
