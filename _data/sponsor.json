@@ -14,6 +14,13 @@
 			"type":"wechat",
 			"accountID":"wxid_119012341123",
 			"account":"wxid_1190****1123",
+		},
+		{
+			"name":"wali",
+			"portrait":"http://pi6ah6koe.bkt.clouddn.com/portrait/zfbid_1110____4234.jpg",
+			"type":"zhifubao",
+			"accountID":"zfbid_111042454234",
+			"account":"zfbid_1110****4234",
 		}
 	]
 }
