@@ -17,8 +17,8 @@ $(function(){
 		owner: 'walidream',
 		repo: 'waliblog',
 		oauth: {
-			client_id: 'e7f2a78d2b02ec3e6137',
-			client_secret: '78539519f80b1a2ec10deb56876bde7fd175d1f3',
+			client_id: '3ddf84b1252297e2ffa4',
+			client_secret: '669522d8f53e46903520f12134b3bc938e550db3',
 			},
 	});
 	gitment.render('gitmentContainer');
