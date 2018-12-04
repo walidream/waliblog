@@ -11,6 +11,10 @@ ghurl_zip:   #github zip下载
 post_nav: false
 ---
 
+按照惯例，小菜先将写好的demo放上去。这里将内容写在一个文件，方便展示，如果小伙伴们写项目还是需要模块化好点。
+
+<script async src="//jsrun.net/exhKp/embed/all/light/"></script>
+
 在directive文件夹下创建一个`highilight.js`文件，将下面代码复制进去
 
 ```javascript
