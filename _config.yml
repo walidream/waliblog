@@ -27,8 +27,8 @@ sass:      #sass配置
 host: 127.0.0.1
 port: 4002
 baseurl: "/"    #网站的根路径 
-url: "http://pi6ah6koe.bkt.clouddn.com" #change this to the base hostname & protocol for your site
-publicPath: "" #'http://pi6ah6koe.bkt.clouddn.com' #公共路径
+url: "http://pif1uj55s.bkt.clouddn.com" #change this to the base hostname & protocol for your site
+publicPath: "" #'http://pif1uj55s.bkt.clouddn.com' #公共路径
 
 google_analytics:
 # cayman-blog date format
