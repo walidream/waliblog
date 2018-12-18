@@ -41,6 +41,12 @@
   .article-content {
     display: block;
     width: 940px;
+	
+	ul{
+	   list-style-type: inherit !important;
+	   margin: 0 0 0 30px;
+	}
+	    
   }
   .article-nav-no{
     width: 1200px !important;
@@ -64,11 +70,11 @@
     margin-bottom: 1em;
   }
   a{
-    color: #42A8E1;
-    text-decoration: underline;
+    color: #42A8E1;    
   }
   a:hover{
     color: #2a6496;
+	text-decoration: underline;
   }
   
   pre {
