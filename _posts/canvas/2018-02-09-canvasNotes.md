@@ -7,6 +7,7 @@ author: wali    #作者
 tag: canvas     #标签
 ghurl:        #github url
 ghurl_zip:   #github zip下载
+comments: true
 
 post_nav: ['1.获取绘图环境','2.绘线条','3.绘制矩形','4.图形变换','5.变换矩阵','6.fillStyle填充样式','7.文本渲染','8.阴影','9.透明度','10.常用']
 ---

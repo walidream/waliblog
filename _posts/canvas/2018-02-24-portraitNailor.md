@@ -7,6 +7,7 @@ author: wali    #作者
 tag: canvas     #标签
 ghurl: https://github.com/walidream/canvasPortraitTailor.git      #github url
 ghurl_zip: https://github.com/walidream/canvasPortraitTailor.git  #github zip下载
+comments: true
 
 post_nav: ['1.判断本地图片宽度和高度','2.绘制头像','3.绘制矩形','4.预览','5.获取圆上任意地点坐标','6.两点间的距离','7.将以base64的图片url数据转换为file']
 ---

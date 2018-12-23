@@ -7,6 +7,7 @@ author: wali    #作者
 tag: Go     #标签
 ghurl:        #github url
 ghurl_zip:   #github zip下载
+comments: true
 
 post_nav: ['1.General(常规)','2.Integer(整型)','3.Integer width(整型宽度)','4.Float(浮点型)','5.String(字符型)','6.String Width(字符型宽度)','7.Struct(结构体)','8.Boolean(布尔型)','9.Pointer(指针)']
 ---

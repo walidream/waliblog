@@ -7,6 +7,7 @@ author: wali    #作者
 tag: vue     #标签
 ghurl:        #github url
 ghurl_zip:   #github zip下载
+comments: true
 
 post_nav: ["1.安装webstrom","2.破解webstrom","3.webstrom支持VUE文件","4.webstrom添加vue模板","5.不识别index"]
 ---
@@ -31,13 +32,13 @@ post_nav: ["1.安装webstrom","2.破解webstrom","3.webstrom支持VUE文件","4.
 
 打开webstrom编辑器，在`file -> settings -> plugins ` 选择 `Browse repositories...` 搜索 `vue` 选中安装。这里小菜安装过了
 
-![ssl](http://pif1uj55s.bkt.clouddn.com/vue/vue_01.jpg)
+![ssl](http://walidream.com:9999/blogImage/vue/vue_01.jpg)
 
-![ssl](http://pif1uj55s.bkt.clouddn.com/vue/vue_02.jpg)
+![ssl](http://walidream.com:9999/blogImage/vue/vue_02.jpg)
 
 设置好了，在`file -> settings -> Editor -> file Types` 找到 `Vue.js Template`模板 选中后在下面添加`+` `*.vue`文件
 
-![ssl](http://pif1uj55s.bkt.clouddn.com/vue/vue_03.jpg)
+![ssl](http://walidream.com:9999/blogImage/vue/vue_03.jpg)
 
 # 4.webstrom添加vue模板
 
@@ -57,7 +58,7 @@ post_nav: ["1.安装webstrom","2.破解webstrom","3.webstrom支持VUE文件","4.
 </scripte>
 ```
 
-![ssl](http://pif1uj55s.bkt.clouddn.com/vue/vue_04.jpg)
+![ssl](http://walidream.com:9999/blogImage/vue/vue_04.jpg)
 
 最后重新启动webstrom就好了。在这里可以大喊一声`我胡汉三又回来了`可以愉快的搬砖了。
 
@@ -65,12 +66,12 @@ post_nav: ["1.安装webstrom","2.破解webstrom","3.webstrom支持VUE文件","4.
 
 回到上面提到那个问题，就是在创建`index.vue`文件时，总是显示`txt`，也没有了高亮，语法提示很是不爽。百度一下，问题出在`file type`上
 
-![ssl](http://pif1uj55s.bkt.clouddn.com/vue/vue_05.jpg)
+![ssl](http://walidream.com:9999/blogImage/vue/vue_05.jpg)
 
 解决方案是找到`index.vue`当前的图标，在`file -> settings -> Editor -> file Types`，然后在下面找到`index.vue`删除这个文件类型，保存就可以了。
 
-![ssl](http://pif1uj55s.bkt.clouddn.com/vue/vue_06.jpg)
-![ssl](http://pif1uj55s.bkt.clouddn.com/vue/vue_07.jpg)
+![ssl](http://walidream.com:9999/blogImage/vue/vue_06.jpg)
+![ssl](http://walidream.com:9999/blogImage/vue/vue_07.jpg)
 
 其实只是因为在txt文件类型中添加了`index.vue`，是自己误添加的，删除就没事了。像`*.js`文件等等出现的问题都是这个原因。
 

@@ -125,8 +125,11 @@ table{
     background-color: transparent;	
 	thead{
 		th{
+			padding: 6px 2px;
 			font-weight:700;
-			color:#333;
+			color:#333;			 
+			background-color: #eee;    
+			border: 1px solid #ddd;
 		}
 	}
 	tr:nth-child(even){

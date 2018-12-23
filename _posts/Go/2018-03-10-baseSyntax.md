@@ -7,6 +7,7 @@ author: wali    #作者
 tag: Go     #标签
 ghurl:        #github url
 ghurl_zip:   #github zip下载
+comments: true
 
 post_nav: ['1.整型','2.浮点数','3.复数','4.布尔型','5.字符串']
 ---

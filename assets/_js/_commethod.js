@@ -4,24 +4,6 @@
  
 import $ from "../../_wp/node_modules/jquery/dist/jquery.js";
 
-//获取首页评论
-export function getHomeComment(){
-
-	$.get('https://api.github.com/repos/walidream/waliblog/issues',function(data){
-		if(data.length>0){
-			var ci = '';
-			data.forEach(function(val,ind){
-				if(ind < 10){
-					var commentItem = '<li class="comment-item"><span class="comment-user">'+val.user.login+'：</span><a href="javascript:void(0)" class="comment-link">'+val.body+'</a></li>';
-					ci += commentItem;
-				}
-			});
-			$('#home-comment').empty().append(ci);
-		}
-	});
-   
-}
-
 //post导航淡入淡出
 export function navFade(){
     $(window).scroll( function(){

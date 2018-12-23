@@ -1,0 +1,20 @@
+{
+  "name": "wp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts":{
+	"dist": "yarn webpack"
+  },
+  "dependencies": {
+    "@babel/core": "next",
+    "@babel/preset-env": "next",
+    "babel-loader": "8.0.0-beta.0",
+    "clean-webpack-plugin": "^0.1.17",
+    "gitment": "^0.0.3",
+    "jquery": "^3.2.1",
+    "rimraf": "^2.6.2",
+    "uglifyjs-webpack-plugin": "^1.1.1",
+    "webpack": "^3.8.1"
+  }
+}

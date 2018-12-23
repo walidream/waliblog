@@ -7,6 +7,7 @@ author: wali    #作者
 tag: canvas     #标签
 ghurl:        #github url
 ghurl_zip:   #github zip下载
+comments: true
 
 post_nav: ['1.canvas转化Base64','2.file对象获取url','3.base64转化Blob','4.获取本地图片base64','5.canvas传递到后台']
 ---

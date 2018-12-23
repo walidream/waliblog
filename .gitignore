@@ -5,5 +5,5 @@ Gemfile.lock
 *.gem
 .idea
 
-_wp
-
+_wp/node_modules
+_wp/yarn.lock
