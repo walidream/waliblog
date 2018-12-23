@@ -47,7 +47,7 @@ layout: default
                 {% assign date_format = site.cayman-blog.date_format | default: "%b %-d, %Y" %}
                 <span class="post-timer"><i class="iconfont wali-icon-riqi"></i><em>{{ post.date | date: date_format }}</em></span>
                 <span class="post-visit"><i class="iconfont wali-icon-fangwenliang"></i><em>访问量 <strong>(<span data-hk-page="{{ site.url | append: post.url }}"> - </span>)</strong></em></span>
-                <span class="post-discuss"><i class="iconfont wali-icon-pinglun1"></i><em>评论数 <strong>(<span data-gh-comment=""> - </span>)</strong></em></span>
+                <span class="post-discuss"><i class="iconfont wali-icon-pinglun1"></i><em>评论数<strong>(<span class='disqus-comment-count' data-disqus-url="{{ site.url }}{{ post.url }}"></span>)</strong></em></span>
                 <span class="post-tag"><i class="iconfont wali-icon-biaoqian"></i><em> #{{post.tag}}</em></span>
             </div>
         </div>
