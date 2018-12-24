@@ -110,12 +110,14 @@
 }
 
 
-#discuss{
+.disqus{
   position: relative;
   display: block;
-  margin: 0 auto;
-  width: 990px;
-  min-width: 990px;
+  margin: 30px auto 30px auto;
+  width: 1200px;
+  .article-nav-no{
+    width: 1200px !important;
+  }
 }
 
 table{
