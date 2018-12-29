@@ -191,6 +191,31 @@ body{
     border-width: 10px 10px 0 10px;
     border-color: #019fe8 transparent transparent transparent;
   }
+  .attention-weibo:hover:before{
+	position: absolute;
+    top:-409px;
+    left: -144px;
+    content: '';
+    display: block;
+    width: 300px;
+    height: 400px;
+    background:url('http://walidream.com:9999/blogImage/assets/image/wali/weibo.png')no-repeat center;
+    background-size:cover;
+    border-radius: 5px;
+    box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+  .attention-weibo:hover:after{
+	content: '';
+    display: block;
+    position: absolute;
+    top: -9px;
+    left: 6px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 10px 0 10px;
+    border-color: #FF0000 transparent transparent transparent;
+  }
 
 }
 .current-pageNum{

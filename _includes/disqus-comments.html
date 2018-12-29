@@ -1,14 +1,7 @@
 {% if page.comments %} 
-
-	{% if page.post_nav %}
-		<div class="disqus">
-			<div id="disqus_thread"></div>
-		</div>
-	{% else %}
-		<div class="disqus article-nav-no">
-			<div id="disqus_thread"></div>
-		</div>
-	{% endif %}
+<div id="disqus">
+	<div id="disqus_thread"></div>
+</div>
 <script>
 	/*var disqus_cofig = function(){
 		this.page.url = 'http://waliblog-com{{ page.url }}';
