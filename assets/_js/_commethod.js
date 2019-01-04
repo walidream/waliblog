@@ -3,6 +3,18 @@
  */
  
 import $ from "../../_wp/node_modules/jquery/dist/jquery.js";
+import {Disqus} from './_disqus';
+
+//获取最新评论
+export function getLastComment(){
+	
+	new Disqus().forumsListPosts().then(data=>{
+		console.log('data',data)
+	},err=>{
+		console.log('err',err)
+	})
+	
+}
 
 //post导航淡入淡出
 export function navFade(){

@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -10444,17 +10444,29 @@ return jQuery;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.getLastComment = getLastComment;
 exports.navFade = navFade;
 exports.backTop = backTop;
 
 var _jquery = _interopRequireDefault(__webpack_require__(0));
+
+var _disqus = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Created by Administrator on 2017/11/26.
  */
-//post导航淡入淡出
+//获取最新评论
+function getLastComment() {
+  new _disqus.Disqus().forumsListPosts().then(function (data) {
+    console.log('data', data);
+  }, function (err) {
+    console.log('err', err);
+  });
+} //post导航淡入淡出
+
+
 function navFade() {
   (0, _jquery.default)(window).scroll(function () {
     var iTop = (0, _jquery.default)(window).scrollTop(); //鼠标滚动的距离
@@ -10494,8 +10506,69 @@ function backTop() {
 }
 
 /***/ }),
-/* 2 */,
-/* 3 */
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Disqus = exports.http = void 0;
+
+var _jquery = _interopRequireDefault(__webpack_require__(0));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var protocol = 'https://';
+var hostName = 'disqus.com/api/3.0';
+var http = {
+  forums: {
+    listPosts: "".concat(protocol).concat(hostName, "/listPosts.json")
+  }
+};
+exports.http = http;
+
+var Disqus =
+/*#__PURE__*/
+function () {
+  function Disqus() {
+    _classCallCheck(this, Disqus);
+  }
+
+  _createClass(Disqus, [{
+    key: "forumsListPosts",
+    value: function forumsListPosts() {
+      return new Promise(function (resolve, reject) {
+        _jquery.default.get(http.forums.listPosts, {
+          'forum': 'waliblog-com',
+          'api_key': 'zcVibGfa97M62yEpiflGjzeKYNnaJyBo92prqU87zQ3rRzRanwGEehchMr7DIHiK'
+        }, function (data) {
+          if (0 == data.code) {
+            resolve(data.response);
+          } else {
+            reject(data);
+          }
+        });
+      });
+    }
+  }]);
+
+  return Disqus;
+}();
+
+exports.Disqus = Disqus;
+
+/***/ }),
+/* 3 */,
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
