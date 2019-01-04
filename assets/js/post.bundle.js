@@ -10547,14 +10547,20 @@ function () {
     key: "forumsListPosts",
     value: function forumsListPosts() {
       return new Promise(function (resolve, reject) {
-        _jquery.default.get(http.forums.listPosts, {
-          'forum': 'waliblog-com',
-          'api_key': 'zcVibGfa97M62yEpiflGjzeKYNnaJyBo92prqU87zQ3rRzRanwGEehchMr7DIHiK'
-        }, function (data) {
-          if (0 == data.code) {
-            resolve(data.response);
-          } else {
-            reject(data);
+        _jquery.default.ajax(http.forums.listPosts, {
+          type: 'GET',
+          data: {
+            'forum': 'waliblog-com',
+            'api_key': 'zcVibGfa97M62yEpiflGjzeKYNnaJyBo92prqU87zQ3rRzRanwGEehchMr7DIHiK'
+          },
+          dataType: 'json',
+          crossDomain: true,
+          success: function success(data) {
+            if (0 == data.code) {
+              resolve(data.response);
+            } else {
+              reject(data);
+            }
           }
         });
       });
