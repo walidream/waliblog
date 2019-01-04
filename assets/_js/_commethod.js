@@ -4,12 +4,22 @@
  
 import $ from "../../_wp/node_modules/jquery/dist/jquery.js";
 import {Disqus} from './_disqus';
+import {TimeUtil} from './_time';
 
 //获取最新评论
 export function getLastComment(){
-	
 	new Disqus().forumsListPosts().then(data=>{
-		console.log('data',data)
+		let li = '';
+		data.forEach((val,ind)=>{
+			if(ind < 20){
+				let time = new TimeUtil(new Date(val.createdAt)).timeYMDHMS1();
+				let commentItem = `<div class="comment-item"><div class="spacing-bottom-narrow"><a class="message" href="javascript:void(0);">${val.message}</a></div><div class="user"><em class="name"> ${val.author.name} </em><span class="time">${time}</span></div></div>`;
+				li += commentItem;
+			}			
+		})
+		$('#nocommnet').hide();
+		$('#home-comment').empty().append(li);		
+		
 	},err=>{
 		console.log('err',err)
 	})

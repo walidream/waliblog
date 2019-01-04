@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -10452,6 +10452,8 @@ var _jquery = _interopRequireDefault(__webpack_require__(0));
 
 var _disqus = __webpack_require__(2);
 
+var _time = __webpack_require__(3);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -10460,7 +10462,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //获取最新评论
 function getLastComment() {
   new _disqus.Disqus().forumsListPosts().then(function (data) {
-    console.log('data', data);
+    var li = '';
+    data.forEach(function (val, ind) {
+      if (ind < 20) {
+        var time = new _time.TimeUtil(new Date(val.createdAt)).timeYMDHMS1();
+        var commentItem = "<div class=\"comment-item\"><div class=\"spacing-bottom-narrow\"><a class=\"message\" href=\"javascript:void(0);\">".concat(val.message, "</a></div><div class=\"user\"><em class=\"name\"> ").concat(val.author.name, " </em><span class=\"time\">").concat(time, "</span></div></div>");
+        li += commentItem;
+      }
+    });
+    (0, _jquery.default)('#nocommnet').hide();
+    (0, _jquery.default)('#home-comment').empty().append(li);
   }, function (err) {
     console.log('err', err);
   });
@@ -10531,7 +10542,7 @@ var protocol = 'https://';
 var hostName = 'disqus.com/api/3.0';
 var http = {
   forums: {
-    listPosts: "".concat(protocol).concat(hostName, "/listPosts.json")
+    listPosts: "".concat(protocol).concat(hostName, "/forums/listPosts.json")
   }
 };
 exports.http = http;
@@ -10547,35 +10558,20 @@ function () {
     key: "forumsListPosts",
     value: function forumsListPosts() {
       return new Promise(function (resolve, reject) {
-        /*$.ajax(http.forums.listPosts,{
-        	type:'GET',
-        	data:{
-        		'forum':'waliblog-com',
-        		'api_key':'zcVibGfa97M62yEpiflGjzeKYNnaJyBo92prqU87zQ3rRzRanwGEehchMr7DIHiK'
-        	},
-        	dataType: 'json',
-        	crossDomain:true,
-        	success:function(data){
-        		if(0 == data.code){
-        			resolve(data.response);
-        		}else{
-        			reject(data);
-        		}
-        	}
-        	
-        })*/
-        console.log('请求url', "".concat(http.forums.listPosts, "?forum=waliblog-com&api_key=zcVibGfa97M62yEpiflGjzeKYNnaJyBo92prqU87zQ3rRzRanwGEehchMr7DIHiK"));
-
-        _jquery.default.ajax({
-          type: "GET",
-          url: "".concat(http.forums.listPosts, "?forum=waliblog-com&api_key=zcVibGfa97M62yEpiflGjzeKYNnaJyBo92prqU87zQ3rRzRanwGEehchMr7DIHiK"),
-          dataType: "jsonp",
-          jsonpCallback: "callback123",
-          success: function success(data) {
-            console.log(data);
+        _jquery.default.ajax(http.forums.listPosts, {
+          type: 'GET',
+          data: {
+            'forum': 'waliblog-com',
+            'api_key': 'zcVibGfa97M62yEpiflGjzeKYNnaJyBo92prqU87zQ3rRzRanwGEehchMr7DIHiK'
           },
-          error: function error(jqXHR) {
-            console.log("发生错误：" + jqXHR.status);
+          dataType: 'json',
+          crossDomain: true,
+          success: function success(data) {
+            if (0 == data.code) {
+              resolve(data.response);
+            } else {
+              reject(data);
+            }
           }
         });
       });
@@ -10588,8 +10584,138 @@ function () {
 exports.Disqus = Disqus;
 
 /***/ }),
-/* 3 */,
-/* 4 */
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.TimeUtil = void 0;
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+//时间格式化
+var TimeUtil =
+/*#__PURE__*/
+function () {
+  function TimeUtil(dat) {
+    _classCallCheck(this, TimeUtil);
+
+    if ('' == dat || !dat) return '';
+    this.$date = this.convert(dat);
+    this.year = this.$date.getFullYear();
+    this.month = this.$date.getMonth() + 1;
+    this.day = this.$date.getDate();
+    this.hour = this.$date.getHours();
+    this.minute = this.$date.getMinutes();
+    this.second = this.$date.getSeconds();
+  } //将参数转成date对象
+
+
+  _createClass(TimeUtil, [{
+    key: "convert",
+    value: function convert(par) {
+      var type = _typeof(par);
+
+      switch (type) {
+        case 'object':
+          return par;
+          break;
+
+        case 'number':
+          return new Date(par);
+          break;
+
+        case 'string':
+          var tmp = par.replace(/\-/g, "/");
+          return new Date(tmp);
+          break;
+      }
+    } //将小于9的字符串前缀补零
+
+  }, {
+    key: "formatNumber",
+    value: function formatNumber(n) {
+      n = n.toString();
+      return n[1] ? n : '0' + n;
+    } //将时间对象转换 YYYY/MM/DD hh:mm:ss
+
+  }, {
+    key: "timeYMDHMS",
+    value: function timeYMDHMS() {
+      return [this.year, this.month, this.day].map(this.formatNumber).join('/') + ' ' + [this.hour, this.minute, this.second].map(this.formatNumber).join(':');
+    } //将时间对象转换YYYY-MM-DD hh:mm:ss
+
+  }, {
+    key: "timeYMDHMS1",
+    value: function timeYMDHMS1() {
+      return [this.year, this.month, this.day].map(this.formatNumber).join('-') + ' ' + [this.hour, this.minute, this.second].map(this.formatNumber).join(':');
+    } //将时间对象转换MM-DD hh:mm
+
+  }, {
+    key: "timeMDhs",
+    value: function timeMDhs() {
+      return [this.month, this.day].map(this.formatNumber).join('-') + ' ' + [this.hour, this.minute].map(this.formatNumber).join(':');
+    } //将时间对象转换YYYY.MM.DD
+
+  }, {
+    key: "timeYMD",
+    value: function timeYMD() {
+      return [this.year, this.month, this.day].map(this.formatNumber).join('.');
+    } //将时间对象转换YYYY-MM-DD
+
+  }, {
+    key: "timeYMD1",
+    value: function timeYMD1() {
+      return [this.year, this.month, this.day].map(this.formatNumber).join('-');
+    } //将时间对象转换YYYY/MM/DD
+
+  }, {
+    key: "timeYMD2",
+    value: function timeYMD2() {
+      return [this.year, this.month, this.day].map(this.formatNumber).join('/');
+    } //将时间对象转换 4月1日 ,昨天,今天,明天
+
+  }, {
+    key: "timeMD",
+    value: function timeMD() {
+      var today = new Date();
+
+      if (today.getFullYear() == this.year && today.getMonth() + 1 == this.month && today.getDate() == this.day + 1) {
+        return '昨天';
+      } else if (today.getFullYear() == this.year && today.getMonth() + 1 == this.month && today.getDate() == this.day) {
+        return '今天';
+      } else if (today.getFullYear() == this.year && today.getMonth() + 1 == this.month && today.getDate() == this.day - 1) {
+        return '明天';
+      }
+
+      return this.month + '月' + this.day + '日';
+    } //将时间对象转换 hh:mm:ss
+
+  }, {
+    key: "timeHMS",
+    value: function timeHMS() {
+      return [this.hour, this.minute, this.second].map(this.formatNumber).join(':');
+    }
+  }]);
+
+  return TimeUtil;
+}();
+
+exports.TimeUtil = TimeUtil;
+
+/***/ }),
+/* 4 */,
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
