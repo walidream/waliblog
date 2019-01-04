@@ -10547,20 +10547,35 @@ function () {
     key: "forumsListPosts",
     value: function forumsListPosts() {
       return new Promise(function (resolve, reject) {
-        _jquery.default.ajax(http.forums.listPosts, {
-          type: 'GET',
-          data: {
-            'forum': 'waliblog-com',
-            'api_key': 'zcVibGfa97M62yEpiflGjzeKYNnaJyBo92prqU87zQ3rRzRanwGEehchMr7DIHiK'
-          },
-          dataType: 'json',
-          crossDomain: true,
+        /*$.ajax(http.forums.listPosts,{
+        	type:'GET',
+        	data:{
+        		'forum':'waliblog-com',
+        		'api_key':'zcVibGfa97M62yEpiflGjzeKYNnaJyBo92prqU87zQ3rRzRanwGEehchMr7DIHiK'
+        	},
+        	dataType: 'json',
+        	crossDomain:true,
+        	success:function(data){
+        		if(0 == data.code){
+        			resolve(data.response);
+        		}else{
+        			reject(data);
+        		}
+        	}
+        	
+        })*/
+        console.log('请求url', "".concat(http.forums.listPosts, "?forum=waliblog-com&api_key=zcVibGfa97M62yEpiflGjzeKYNnaJyBo92prqU87zQ3rRzRanwGEehchMr7DIHiK"));
+
+        _jquery.default.ajax({
+          type: "GET",
+          url: "".concat(http.forums.listPosts, "?forum=waliblog-com&api_key=zcVibGfa97M62yEpiflGjzeKYNnaJyBo92prqU87zQ3rRzRanwGEehchMr7DIHiK"),
+          dataType: "jsonp",
+          jsonpCallback: "callback123",
           success: function success(data) {
-            if (0 == data.code) {
-              resolve(data.response);
-            } else {
-              reject(data);
-            }
+            console.log(data);
+          },
+          error: function error(jqXHR) {
+            console.log("发生错误：" + jqXHR.status);
           }
         });
       });
