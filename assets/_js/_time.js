@@ -65,6 +65,28 @@ export class TimeUtil{
   timeHMS(){
     return [this.hour, this.minute, this.second].map(this.formatNumber).join(':');
   }
+  
+  daysAgo(){
+	const tian = 24 * 60 * 60 * 1000;
+
+    let date = Math.floor((new Date() - this.$date) / tian);	   
+	let hour = Math.floor((new Date() - this.$date) / (60 * 60 * 1000));
+	let min = Math.floor((new Date() - this.$date) / (60 * 1000));
+	let second = Math.floor((new Date() - this.$date) / (1000))
+	
+	if( 0 < date && date <= 30 ){
+	   return `${date} days ago`;
+    }else if( 0 < hour && hour <=59 ){
+		return `${hour} hours ago`;
+	}else if( 0 < min && min <=59 ){
+		return `${min} minutes ago`;
+	}else if( 0 < second && second <=59 ){
+		return `${second} seconds ago`;
+	}
+	   
+    return this.timeYMD1();	   
+   }
+  
 }
 
 

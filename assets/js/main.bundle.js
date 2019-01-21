@@ -10465,7 +10465,7 @@ function getLastComment() {
     var li = '';
     data.forEach(function (val, ind) {
       if (ind < 20) {
-        var time = new _time.TimeUtil(new Date(val.createdAt)).timeYMDHMS1();
+        var time = new _time.TimeUtil(new Date(val.createdAt)).daysAgo();
         var commentItem = "<div class=\"comment-item\"><div class=\"spacing-bottom-narrow\"><a class=\"message\" href=\"javascript:void(0);\">".concat(val.message, "</a></div><div class=\"user\"><em class=\"name\"> ").concat(val.author.name, " </em><span class=\"time\">").concat(time, "</span></div></div>");
         li += commentItem;
       }
@@ -10705,6 +10705,27 @@ function () {
     key: "timeHMS",
     value: function timeHMS() {
       return [this.hour, this.minute, this.second].map(this.formatNumber).join(':');
+    }
+  }, {
+    key: "daysAgo",
+    value: function daysAgo() {
+      var tian = 24 * 60 * 60 * 1000;
+      var date = Math.floor((new Date() - this.$date) / tian);
+      var hour = Math.floor((new Date() - this.$date) / (60 * 60 * 1000));
+      var min = Math.floor((new Date() - this.$date) / (60 * 1000));
+      var second = Math.floor((new Date() - this.$date) / 1000);
+
+      if (0 < date && date <= 30) {
+        return "".concat(date, " days ago");
+      } else if (0 < hour && hour <= 59) {
+        return "".concat(hour, " hours ago");
+      } else if (0 < min && min <= 59) {
+        return "".concat(min, " minutes ago");
+      } else if (0 < second && second <= 59) {
+        return "".concat(second, " seconds ago");
+      }
+
+      return this.timeYMD1();
     }
   }]);
 

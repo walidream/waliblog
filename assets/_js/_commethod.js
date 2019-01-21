@@ -12,7 +12,7 @@ export function getLastComment(){
 		let li = '';
 		data.forEach((val,ind)=>{
 			if(ind < 20){
-				let time = new TimeUtil(new Date(val.createdAt)).timeYMDHMS1();
+				let time = new TimeUtil(new Date(val.createdAt)).daysAgo();
 				let commentItem = `<div class="comment-item"><div class="spacing-bottom-narrow"><a class="message" href="javascript:void(0);">${val.message}</a></div><div class="user"><em class="name"> ${val.author.name} </em><span class="time">${time}</span></div></div>`;
 				li += commentItem;
 			}			
