@@ -18,6 +18,8 @@ post_nav: ['1.判断本地图片宽度和高度','2.绘制头像','3.绘制矩�
 
 原本写这个demo想未大家封装成一个jq插件，但后来由于时间问题就没有做了，感兴趣的小伙伴可以自己玩玩。小菜把demo放在个人github上，想下载的点击页面上按钮。别忘了在github上给个星哦！
 
+> 备用演示地址 [http://walidream.com/example/portraitNailor/](http://walidream.com/example/portraitNailor/ "http://walidream.com/example/portraitNailor/"){:target="_blank"}
+
 <script async src="//jsrun.net/X2gKp/embed/all/light/"></script>
 
 

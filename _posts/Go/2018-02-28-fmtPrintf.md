@@ -1,6 +1,6 @@
 ﻿---
 layout: post
-title: fmt.Printf方法详解   #标题
+title: Go fmt.Printf方法详解(3)   #标题
 tagline: 
 category: Go      #分类
 author: wali    #作者

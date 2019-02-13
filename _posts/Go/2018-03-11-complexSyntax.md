@@ -1,6 +1,6 @@
 ﻿---
 layout: post
-title: Go语言数据类型(二)   #标题
+title: Go 语言数据类型(6)   #标题
 tagline: 介绍数组、Slice(切片)、Map、结构体、JSON
 category: Go      #分类
 author: wali    #作者

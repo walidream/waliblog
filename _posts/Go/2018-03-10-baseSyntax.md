@@ -1,6 +1,6 @@
 ﻿---
 layout: post
-title: Go语言数据类型(一)   #标题
+title: Go 语言数据类型(5)   #标题
 tagline: 介绍整型、浮点型、复数、布尔型、字符串
 category: Go      #分类
 author: wali    #作者
