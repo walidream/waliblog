@@ -4,6 +4,6 @@ _site
 Gemfile.lock
 *.gem
 .idea
-
+.tmp.drivedownload
 _wp/node_modules
 _wp/yarn.lock
