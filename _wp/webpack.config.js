@@ -31,7 +31,13 @@ var _config = {
 			}
 		  }
 		}
-	  ]
+	  ],
+	  loaders: [
+		  {
+			test: /\.json$/,
+			loader: 'json-loader'
+		  }
+		]
 	},
 	plugins:[
 		/***加载jquery**/

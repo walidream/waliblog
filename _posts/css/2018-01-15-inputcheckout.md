@@ -9,7 +9,7 @@ ghurl:        #github url
 ghurl_zip:    #github zip下载
 comments: true
 
-post_nav: false
+post_nav: ["1.html结构","2.css样式"]
 ---
 
 以前写checkbox的样式，用div,加上js才能达到切换效果，今天写个用css写个ckeckbox样式，喜欢的伙伴可以自己写写。用到css3属性，不是很清楚的伙伴就得多查查css文档了。
@@ -19,13 +19,17 @@ post_nav: false
 <script async src="//jsfiddle.net/waliblog/orxvab5c/embed/result,html,css/"></script>
 
 
+# 1.html结构
 
+```html
 
+```
 
+# 2.css样式
 
+```css
 
-
-
+```
 
 
 

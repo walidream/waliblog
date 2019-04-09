@@ -3,8 +3,11 @@
  */
  
 import $ from "../../_wp/node_modules/jquery/dist/jquery.js";
+import Clipboard from "../../_wp/node_modules/copy-to-clipboard/index.js"
 import {Disqus} from './_disqus';
 import {TimeUtil} from './_time';
+const fileNameJson = require('../json/fileName.json');
+require("../../_wp/node_modules/layui-layer/dist/layer.js");
 
 //获取最新评论
 export function getLastComment(){
@@ -58,9 +61,60 @@ export function backTop(){
     });
 }
 
+//添加复制 保存按钮
+export function addBtn(){
+	let doms = $('div.highlight');
+	
+	let btn = `<div class="copy-save"><span class="copy-code"><span class="iconfont wali-icon-fuzhi"></span>复制代码</span><span class="save-code"><span class="iconfont wali-icon-baocun"></span>保存文件</span></div>`;
+	
+	for(let i=0;i<doms.length;i++){
+		$('div.highlight').eq(i).append(btn);
+	}
+	
+	$(document).on('click', '.copy-code', function(e){
+	  copyCode(e);
+	});
+	
+	$(document).on('click', '.save-code', function(e){
+	  saveCode(e);
+	});
+}
 
+//复制代码
+export function copyCode(e){
+	let dom = $(e.target).parent().prev().find('code')[0];
+	let txt = dom.innerText;
+	
+	let flag = Clipboard(txt,{
+		debug: true,
+		message: 'Press  to copy',
+	});
+	
+	if(flag){
+		layer.msg("复制代码成功！")
+	}else{
+		layer.msg("复制代码失败！")
+	}
+}
 
+//保存代码
+export function saveCode(e){
+	let dom = $(e.target).parent().prev().find('code')[0];
+	
+	let cla = $(e.target).parents('.highlighter-rouge').attr('class');
+	let str = /language-([a-z]+)/.exec(cla)[1];	
+	let houzui = fileNameJson[str]?fileNameJson[str]:'txt';
+	let fileName = `save.${houzui}`;
+	let txt = dom.innerText;
+	createAndDownloadFile(fileName,txt);
+}
 
-
-
+function createAndDownloadFile(fileName, content) {
+    var aTag = document.createElement('a');
+    var blob = new Blob([content]);
+    aTag.download = fileName;
+    aTag.href = URL.createObjectURL(blob);
+    aTag.click();
+    URL.revokeObjectURL(blob);
+}
 
