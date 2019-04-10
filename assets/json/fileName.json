@@ -3,5 +3,6 @@
 	"html":"html",
 	"javascript":"js",
 	"nginx":"conf",
-	"java":"java"
+	"java":"java",
+	"txt":"txt"
 }

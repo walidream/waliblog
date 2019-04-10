@@ -28,7 +28,7 @@ vim test.com.conf
 ```
 输入`i`进入编辑
 
-```ruby
+```nginx
 server
 {
     listen 80;
@@ -59,7 +59,7 @@ server
 
 将7000端口转给3000，这个配置有https，如果不需要就删掉`ssl`相关的
 
-```ruby
+```nginx
 server {
 	listen 7000 ssl;
 	server_name bbbb.test.com;
