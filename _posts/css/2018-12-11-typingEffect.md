@@ -4,7 +4,7 @@ title:  css3 打字渐变效果 #标题
 tagline: css3打字效果，字体颜色渐变
 category: css      #分类
 author: wali    #作者
-tag: input     #标签
+tag: animation     #标签
 ghurl:        #github url
 ghurl_zip:    #github zip下载
 comments: true

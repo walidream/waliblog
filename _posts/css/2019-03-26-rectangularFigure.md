@@ -17,6 +17,9 @@ post_nav: ["1.html结构","2.css样式","3.script脚本"]
 <script async src="//jsrun.net/cQXKp/embed/all/light/"></script>
 
 
+> 备用演示地址 [http://walidream.com/example/css/rectangularFigure/](http://walidream.com/example/css/rectangularFigure/ "http://walidream.com/example/css/rectangularFigure/"){:target="_blank"}
+
+
 # 1.html结构
 
 ```html

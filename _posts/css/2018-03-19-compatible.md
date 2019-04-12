@@ -4,7 +4,7 @@ title:  PC端适配屏幕尺寸 #标题
 tagline: 适配1920、1366分辨率
 category: css      #分类
 author: wali    #作者
-tag: input     #标签
+tag: px     #标签
 ghurl:        #github url
 ghurl_zip:    #github zip下载
 comments: true
