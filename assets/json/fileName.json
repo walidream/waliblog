@@ -4,5 +4,6 @@
 	"javascript":"js",
 	"nginx":"conf",
 	"java":"java",
-	"txt":"txt"
+	"txt":"txt",
+	"linux":"sh"
 }
