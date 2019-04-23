@@ -5,5 +5,6 @@
 	"nginx":"conf",
 	"java":"java",
 	"txt":"txt",
-	"linux":"sh"
+	"linux":"sh",
+	"sql":"sql"
 }
