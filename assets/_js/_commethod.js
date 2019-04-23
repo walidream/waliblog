@@ -3,11 +3,13 @@
  */
  
 import $ from "../../_wp/node_modules/jquery/dist/jquery.js";
+
 import Clipboard from "../../_wp/node_modules/copy-to-clipboard/index.js"
 import {Disqus} from './_disqus';
 import {TimeUtil} from './_time';
 const fileNameJson = require('../json/fileName.json');
 require("../../_wp/node_modules/layui-layer/dist/layer.js");
+
 
 //获取最新评论
 export function getLastComment(){
@@ -117,4 +119,7 @@ function createAndDownloadFile(fileName, content) {
     aTag.click();
     URL.revokeObjectURL(blob);
 }
+
+
+
 

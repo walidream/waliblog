@@ -10,9 +10,6 @@ $(function(){
 	navFade();
 	//返回顶部
     backTop();
-	addBtn();
-	//复制代码
-	
-	//保存代码
-	
+	//添加复制按钮
+	addBtn();	
 });

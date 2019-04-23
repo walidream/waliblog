@@ -10941,7 +10941,7 @@ exports.TimeUtil = TimeUtil;
 /* 6 */
 /***/ (function(module, exports) {
 
-module.exports = {"css":"css","html":"html","javascript":"js","nginx":"conf","java":"java","txt":"txt"}
+module.exports = {"css":"css","html":"html","javascript":"js","nginx":"conf","java":"java","txt":"txt","linux":"sh"}
 
 /***/ }),
 /* 7 */
@@ -10972,9 +10972,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
   //post导航淡入淡出
   (0, _commethod.navFade)(); //返回顶部
 
-  (0, _commethod.backTop)();
-  (0, _commethod.addBtn)(); //复制代码
-  //保存代码
+  (0, _commethod.backTop)(); //添加复制按钮
+
+  (0, _commethod.addBtn)();
 });
 
 /***/ })

@@ -126,7 +126,17 @@ layout: compress
 </script>
 {% endif %}
 <!-- 插件 -->
+<script src="{{ '/assets/lib/jquery.min.js?v=' | append: site.github.build_revision | relative_url }}"></script>
 <script src="{{ '/assets/lib/av-mini-0.6.10.js?v=' | append: site.github.build_revision | relative_url }}"></script>
 <script src="{{ '/assets/lib/hit-kounter-lc-0.2.0.js?v=' | append: site.github.build_revision | relative_url }} "></script>
+<script src="{{ '/assets/lib/viewer-jquery.min.js?v=' | append: site.github.build_revision | relative_url }}"></script>
 
 <script src="{{ '/assets/js/post.bundle.js?v=' | append: site.github.build_revision | relative_url }}"></script>
+<script>
+$(function() {
+	$('body').viewer({
+		url: 'src',
+	});
+});
+</script>
+
