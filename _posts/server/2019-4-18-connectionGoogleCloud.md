@@ -9,7 +9,7 @@ ghurl:        #github url
 ghurl_zip:    #github zip下载
 comments: true
 
-post_nav: ["1.登录google服务器","2.xshell工具登录","3.添加密钥到google云上","4.用xshell连接"]
+post_nav: ["1.登录google服务器","2.xshell工具用户密码登录","3.xshell工具ssh登录"]
 ---
 
 记录用ssh工具XShell连接谷歌云服务器。
@@ -45,7 +45,7 @@ PasswordAuthentication yes //默认为no，改为yes开启密码登陆
 ### 给root用户设置密码
 
 ```
-passwd root
+passwd root  #设置root密码后直接可以用root账户登录
 ```
 
 ### 重启SSH服务使修改生效
@@ -54,12 +54,18 @@ passwd root
 /etc/init.d/ssh restart
 ```
 
-# 2.xshell工具登录
+# 2.xshell工具用户密码登录
+
+![ssl](http://walidream.com:9999/blogImage/server/server_32.png)
+
+# 3.xshell工具ssh登录
+
+### 生成ssh
 
 ![ssl](http://walidream.com:9999/blogImage/server/server_2.png)
 
 
-# 3.添加密钥到google云上
+### 添加密钥到google云上
 
 > 菜单 — 计算引擎 — 元数据 — SSH秘钥 — 修改 — 添加一项
 
@@ -72,7 +78,7 @@ passwd root
 ![ssl](http://walidream.com:9999/blogImage/server/server_4.png)
 
 
-# 4.用xshell连接
+### 用xshell连接
 
 ![ssl](http://walidream.com:9999/blogImage/server/server_5.png)
 

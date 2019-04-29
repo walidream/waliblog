@@ -26,7 +26,9 @@ Google Cloud Platform (以下简称GCP)是Google提供的云平台, 可以用来
 
 # 2.申请
 
-登陆 [Google Cloud Platform](https://console.cloud.google.com/getting-started?hl=zh-CN&pli=1 "https://console.cloud.google.com/getting-started?hl=zh-CN&pli=1"){:target="_blank"} 并填写相关信息
+登陆 [Google Cloud Platform](https://console.cloud.google.com/getting-started?hl=zh-CN&pli=1 "https://console.cloud.google.com/getting-started?hl=zh-CN&pli=1"){:target="_blank"} 并填写相关信息。
+如果想免费获取$300美金，需要添加一个支付账户。小菜在网页上没有添加成功过，尽管账号和信息填写正确。最后是用手机下载google pay在手机端完成的。希望
+对大家有帮助。
 
 
 
