@@ -4,10 +4,10 @@
 #articleBody {
   display: flex;
   flex-flow: row nowrap;
-  justify-content: space-between;
+  justify-content: center;
   align-items: flex-start;
   margin: 30px auto 30px auto;
-  width: 1200px;
+  width: 90%;
   overflow: hidden;
   .article-nav {
     display: block;
@@ -40,7 +40,7 @@
   }
   .article-content {
     display: block;
-    width: 940px;
+    max-width: 1100px;
 	
 	ul{
 	   list-style-type: inherit !important;
@@ -49,7 +49,31 @@
 	    
   }
   .article-nav-no{
-    width: 1200px !important;
+   
+  }
+  
+  .group-tag{
+	margin: 0 0 0 60px;
+	min-width:200px;
+	max-width:280px;
+	border:1px solid #3C8DBC;
+	background-color:#fff;
+	border-radius:5px;
+	box-shadow: 0 3px 8px 0 rgba(60,141,188, 0.2), 0 0 0 1px rgba(60,141,188, 0.08);
+	overflow:hidden;
+	.title{
+		margin: 0;
+		padding: 0 15px;		
+		height: 40px;
+		line-height: 40px;
+		color: #fff;
+		background: #3c8dbc;		
+	}
+  }
+  .jump-post{
+	margin:6px 0;
+	padding:0 15px;
+	display:block;
   }
 
   h1,h2,h3,h4,h5,h6 {

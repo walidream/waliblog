@@ -3,22 +3,37 @@ layout: post_default
 ---
 <article id="articleBody" itemscope itemtype="http://waliblog.com/">
     {% if page.post_nav %}
-    <div class="article-nav">
-        <ul class="article-nav-list">
-            {% for title in page.post_nav %}
-            <li><a href="{{ title | remove: '.' |remove: '('|remove: ')'| remove: '、' |prepend:'#'|replace:' ','-' |downcase }}" title="{{title}}">{{ title }}</a></li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div class="article-content ">
-        {{ content }}
-    </div>
+		<div class="article-nav">	
+			<ul class="article-nav-list">
+				{% for title in page.post_nav %}
+				<li><a href="{{ title | remove: '.' |remove: '('|remove: ')'| remove: '、' |prepend:'#'|replace:' ','-' |downcase }}" title="{{title}}">{{ title }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+		<div class="article-content ">
+			{{ content }}
+		</div>		
     {% else %}
-    <div class="article-content article-nav-no">
-        {{ content }}
-    </div>
+		<div class="article-content article-nav-no">
+			{{ content }}
+		</div>
     {% endif %}
+	<!--关联同一类文章的分类-->
+	{% assign group_tag = page.group_tag %}
+	{% if group_tag %}
+		{% assign tag = page.tag%}
+		{% assign postArr = site.tags[tag] | reverse %}
+		<div class="group-tag">
+		<h2 class="title">{{group_tag}}</h2>
+		{% for post in postArr %}
+		{% if post.group_tag == group_tag%}
+			<a class="jump-post" href="{{post.url}}" title="{{post.title}}">{{post.title}}</a>
+		{% endif %}
+		{% endfor%}
+		</div>
+	{% endif %}
 </article>
+
 
 
 

@@ -10,6 +10,7 @@ ghurl_zip:    #github zip下载
 comments: true
 
 post_nav: ["1.登录google服务器","2.xshell工具用户密码登录","3.xshell工具ssh登录"]
+group_tag: google云服务器
 ---
 
 记录用ssh工具XShell连接谷歌云服务器。

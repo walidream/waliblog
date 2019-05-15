@@ -10,6 +10,7 @@ ghurl_zip:    #github zip下载
 comments: true
 
 post_nav: ["1.准备工作","2.申请", "3.创建VM实例","4.防火墙规则","5.VPC网络","6.负载平衡","7.登陆服务器"]
+group_tag: google云服务器
 ---
 
 Google Cloud Platform (以下简称GCP)是Google提供的云平台, 可以用来搭建加速服务, 网站和存储数据等等, 本文将介绍如何申请GCP一年的免费试用、Linux服务器环境搭建。
