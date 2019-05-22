@@ -159,13 +159,3 @@ DEALLOCATE PREPARE stmt;
 ```
 
 ![ssl](http://walidream.com:9999/blogImage/server/server_50.png)
-
-
-
-
-
-
-
-
-
-

@@ -187,13 +187,3 @@ yum erase postgresql96
 
 
 
-
-
-
-
-
-
-
-
-
-
