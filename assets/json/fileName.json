@@ -7,5 +7,6 @@
 	"java":"java",
 	"txt":"txt",
 	"linux":"sh",
-	"sql":"sql"
+	"sql":"sql",
+	"diff":"txt"
 }
