@@ -68,11 +68,12 @@ export class TimeUtil{
   
   daysAgo(){
 	const tian = 24 * 60 * 60 * 1000;
-
-    let date = Math.floor((new Date() - this.$date) / tian);	   
-	let hour = Math.floor((new Date() - this.$date) / (60 * 60 * 1000));
-	let min = Math.floor((new Date() - this.$date) / (60 * 1000));
-	let second = Math.floor((new Date() - this.$date) / (1000))
+	
+	let time = new Date(Date.parse(this.$date) + (8 * 60 * 60 * 1000))
+    let date = Math.floor((new Date() - time) / tian);	   
+	let hour = Math.floor((new Date() - time) / (60 * 60 * 1000));
+	let min = Math.floor((new Date() - time) / (60 * 1000));
+	let second = Math.floor((new Date() - time) / (1000))
 	
 	if( 0 < date && date <= 30 ){
 	   return `${date} days ago`;

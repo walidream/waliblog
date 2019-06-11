@@ -10913,10 +10913,11 @@ function () {
     key: "daysAgo",
     value: function daysAgo() {
       var tian = 24 * 60 * 60 * 1000;
-      var date = Math.floor((new Date() - this.$date) / tian);
-      var hour = Math.floor((new Date() - this.$date) / (60 * 60 * 1000));
-      var min = Math.floor((new Date() - this.$date) / (60 * 1000));
-      var second = Math.floor((new Date() - this.$date) / 1000);
+      var time = new Date(Date.parse(this.$date) + 8 * 60 * 60 * 1000);
+      var date = Math.floor((new Date() - time) / tian);
+      var hour = Math.floor((new Date() - time) / (60 * 60 * 1000));
+      var min = Math.floor((new Date() - time) / (60 * 1000));
+      var second = Math.floor((new Date() - time) / 1000);
 
       if (0 < date && date <= 30) {
         return "".concat(date, " days ago");
@@ -10941,7 +10942,7 @@ exports.TimeUtil = TimeUtil;
 /* 6 */
 /***/ (function(module, exports) {
 
-module.exports = {"css":"css","html":"html","javascript":"js","js":"js","nginx":"conf","java":"java","txt":"txt","linux":"sh","sql":"sql"}
+module.exports = {"css":"css","html":"html","javascript":"js","js":"js","nginx":"conf","java":"java","txt":"txt","linux":"sh","sql":"sql","diff":"txt"}
 
 /***/ }),
 /* 7 */
