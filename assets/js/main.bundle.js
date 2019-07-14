@@ -10942,7 +10942,7 @@ exports.TimeUtil = TimeUtil;
 /* 6 */
 /***/ (function(module, exports) {
 
-module.exports = {"css":"css","html":"html","javascript":"js","js":"js","nginx":"conf","java":"java","txt":"txt","linux":"sh","sql":"sql","diff":"txt"}
+module.exports = {"css":"css","html":"html","javascript":"js","js":"js","nginx":"conf","java":"java","txt":"txt","linux":"sh","sql":"sql","diff":"txt","python":"python"}
 
 /***/ }),
 /* 7 */

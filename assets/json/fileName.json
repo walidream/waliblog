@@ -8,5 +8,6 @@
 	"txt":"txt",
 	"linux":"sh",
 	"sql":"sql",
-	"diff":"txt"
+	"diff":"txt",
+	"python":"python"
 }
