@@ -9,5 +9,6 @@
 	"linux":"sh",
 	"sql":"sql",
 	"diff":"txt",
-	"python":"python"
+	"python":"python",
+	"vim":"txt"
 }
