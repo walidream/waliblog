@@ -10,5 +10,6 @@
 	"sql":"sql",
 	"diff":"txt",
 	"python":"python",
-	"vim":"txt"
+	"vim":"txt",
+	"json":"json"
 }
