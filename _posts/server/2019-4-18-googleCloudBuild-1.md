@@ -1,6 +1,6 @@
 ﻿---
 layout: post
-title: Google Cloud Platform免费申请与搭建服务器   #标题
+title: Google Cloud Platform免费申请与搭建服务器(1)   #标题
 tagline:  Google Cloud Platform免费申请与搭建服务器
 category: server      #分类
 author: wali    #作者

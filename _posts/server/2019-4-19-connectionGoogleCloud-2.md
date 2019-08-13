@@ -1,6 +1,6 @@
 ﻿---
 layout: post
-title: 用ssh工具xShell连接google云服务器   #标题
+title: 用ssh工具xShell连接google云服务器(2)   #标题
 tagline: 用ssh工具xShell连接google云服务器
 category: server      #分类
 author: wali    #作者

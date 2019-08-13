@@ -1,6 +1,6 @@
 ﻿---
 layout: post
-title:  谷歌云用v2ray搭建梯子  #标题
+title:  谷歌云用v2ray搭建梯子(3)  #标题
 tagline: 用google云服务器搭建梯子 科学上网
 category: server      #分类
 author: wali    #作者
