@@ -1,6 +1,6 @@
 ﻿---
 layout: post
-title:  mySql 开发技巧及优化(1) #标题
+title:  mySql 开发技巧及优化 #标题
 tagline: mySql 开发技巧及优化
 category: SQL      #分类
 author: wali    #作者
