@@ -1,16 +1,16 @@
 ﻿---
 layout: post
-title: centos7安装 python3.6 #标题
-tagline: python3.7 入门教程
+title: centos7安装 python3.6  #标题
+tagline: centos7安装 python3.6
 category: python      #分类
 author: wali    #作者
-tag: Python     #标签
+tag: python     #标签
 ghurl:        #github url
 ghurl_zip:   #github zip下载
 comments: true
 
-post_nav: ["1.安装相关的包","2.下载python3","3.安装","4.安装pip3"]
-group_tag: python3.7 入门教程
+post_nav: ["1.安装相关的包","2.下载python3","3.安装","4.安装pip3"] 
+group_tag: python 杂记 
 ---
 
 CentOS 7.2 默认安装了python2.7.5 因为一些命令要用它比如yum 它使用的是python2.7.5。
@@ -85,3 +85,12 @@ ln -s /usr/local/python3/bin/pip3 /usr/bin/pip3
 
 我们可以通过pip install **安装python2的安装包 
 也可以通过pip3 install **安装python3的安装包
+
+
+
+
+
+
+
+
+

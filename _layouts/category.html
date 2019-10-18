@@ -33,15 +33,16 @@ layout: default
         <h3 class="article-title"><span><i class="iconfont wali-icon-zhuanti"></i></span> {{cate}}专题</h3>        
         {% assign curr_group = "" %}
         {% for post in posts %}
-            {% if post.group_tag %}
-                {% unless curr_group == post.group_tag %}
+            {% if post.group_tag %}                           
+                {% unless curr_group contains post.group_tag %}
                     <a class="special-topic" href="{{post.url}}">{{ post.group_tag }}</a>
-                    {% capture curr_group %}{{ post.group_tag }}{% endcapture %}
-                {% endunless  %}
+                    {% capture curr_group %}{{ curr_group | append: "|" | append:post.group_tag }}{% endcapture %}
+                {% endunless %}            
             {% endif %}
         {% endfor%}            
     </div>
     {% endunless %}
+   
     <div class="comment">
         <h3 class="comment-title"><span><i class="iconfont wali-icon-pinglun"></i></span> 最新评论</h3>
         <div class="comment-content">
