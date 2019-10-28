@@ -9,6 +9,10 @@
   margin: 30px auto 30px auto;
   width: 90%;
   overflow: hidden;
+  ol{
+	  list-style-type:decimal;
+	  list-style-position: inside;
+  }
   .article-nav {
     display: block;
     width: 260px;
