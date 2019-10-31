@@ -10,7 +10,7 @@ ghurl_zip:   #github zip下载
 comments: true
 
 post_nav: false
-group_tag: python Error 
+group_tag: Scrapy Error 
 ---
 
 

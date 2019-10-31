@@ -27,8 +27,7 @@ group_tag: cordova 教程
 
 下载完签名工具后，输入开放平台的应用包名，然后看生成的应用签名和开放平台上的应用签名是否一致。如果不一致，请将开放平台的应用签名修改为`最新生成的应用签名`
 
-![ssl](http://walidream.com:9999/blogImage/mobile/mobile_5.png)
-
+![ssl](http://walidream.com:9999/blogImage/mobile/mobile_3.png)
 
 
 

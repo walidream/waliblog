@@ -10,7 +10,7 @@ ghurl_zip:   #github zip下载
 comments: true
 
 post_nav: ["1.介绍","2.架构","3.核心组件","4.数据流转","5.核心组件交互图","6.核心类图"] 
-group_tag: Scrapy 
+group_tag: Scrapy 1.7
 ---
 
 在小菜初学`scrapy`时，从google上发现了几篇非常不错的文章，未经博主同意擅自将博主的文章收藏，主要怕日后看时，找不到此文章。小菜在这里向博主致敬，希望看到这篇帖子的小伙伴能够阅读原贴。

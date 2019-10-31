@@ -10,7 +10,7 @@ ghurl_zip:   #github zip下载
 comments: true
 
 post_nav: ["1.scrapy命令","2.入口","3.流程解析"] 
-group_tag: Scrapy 
+group_tag: Scrapy 1.7
 ---
 
 在小菜初学`scrapy`时，从google上发现了几篇非常不错的文章，未经博主同意擅自将博主的文章收藏，主要怕日后看时，找不到此文章。小菜在这里向博主致敬，希望看到这篇帖子的小伙伴能够阅读原贴。
