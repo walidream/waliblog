@@ -76,7 +76,9 @@ group_tag: python 杂记
 3. [12306 验证码识别 在线demo](http://littlebigluo.qicp.net:47720 "http://littlebigluo.qicp.net:47720")
 
 
+#### USER_AGENT
 
+1.[fake-useragent](https://github.com/hellysmile/fake-useragent "https://github.com/hellysmile/fake-useragent")
 
 
 
