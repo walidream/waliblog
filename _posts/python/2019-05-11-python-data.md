@@ -80,7 +80,9 @@ group_tag: python 杂记
 
 1.[fake-useragent](https://github.com/hellysmile/fake-useragent "https://github.com/hellysmile/fake-useragent")
 
+#### IP池
 
+1.[西刺代理](https://www.xicidaili.com/?_id=015448211445 "https://www.xicidaili.com/?_id=015448211445")
 
 
 
