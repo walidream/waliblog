@@ -9,7 +9,7 @@
 	"linux":"sh",
 	"sql":"sql",
 	"diff":"txt",
-	"python":"python",
+	"python":"py",
 	"vim":"txt",
-	"json":"json"
+	"json":"json"	
 }
