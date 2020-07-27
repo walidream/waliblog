@@ -282,6 +282,12 @@ body{
     max-width:800px !important;	  
   }
 }
+@media screen and ( 1440px < width <= 1680px) {
+  .article-content {
+    width:900px !important;
+    max-width:900px !important;	  
+  }
+}
 
 
 
