@@ -276,8 +276,12 @@ body{
 		}
 	}
 }
-
-
+@media screen and (min-width: 1440px) {
+  .article-content {
+    width:800px !important;
+    max-width:800px !important;	  
+  }
+}
 
 
 
