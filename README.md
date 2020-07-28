@@ -1,4 +1,2 @@
 
-瓦力的博客
-
-[页面地址]("http://waliblog.com")
+欢迎访问[瓦力的博客]("http://waliblog.com")主页
