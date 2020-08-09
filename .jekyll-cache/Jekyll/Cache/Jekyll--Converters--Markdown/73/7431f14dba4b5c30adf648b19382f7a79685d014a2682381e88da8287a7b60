@@ -1,0 +1,206 @@
+I"�1<p>这篇博客主要介绍什么是静态资源。nginx将图片，文件等类型压缩来减少http请求数来达到优化前端性能，可以在一定程度上能减少web服务器的压力</p>
+
+<h1 id="1静态资源类型">1.静态资源类型</h1>
+
+<p>前端向后台服务器进行请求，一般分为两种<code class="language-plaintext highlighter-rouge">静态请求</code>和<code class="language-plaintext highlighter-rouge">动态请求</code>。静态请求常见列子客户端请求图片，css，js，html文件等。动态请求是需要服务进行动态运算，封装数据然后在返回给客户端。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_7.jpg?123456" alt="ssl" /></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>静态类型</th>
+      <th>种类</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>浏览器端渲染</td>
+      <td>HTML、CSS、JS</td>
+    </tr>
+    <tr>
+      <td>图片</td>
+      <td>JPEG、GIF、PNG</td>
+    </tr>
+    <tr>
+      <td>视频</td>
+      <td>FLV、MPEG</td>
+    </tr>
+    <tr>
+      <td>文件</td>
+      <td>TXT、等任意下载文件</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="2静态资源服务场景cdn">2.静态资源服务场景cdn</h1>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_8.jpg?32424" alt="ssl" /></p>
+
+<p>CDN的全称是Content Delivery Network，即内容分发网络。CDN是构建在网络之上的内容分发网络，依靠部署在各地的边缘服务器，通过中心平台的负载均衡、内容分发、调度等功能模块，使用户就近获取所需内容，降低网络拥塞，提高用户访问响应速度和命中率。</p>
+
+<h1 id="3ngx_http_gzip_module">3.ngx_http_gzip_module</h1>
+
+<h3 id="1gzip">1.gzip</h3>
+
+<p>启用或禁用gzipping响应。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">gzip</span> <span class="no">on</span> <span class="s">|</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">gzip</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location,</span> <span class="s">if</span> <span class="s">in</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="2gzip_buffers">2.gzip_buffers</h3>
+
+<p>设置用于压缩响应的缓冲区的数量和大小。默认情况下，缓冲区大小等于一个内存页面。这是4K或8K，具体取决于平台。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">gzip_buffers</span> <span class="s">number</span> <span class="s">size</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">gzip_buffers</span> <span class="mi">32</span> <span class="mi">4k</span><span class="s">|16</span> <span class="mi">8k</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="3gzip_comp_level">3.gzip_comp_level</h3>
+
+<p>设置响应的gzip压缩级别。可接受的值范围为1到9。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">gzip_comp_level</span> <span class="s">level</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">gzip_comp_level</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="4gzip_disable">4.gzip_disable</h3>
+
+<p>对具有与任何指定正则表达式匹配的<code class="language-plaintext highlighter-rouge">User-Agent</code>标头字段的请求禁用gzipping响应。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">gzip_disable</span> <span class="s">regex</span> <span class="s">...</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="5gzip_http_version">5.gzip_http_version</h3>
+
+<p>设置压缩响应所需的最低HTTP请求版本。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">gzip_http_version</span> <span class="mi">1</span><span class="s">.0</span> <span class="s">|</span> <span class="mi">1</span><span class="s">.1</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">gzip_http_version</span> <span class="mi">1</span><span class="s">.1</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="6gzip_min_length">6.gzip_min_length</h3>
+
+<p>设置将被gzip压缩的响应的最小长度。长度仅由“Content-Length”响应头字段确定。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">gzip_min_length</span> <span class="s">length</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">gzip_min_length</span> <span class="mi">20</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="7gzip_proxied">7.gzip_proxied</h3>
+
+<p>根据请求和响应启用或禁用对代理请求的响应的gzipping。代理请求的事实由“Via”请求头字段的存在确定。该指令接受多个参数：</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">gzip_proxied</span> <span class="no">off</span> <span class="s">|</span> <span class="s">expired</span> <span class="s">|</span> <span class="s">no-cache</span> <span class="s">|</span> <span class="s">no-store</span> <span class="s">|</span> <span class="s">private</span> <span class="s">|</span> <span class="s">no_last_modified</span> <span class="s">|</span> <span class="s">no_etag</span> <span class="s">|</span> <span class="s">auth</span> <span class="s">|</span> <span class="s">any</span> <span class="s">...</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">gzip_proxied</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<p>　　　</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>off</td>
+      <td>禁用所有代理请求的压缩，忽略其他参数</td>
+    </tr>
+    <tr>
+      <td>expired</td>
+      <td>如果响应头包含“Expires”字段，其值为禁用缓存，则启用压缩</td>
+    </tr>
+    <tr>
+      <td>no-cache</td>
+      <td>如果响应头包含带有“no-cache”参数的“Cache-Control”字段，则启用压缩</td>
+    </tr>
+    <tr>
+      <td>no-store</td>
+      <td>如果响应头包含带有“no-store”参数的“Cache-Control”字段，则启用压缩</td>
+    </tr>
+    <tr>
+      <td>private</td>
+      <td>如果响应头包含带有“private”参数的“Cache-Control”字段，则启用压缩</td>
+    </tr>
+    <tr>
+      <td>no_last_modified</td>
+      <td>如果响应头不包含“Last-Modified”字段，则启用压缩</td>
+    </tr>
+    <tr>
+      <td>no_etag</td>
+      <td>如果响应头不包含“ETag”字段，则启用压缩</td>
+    </tr>
+    <tr>
+      <td>auth</td>
+      <td>如果请求标头包含“授权”字段，则启用压缩</td>
+    </tr>
+    <tr>
+      <td>any</td>
+      <td>为所有代理请求启用压缩</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="8gzip_types">8.gzip_types</h3>
+
+<p>除了“text / html”之外，还允许对指定的MIME类型进行gzipping响应。特殊值“*”匹配任何MIME类型（0.8.29）。始终压缩“text / html”类型的响应。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">gzip_types</span> <span class="s">mime-type</span> <span class="s">...</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">gzip_types</span> <span class="nc">text/html</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="9gzip_vary">9.gzip_vary</h3>
+
+<p>如果指令gzip，gzip_static或gunzip处于活动状态，则启用或禁用插入“Vary：Accept-Encoding”响应头字段。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">gzip_vary</span> <span class="no">on</span> <span class="s">|</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">gzip_vary</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h1 id="4示例配置">4.示例配置</h1>
+
+<p>1.图片配置</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">location</span> <span class="p">~</span> <span class="sr">.*\.(jpg|gif|png)$</span> <span class="p">{</span>
+	<span class="kn">root</span>  <span class="n">/opt/app/code/images</span><span class="p">;</span>
+	<span class="kn">gzip</span> <span class="no">on</span><span class="p">;</span>
+	<span class="kn">gzip_http_version</span> <span class="mi">1</span><span class="s">.1</span><span class="p">;</span>
+	<span class="kn">gzip_comp_level</span> <span class="mi">2</span><span class="p">;</span>
+	<span class="kn">gzip_types</span> <span class="nc">text/plain</span> <span class="nc">application/javascript</span> <span class="nc">application/x-javascript</span> <span class="nc">text/css</span> <span class="nc">application/xml</span> <span class="nc">text/javascript</span> <span class="nc">application/x-httpd-php</span> <span class="nc">image/jpeg</span> <span class="nc">image/gif</span> <span class="nc">image/png</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>2.文件下载</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">location</span> <span class="p">~</span> <span class="sr">.*\.(txt|xml)$</span> <span class="p">{</span>
+	<span class="kn">root</span>  <span class="n">/opt/app/code/doc</span><span class="p">;</span>
+	<span class="kn">gzip</span> <span class="no">on</span><span class="p">;</span>
+	<span class="kn">gzip_http_version</span> <span class="mi">1</span><span class="s">.1</span><span class="p">;</span>
+	<span class="kn">gzip_comp_level</span> <span class="mi">1</span><span class="p">;</span>
+	<span class="kn">gzip_types</span> <span class="nc">text/plain</span> <span class="nc">application/javascript</span> <span class="nc">application/x-javascript</span> <span class="nc">text/css</span> <span class="nc">application/xml</span> <span class="nc">text/javascript</span> <span class="nc">application/x-httpd-php</span> <span class="nc">image/jpeg</span> <span class="nc">image/gif</span> <span class="nc">image/png</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>3.预读gzip功能</p>
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">location</span> <span class="p">~</span> <span class="sr">^/download</span> <span class="p">{</span>
+	<span class="kn">root</span> <span class="n">/opt/app/code</span><span class="p">;</span>
+	<span class="kn">gzip_static</span> <span class="no">on</span><span class="p">;</span>
+	<span class="kn">tcp_nopush</span> <span class="no">on</span><span class="p">;</span>	
+<span class="p">}</span>
+</code></pre></div></div>
+
+:ET

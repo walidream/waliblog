@@ -1,0 +1,308 @@
+I"�M<p>小菜简单介绍nginx模块，模块太多，就不一一介绍。这里是nginx的所有模块<a href="http://nginx.org/en/docs/" title="http://nginx.org/en/docs/" target="_blank">http://nginx.org/en/docs/</a>。在后面的操作中用到了<code class="language-plaintext highlighter-rouge">ab</code>压力测试工具，不会的伙伴请查看<a href="/linux/2018/12/06/ab.html" title="/linux/2018/12/06/ab.html" target="_blank">ab</a>这篇博客</p>
+
+<p>nginx模块在编译的时候就作为选项被添加进去，查看添加哪些模块</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -V
+</code></pre></div></div>
+
+<h1 id="1http_stub_status_module配置">1.http_stub_status_module配置</h1>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">syntax:</span> <span class="s">stub_status</span><span class="p">;</span>
+<span class="k">default:</span> <span class="s">-</span>
+<span class="s">contentx:</span> <span class="s">server,location</span>
+</code></pre></div></div>
+
+<p>下面小菜配置到自己walidream.com的域名下，展示一下做什么用处的。根据语法知道配置在server,和location下，小菜就配置location下面</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd /etc/nginx/conf.d/
+
+vim server1.conf
+</code></pre></div></div>
+
+<p>将这段代码添加到 <code class="language-plaintext highlighter-rouge">location /</code>下面</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">location</span> <span class="n">/mystatus</span> <span class="p">{</span>
+	<span class="kn">stub_status</span><span class="p">;</span>
+<span class="p">}</span>   
+</code></pre></div></div>
+
+<p>然后在浏览器上输入walidream.com/mystatus</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_n1.jpg" alt="ssl" /></p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Active</span> <span class="s">connections:</span> <span class="mi">2</span>  <span class="c1">#连接数</span>
+<span class="s">server</span> <span class="s">accepts</span> <span class="s">handled</span> <span class="s">requests</span>
+ <span class="mi">94</span> <span class="mi">94</span> <span class="mi">86</span>  <span class="c1">#总握手次数  总连接数  总请求数</span>
+<span class="s">Reading:</span> <span class="mi">0</span> <span class="s">Writing:</span> <span class="mi">1</span> <span class="s">Waiting:</span> <span class="mi">1</span>  <span class="c1">#读的数   写的数  等待的数</span>
+</code></pre></div></div>
+
+<h1 id="2random_index_module">2.random_index_module</h1>
+
+<p>语法</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">syntax:</span> <span class="s">random_index</span> <span class="no">on</span><span class="s">|off</span><span class="p">;</span>
+<span class="k">default:</span> <span class="s">random_index</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">context:</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<p>随机的获取目录下面后缀为<code class="language-plaintext highlighter-rouge">.html</code>，进入配置</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">location</span> <span class="n">/</span> <span class="p">{</span>
+	<span class="kn">root</span> <span class="n">/var/share/nginx/html/server</span><span class="p">;</span>
+	<span class="kn">random_index</span> <span class="no">on</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>在/var/share/nginx/html/server目录下新建1.html,2.html,3.html内容分别为</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!--这个是1.html内容 --&gt;</span>
+<span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+	<span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;title&gt;</span>Document<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body</span> <span class="na">style=</span><span class="s">"background:red;"</span><span class="nt">&gt;</span>
+	
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+
+<span class="c">&lt;!--这个是2.html内容 --&gt;</span>
+
+<span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+	<span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;title&gt;</span>Document<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body</span> <span class="na">style=</span><span class="s">"background:blue;"</span><span class="nt">&gt;</span>
+	
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+
+<span class="c">&lt;!--这个是3.html内容 --&gt;</span>
+
+<span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+	<span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;title&gt;</span>Document<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body</span> <span class="na">style=</span><span class="s">"background:blank;"</span><span class="nt">&gt;</span>
+	
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<p>然后在浏览器输入 walidream.com,多按几次f5刷新看看:</p>
+
+<h1 id="3http_sub_module">3.http_sub_module</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>替换返回html的内容
+</code></pre></div></div>
+
+<h3 id="1sub_filter-作用是替换返回html的内容">1.sub_filter 作用是替换返回html的内容</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">syntax:</span> <span class="s">sub_filter</span> <span class="s">string</span> <span class="s">replacement</span><span class="p">;</span>  
+<span class="k">default:</span> <span class="s">-</span>
+<span class="s">contentx:</span> <span class="s">http,server,location</span>
+</code></pre></div></div>
+
+<h3 id="2sub_filter_last_modified用来校验服务端的html内容是否有更新主要用于缓存">2.sub_filter_last_modified用来校验服务端的html内容是否有更新，主要用于缓存</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">syntax:</span> <span class="s">sub_filter_last_modified</span> <span class="no">on</span><span class="s">|off</span><span class="p">;</span>
+<span class="k">default:</span> <span class="s">sub_filter_last_modified</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">context:</span> <span class="s">http,server,location</span>
+</code></pre></div></div>
+
+<h3 id="3sub_filter_once-只匹配第一个还是匹配所有">3.sub_filter_once 只匹配第一个还是匹配所有</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">syntax:</span> <span class="s">sub_filter_once</span> <span class="no">on</span><span class="s">|off</span><span class="p">;</span>
+<span class="k">default:</span> <span class="s">sub_filter_once</span> <span class="no">on</span><span class="p">;</span>
+<span class="k">contentx:</span> <span class="s">http,server,location</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="4sub_filter_types-替换的类型">4.sub_filter_types 替换的类型</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">sub_filter_types</span> <span class="s">mime-type</span> <span class="s">...</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">sub_filter_types</span> <span class="nc">text/html</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+<p>除了<code class="language-plaintext highlighter-rouge">text/html</code>之外，还在具有指定MIME类型的响应中启用字符串替换。特殊值<code class="language-plaintext highlighter-rouge">*</code>匹配任何MIME类型。</p>
+
+<p>示例配置</p>
+
+<p>将返回内容中<code class="language-plaintext highlighter-rouge">Golang</code>字符串替换成<code class="language-plaintext highlighter-rouge">Nginx</code>,只匹配一次。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">location</span> <span class="n">/</span> <span class="p">{</span>
+	<span class="kn">root</span> <span class="n">/opt/app/code</span><span class="p">;</span>
+	<span class="kn">index</span> <span class="s">sub_module.html</span> <span class="s">sub_module.htm</span><span class="p">;</span>
+	<span class="kn">sub_filter</span> <span class="s">'Golang'</span> <span class="s">'Nginx'</span><span class="p">;</span>
+	<span class="kn">sub_filter_once</span> <span class="no">on</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="4http_limit_conn_module">4.http_limit_conn_module</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>连接频率限制
+</code></pre></div></div>
+
+<h3 id="1limit_conn">1.limit_conn</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">limit_conn</span> <span class="s">zone</span> <span class="s">number</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="2limit_conn_log_level">2.limit_conn_log_level</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">limit_conn_log_level</span> <span class="s">info</span> <span class="s">|</span> <span class="s">notice</span> <span class="s">|</span> <span class="s">warn</span> <span class="s">|</span> <span class="s">error</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">limit_conn_log_level</span> <span class="s">error</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="3limit_conn_status">3.limit_conn_status</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">limit_conn_status</span> <span class="s">code</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">limit_conn_status</span> <span class="mi">503</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="4limit_conn_zone">4.limit_conn_zone</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">limit_conn_zone</span> <span class="s">key</span> <span class="s">zone=name:size</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http</span>
+</code></pre></div></div>
+
+<h3 id="5limit_zone">5.limit_zone</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">limit_zone</span> <span class="s">name</span> <span class="nv">$variable</span> <span class="s">size</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http</span>
+</code></pre></div></div>
+
+<p>示例配置</p>
+
+<p><code class="language-plaintext highlighter-rouge">$binary_remote_addr</code>比<code class="language-plaintext highlighter-rouge">remote_addr</code>占用的字节少。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">limit_conn_zone</span> <span class="nv">$binary_remote_addr</span> <span class="s">zone=conn_zone:1m</span><span class="p">;</span>
+
+<span class="k">server</span> <span class="p">{</span>
+	<span class="kn">listen</span>		<span class="mi">80</span><span class="p">;</span>
+	<span class="kn">server_name</span>	<span class="s">walidream.com</span><span class="p">;</span>
+	
+	<span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+		<span class="kn">root</span> <span class="n">/opt/app/code</span><span class="p">;</span>
+		<span class="kn">limit_conn</span> <span class="s">conn_zone</span> <span class="mi">1</span><span class="p">;</span>
+		<span class="kn">index</span> <span class="s">sub_module.html</span> <span class="s">sub_module.htm</span><span class="p">;</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>用压力测试工具<code class="language-plaintext highlighter-rouge">ab</code>进行压力测试。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ab -n 100 -c 20 http://walidream/sub_module.html
+</code></pre></div></div>
+
+<h1 id="5limit_req_module">5.limit_req_module</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>请求频率限制
+</code></pre></div></div>
+
+<h3 id="1limit_req">1.limit_req</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">limit_req</span> <span class="s">zone=name</span> <span class="s">[burst=number]</span> <span class="s">[nodelay</span> <span class="s">|</span> <span class="s">delay=number]</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+<h3 id="2limit_req_log_level">2.limit_req_log_level</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">limit_req_log_level</span> <span class="s">info</span> <span class="s">|</span> <span class="s">notice</span> <span class="s">|</span> <span class="s">warn</span> <span class="s">|</span> <span class="s">error</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">limit_req_log_level</span> <span class="s">error</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="3limit_req_status">3.limit_req_status</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">limit_req_status</span> <span class="s">code</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">limit_req_status</span> <span class="mi">503</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="4limit_req_zone">4.limit_req_zone</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">limit_req_zone</span> <span class="s">key</span> <span class="s">zone=name:size</span> <span class="s">rate=rate</span> <span class="s">[sync]</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http</span>
+</code></pre></div></div>
+
+<p>示例配置</p>
+
+<p><code class="language-plaintext highlighter-rouge">$binary_remote_addr</code>比<code class="language-plaintext highlighter-rouge">remote_addr</code>占用的字节少。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">limit_req_zone</span> <span class="nv">$binary_remote_addr</span> <span class="s">zone=req_zone:1m</span> <span class="s">rate=1r/s</span><span class="p">;</span>
+
+<span class="k">server</span> <span class="p">{</span>
+	<span class="kn">listen</span>		<span class="mi">80</span><span class="p">;</span>
+	<span class="kn">server_name</span>	<span class="s">walidream.com</span><span class="p">;</span>
+	
+	<span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+		<span class="kn">root</span> <span class="n">/opt/app/code</span><span class="p">;</span>
+		<span class="c1">#limit_req zone=req_zone burst=3 nodelay;</span>
+		<span class="c1">#limit_req zone=req_zone burst=3 nodelay;</span>
+		<span class="c1">#limit_req zone=req_zone burst=3;</span>
+		<span class="kn">limit_req</span> <span class="s">zone=req_zone</span><span class="p">;</span>     
+		<span class="kn">index</span> <span class="s">sub_module.html</span> <span class="s">sub_module.htm</span><span class="p">;</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>用压力测试工具<code class="language-plaintext highlighter-rouge">ab</code>进行压力测试。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ab -n 100 -c 20 http://walidream/sub_module.html
+</code></pre></div></div>
+
+<p>输出</p>
+<pre><code class="language-linux">Server Software:        nginx/1.14.1
+Server Hostname:        walidream.com
+Server Port:            80
+
+Document Path:          /sub_module.html
+Document Length:        143 bytes
+
+Concurrency Level:      20
+Time taken for tests:   1.009 seconds
+Complete requests:      100
+Failed requests:        98
+   (Connect: 0, Receive: 0, Length: 98, Exceptions: 0)
+Write errors:           0
+Non-2xx responses:      98
+Total transferred:      72388 bytes
+HTML transferred:       52912 bytes
+Requests per second:    99.06 [#/sec] (mean)
+Time per request:       201.895 [ms] (mean)
+Time per request:       10.095 [ms] (mean, across all concurrent requests)
+Transfer rate:          70.03 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   10 100.0      0    1001
+Processing:     0    1   0.1      1       2
+Waiting:        0    1   0.2      1       2
+Total:          1   12  99.9      2    1001
+
+Percentage of the requests served within a certain time (ms)
+  50%      2
+  66%      2
+  75%      2
+  80%      2
+  90%      2
+  95%      2
+  98%      3
+  99%   1001
+ 100%   1001 (longest request)
+
+</code></pre>
+
+:ET

@@ -1,0 +1,327 @@
+I"r�<p>小菜最近遇到一个需求，批量合成二维码。比如一个饭店有冰箱、桌子、显示器、电脑等等，需要为这些资产贴上一个二维码，二维码中只有一个ID号，用ID向后台来查询资产的信息。在这个方案中有一个问题，就是生成二维码后，怎么让员工一眼就是知道二维码和资产对应的关系。</p>
+
+<p>实现思路，先将后台生成的ID号建立一个excel表格，通过读取excel表格来批量生成二维码，然后在用canvas技术，将二维码和excel表格信息对应起来，最后在合成一个二维码。废话少说，先上代码示例。</p>
+
+<blockquote>
+  <p>备份演示地址 <a href="http://walidream.com/example/js/qrcode/" title="http://walidream.com/example/js/qrcode/" target="_blank">http://walidream.com/example/js/qrcode/</a></p>
+</blockquote>
+
+<h4 id="参考资料">参考资料</h4>
+
+<ul>
+  <li>
+    <p>读取excel文件 <a href="https://github.com/SheetJS/js-xlsx" title="https://github.com/SheetJS/js-xlsx" target="_blank">https://github.com/SheetJS/js-xlsx</a></p>
+  </li>
+  <li>
+    <p>js生成二维码 <a href="https://github.com/soldair/node-qrcode" title="https://github.com/soldair/node-qrcode" target="_blank">https://github.com/soldair/node-qrcode</a></p>
+  </li>
+</ul>
+
+<h4 id="示例演示">示例演示</h4>
+
+<script async="" src="//jsrun.net/NhXKp/embed/all/light/"></script>
+
+<h1 id="1读取本地excel文件">1.读取本地excel文件</h1>
+
+<blockquote>
+  <p>方法：readWorkbookFromLocalFile</p>
+</blockquote>
+
+<blockquote>
+  <p>参数：file</p>
+</blockquote>
+
+<blockquote>
+  <p>说明：读取excel中的数据</p>
+</blockquote>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">readWorkbookFromLocalFile</span><span class="p">(</span><span class="nx">file</span><span class="p">){</span>
+	<span class="kd">let</span> <span class="nb">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+	<span class="kd">let</span> <span class="nx">reader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FileReader</span><span class="p">();</span>
+	<span class="nx">reader</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+		<span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">result</span><span class="p">;</span>
+		<span class="kd">let</span> <span class="nx">workbook</span> <span class="o">=</span> <span class="nx">XLSX</span><span class="p">.</span><span class="nx">read</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">binary</span><span class="dl">'</span><span class="p">});</span>
+		<span class="nb">self</span><span class="p">.</span><span class="nx">readWorkbook</span><span class="p">(</span><span class="nx">workbook</span><span class="p">);</span>
+	<span class="p">};</span>
+	<span class="nx">reader</span><span class="p">.</span><span class="nx">readAsBinaryString</span><span class="p">(</span><span class="nx">file</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="2处理读取到的数据">2.处理读取到的数据</h1>
+
+<blockquote>
+  <p>方法：readWorkbook</p>
+</blockquote>
+
+<blockquote>
+  <p>参数：workbook</p>
+</blockquote>
+
+<blockquote>
+  <p>说明：处理excel中的数据</p>
+</blockquote>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">readWorkbook</span><span class="p">(</span><span class="nx">workbook</span><span class="p">){</span>
+	<span class="kd">let</span> <span class="nb">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+	<span class="kd">let</span> <span class="nx">sheetNames</span> <span class="o">=</span> <span class="nx">workbook</span><span class="p">.</span><span class="nx">SheetNames</span><span class="p">;</span> <span class="c1">// 工作表名称集合</span>
+	<span class="kd">let</span> <span class="nx">worksheet</span> <span class="o">=</span> <span class="nx">workbook</span><span class="p">.</span><span class="nx">Sheets</span><span class="p">[</span><span class="nx">sheetNames</span><span class="p">[</span><span class="mi">0</span><span class="p">]];</span> <span class="c1">// 这里我们只读取第一张sheet</span>
+	<span class="kd">let</span> <span class="nx">csv</span> <span class="o">=</span> <span class="nx">XLSX</span><span class="p">.</span><span class="nx">utils</span><span class="p">.</span><span class="nx">sheet_to_csv</span><span class="p">(</span><span class="nx">worksheet</span><span class="p">);</span>
+	<span class="kd">let</span> <span class="nx">rows</span> <span class="o">=</span> <span class="nx">csv</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">);</span>
+
+	<span class="kd">let</span> <span class="nx">head</span> <span class="o">=</span> <span class="nx">rows</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span> <span class="c1">//编辑表格头部</span>
+	<span class="nb">self</span><span class="p">.</span><span class="nx">tabHeads</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="nx">getTabHeah</span><span class="p">(</span><span class="nx">head</span><span class="p">);</span>
+
+	<span class="nx">rows</span><span class="p">.</span><span class="nx">pop</span><span class="p">();</span> <span class="c1">// 最后一行没用的</span>
+	<span class="nb">self</span><span class="p">.</span><span class="nx">qrcodes</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="nx">getTabBody</span><span class="p">(</span><span class="nx">rows</span><span class="p">);</span>
+
+	<span class="c1">//生成二维码</span>
+	<span class="nb">self</span><span class="p">.</span><span class="nx">creatQrcode</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="3获取表格头部">3.获取表格头部</h1>
+
+<blockquote>
+  <p>方法：getTabHeah</p>
+</blockquote>
+
+<blockquote>
+  <p>参数：head</p>
+</blockquote>
+
+<blockquote>
+  <p>说明：将第一个处理成表头和key对应</p>
+</blockquote>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">getTabHeah</span><span class="p">(</span><span class="nx">head</span><span class="p">){</span>
+	<span class="kd">let</span> <span class="nx">arr</span> <span class="o">=</span> <span class="nx">head</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1">,</span><span class="dl">'</span><span class="p">);</span>
+	<span class="kd">let</span> <span class="nx">headrs</span> <span class="o">=</span> <span class="p">[];</span>
+	<span class="nx">headrs</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">val</span><span class="p">,</span><span class="nx">ind</span><span class="p">)</span><span class="o">=&gt;</span><span class="p">{</span>
+		<span class="k">return</span> <span class="p">{</span><span class="na">prop</span><span class="p">:</span><span class="dl">'</span><span class="s1">key</span><span class="dl">'</span><span class="o">+</span><span class="nx">ind</span><span class="p">,</span><span class="na">label</span><span class="p">:</span><span class="nx">val</span><span class="p">}</span>
+	<span class="p">});</span>
+	<span class="k">return</span> <span class="nx">headrs</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="4获取表数据">4.获取表数据</h1>
+
+<blockquote>
+  <p>方法：getTabBody</p>
+</blockquote>
+
+<blockquote>
+  <p>参数：rows</p>
+</blockquote>
+
+<blockquote>
+  <p>说明：处理excel表中的数据</p>
+</blockquote>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">getTabBody</span><span class="p">(</span><span class="nx">rows</span><span class="p">){</span>
+	<span class="kd">let</span> <span class="nb">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+	<span class="kd">let</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[];</span>
+	<span class="nx">rows</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">val</span><span class="o">=&gt;</span><span class="p">{</span>
+		<span class="kd">let</span> <span class="nx">brr</span> <span class="o">=</span> <span class="nx">val</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">"</span><span class="s2">,</span><span class="dl">"</span><span class="p">);</span>
+		<span class="kd">let</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{};</span>
+		<span class="nx">brr</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">v</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span><span class="o">=&gt;</span><span class="p">{</span>
+			<span class="nx">obj</span><span class="p">[</span><span class="dl">'</span><span class="s1">key</span><span class="dl">'</span><span class="o">+</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">v</span><span class="p">;</span>
+			<span class="nx">obj</span><span class="p">[</span><span class="dl">'</span><span class="s1">label</span><span class="dl">'</span><span class="o">+</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="nx">tabHeads</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">label</span><span class="p">;</span>
+		<span class="p">})</span>
+		<span class="nx">obj</span><span class="p">[</span><span class="dl">'</span><span class="s1">qrcode</span><span class="dl">'</span><span class="p">]</span> <span class="o">=</span> <span class="dl">''</span><span class="p">;</span>
+		<span class="nx">obj</span><span class="p">[</span><span class="dl">'</span><span class="s1">synthesis</span><span class="dl">'</span><span class="p">]</span> <span class="o">=</span> <span class="dl">''</span><span class="p">;</span>
+		<span class="nx">obj</span><span class="p">[</span><span class="dl">'</span><span class="s1">isMome</span><span class="dl">'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+		<span class="nx">arr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>
+	<span class="p">})</span>
+	<span class="k">return</span> <span class="nx">arr</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="5生成二维码">5.生成二维码</h1>
+
+<blockquote>
+  <p>方法：creatQrcode</p>
+</blockquote>
+
+<blockquote>
+  <p>说明：将第一列的ID生成对应的二维码</p>
+</blockquote>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">creatQrcode</span><span class="p">(){</span>
+	<span class="kd">let</span> <span class="nb">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+	<span class="kd">let</span> <span class="nx">opts</span> <span class="o">=</span> <span class="p">{</span>
+		<span class="na">errorCorrectionLevel</span><span class="p">:</span> <span class="dl">'</span><span class="s1">H</span><span class="dl">'</span><span class="p">,</span>
+		<span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">image/jpeg</span><span class="dl">'</span><span class="p">,</span>
+		<span class="na">width</span><span class="p">:</span><span class="mi">200</span><span class="p">,</span>
+		<span class="na">rendererOpts</span><span class="p">:</span> <span class="p">{</span>
+			<span class="na">quality</span><span class="p">:</span> <span class="mf">0.5</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="kd">let</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[];</span>
+	<span class="nb">self</span><span class="p">.</span><span class="nx">qrcodes</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">val</span><span class="o">=&gt;</span><span class="p">{</span>
+		<span class="nx">QRCode</span><span class="p">.</span><span class="nx">toDataURL</span><span class="p">(</span><span class="nx">val</span><span class="p">[</span><span class="dl">'</span><span class="s1">key0</span><span class="dl">'</span><span class="p">],</span> <span class="nx">opts</span> <span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">err</span><span class="p">;</span>
+
+			<span class="nx">val</span><span class="p">.</span><span class="nx">qrcode</span> <span class="o">=</span> <span class="nx">url</span><span class="p">;</span>
+			<span class="nx">arr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">val</span><span class="p">);</span>
+		<span class="p">})</span>
+	<span class="p">})</span>
+	<span class="nb">self</span><span class="p">.</span><span class="nx">qrcodes</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="6合成单个二维码">6.合成单个二维码</h1>
+
+<blockquote>
+  <p>方法：qrcodeSynthesis</p>
+</blockquote>
+
+<blockquote>
+  <p>参数：obj，setting</p>
+</blockquote>
+
+<blockquote>
+  <p>说明：将二维码和ID对应并合成新的二维码</p>
+</blockquote>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">qrcodeSynthesis</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span><span class="nx">setting</span><span class="p">){</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">resolve</span><span class="p">,</span><span class="nx">reject</span><span class="p">){</span>
+        <span class="kd">var</span> <span class="nx">canvas</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">"</span><span class="s2">canvas</span><span class="dl">"</span><span class="p">);</span>
+
+        <span class="c1">//设置canvas宽高</span>
+        <span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span> <span class="o">=</span> <span class="nx">setting</span><span class="p">.</span><span class="nx">width</span><span class="p">;</span>
+        <span class="nx">canvas</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="nx">setting</span><span class="p">.</span><span class="nx">height</span><span class="p">;</span>
+
+        <span class="c1">//获取绘图环境</span>
+        <span class="kd">var</span> <span class="nx">context</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="dl">'</span><span class="s1">2d</span><span class="dl">'</span><span class="p">);</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">context</span><span class="p">){</span>
+            <span class="nx">alert</span><span class="p">(</span><span class="dl">'</span><span class="s1">您的浏览器尚不支持，请更换浏览器</span><span class="dl">'</span><span class="p">);</span>
+            <span class="k">return</span> <span class="p">;</span>
+        <span class="p">}</span>
+        <span class="c1">//设置加载图片的状态</span>
+        <span class="kd">var</span> <span class="nx">ImgStatus</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="na">qrImgStatus</span><span class="p">:</span><span class="kc">false</span>
+        <span class="p">}</span>
+        <span class="c1">//设置二维码</span>
+        <span class="kd">var</span> <span class="nx">qrImg</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Image</span><span class="p">();</span>
+
+        <span class="c1">//加载二维码</span>
+        <span class="nx">qrImg</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+            <span class="c1">//绘制二维码</span>
+            <span class="nx">context</span><span class="p">.</span><span class="nx">drawImage</span><span class="p">(</span><span class="nx">qrImg</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+            <span class="nx">ImgStatus</span><span class="p">.</span><span class="nx">qrImgStatus</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="c1">//填充画布背景</span>
+        <span class="nx">drawRect</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nx">setting</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span><span class="nx">setting</span><span class="p">.</span><span class="nx">height</span><span class="p">,</span><span class="nx">setting</span><span class="p">.</span><span class="nx">canvasBorder</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nx">setting</span><span class="p">.</span><span class="nx">canvasBorder</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="nx">setting</span><span class="p">.</span><span class="nx">canvasBg</span><span class="p">);</span>
+
+        <span class="c1">//绘制二维码</span>
+        <span class="nx">qrImg</span><span class="p">.</span><span class="nx">crossOrigin</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">Anonymous</span><span class="dl">"</span> <span class="p">;</span>  <span class="c1">//二维码</span>
+        <span class="nx">qrImg</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">qrcode</span><span class="p">;</span>
+
+        <span class="c1">//绘制编号</span>
+        <span class="kd">var</span> <span class="nx">style</span> <span class="o">=</span><span class="p">{</span>
+            <span class="na">font</span><span class="p">:</span><span class="dl">'</span><span class="s1">bold 16px Arial </span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">color</span><span class="p">:</span><span class="dl">'</span><span class="s1">#000</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">textBaseline</span><span class="p">:</span><span class="dl">'</span><span class="s1">middle</span><span class="dl">'</span>
+        <span class="p">};</span>
+        <span class="kd">var</span> <span class="nx">numTxt</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="na">txt</span><span class="p">:</span><span class="nx">obj</span><span class="p">[</span><span class="dl">'</span><span class="s1">label0</span><span class="dl">'</span><span class="p">]</span><span class="o">+</span><span class="dl">'</span><span class="s1"> ：</span><span class="dl">'</span><span class="o">+</span><span class="nx">obj</span><span class="p">[</span><span class="dl">'</span><span class="s1">key0</span><span class="dl">'</span><span class="p">],</span>
+            <span class="na">x</span><span class="p">:</span><span class="nx">setting</span><span class="p">.</span><span class="nx">qrcode</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span>
+            <span class="na">y</span><span class="p">:</span><span class="mi">40</span>
+        <span class="p">}</span>
+        <span class="kd">var</span> <span class="nx">numTxtAttr</span> <span class="o">=</span> <span class="nx">drawText</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span><span class="nx">numTxt</span><span class="p">,</span><span class="nx">style</span><span class="p">);</span>
+        <span class="c1">//绘制资产名称</span>
+        <span class="kd">var</span> <span class="nx">nameTxt</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="na">txt</span><span class="p">:</span><span class="nx">obj</span><span class="p">[</span><span class="dl">'</span><span class="s1">label1</span><span class="dl">'</span><span class="p">]</span><span class="o">+</span><span class="dl">'</span><span class="s1"> ：</span><span class="dl">'</span><span class="o">+</span><span class="nx">obj</span><span class="p">[</span><span class="dl">'</span><span class="s1">key1</span><span class="dl">'</span><span class="p">],</span>
+            <span class="na">x</span><span class="p">:</span><span class="nx">setting</span><span class="p">.</span><span class="nx">qrcode</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span>
+            <span class="na">y</span><span class="p">:</span> <span class="nx">numTxt</span><span class="p">.</span><span class="nx">y</span> <span class="o">+</span> <span class="nx">numTxtAttr</span><span class="p">.</span><span class="nx">txtHeight</span> <span class="o">+</span> <span class="mi">15</span>
+        <span class="p">}</span>
+        <span class="kd">var</span> <span class="nx">nameTxtAttr</span> <span class="o">=</span> <span class="nx">drawText</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span><span class="nx">nameTxt</span><span class="p">,</span><span class="nx">style</span><span class="p">);</span>
+
+
+
+        <span class="p">(</span><span class="kd">function</span> <span class="nx">imgStatus</span><span class="p">(</span><span class="nx">ImgStatus</span><span class="p">){</span>
+            <span class="kd">var</span> <span class="nx">time</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+            <span class="k">if</span><span class="p">(</span><span class="nx">ImgStatus</span><span class="p">.</span><span class="nx">qrImgStatus</span><span class="p">){</span>
+                <span class="kd">var</span> <span class="nx">imgdate</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">toDataURL</span><span class="p">(</span><span class="dl">"</span><span class="s2">image/jpeg</span><span class="dl">"</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">);</span>
+                <span class="nx">resolve</span><span class="p">(</span><span class="nx">imgdate</span><span class="p">);</span>
+                <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+                <span class="nx">time</span> <span class="o">=</span> <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+                    <span class="nx">imgStatus</span><span class="p">(</span><span class="nx">ImgStatus</span><span class="p">);</span>
+                <span class="p">},</span><span class="mi">1000</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">})(</span><span class="nx">ImgStatus</span><span class="p">);</span>
+
+    <span class="p">})</span>
+
+    <span class="c1">//绘制矩形</span>
+    <span class="kd">function</span> <span class="nx">drawRect</span><span class="p">(</span><span class="nx">cxt</span><span class="p">,</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="p">,</span><span class="nx">width</span><span class="p">,</span><span class="nx">height</span><span class="p">,</span><span class="nx">BW</span><span class="p">,</span><span class="nx">BC</span><span class="p">,</span><span class="nx">fillColor</span><span class="p">){</span>
+        <span class="nx">cxt</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">();</span>
+        <span class="nx">cxt</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="p">);</span>
+        <span class="nx">cxt</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="nx">x</span><span class="o">+</span><span class="nx">width</span><span class="p">,</span><span class="nx">y</span><span class="p">);</span>
+        <span class="nx">cxt</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="nx">x</span><span class="o">+</span><span class="nx">width</span><span class="p">,</span><span class="nx">y</span><span class="o">+</span><span class="nx">height</span><span class="p">);</span>
+        <span class="nx">cxt</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="o">+</span><span class="nx">height</span><span class="p">);</span>
+        <span class="nx">cxt</span><span class="p">.</span><span class="nx">closePath</span><span class="p">();</span>
+
+        <span class="nx">cxt</span><span class="p">.</span><span class="nx">lineWidth</span><span class="o">=</span><span class="nx">BW</span><span class="p">;</span>
+        <span class="nx">cxt</span><span class="p">.</span><span class="nx">fillStyle</span><span class="o">=</span><span class="nx">fillColor</span><span class="p">;</span>
+        <span class="nx">cxt</span><span class="p">.</span><span class="nx">strokeStyle</span><span class="o">=</span><span class="nx">BC</span><span class="p">;</span>
+
+        <span class="nx">cxt</span><span class="p">.</span><span class="nx">fill</span><span class="p">();</span>
+        <span class="nx">cxt</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="c1">//绘制单行文本</span>
+    <span class="kd">function</span> <span class="nx">drawText</span><span class="p">(</span><span class="nx">cxt</span><span class="p">,</span><span class="nx">obj</span><span class="p">,</span><span class="nx">setobj</span><span class="p">){</span>
+        <span class="kd">var</span> <span class="nx">setting</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="na">font</span><span class="p">:</span><span class="dl">'</span><span class="s1">30px Arial</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">color</span><span class="p">:</span><span class="dl">'</span><span class="s1">#000</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">textBaseline</span><span class="p">:</span><span class="dl">'</span><span class="s1">middle</span><span class="dl">'</span>
+        <span class="p">}</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">setobj</span><span class="p">)</span> <span class="nx">setting</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span><span class="nx">setting</span><span class="p">,</span><span class="nx">setobj</span><span class="p">);</span>
+
+        <span class="nx">cxt</span><span class="p">.</span><span class="nx">font</span><span class="o">=</span><span class="nx">setting</span><span class="p">.</span><span class="nx">font</span><span class="p">;</span>
+        <span class="nx">cxt</span><span class="p">.</span><span class="nx">fillStyle</span><span class="o">=</span><span class="nx">setting</span><span class="p">.</span><span class="nx">color</span><span class="p">;</span>
+        <span class="nx">cxt</span><span class="p">.</span><span class="nx">fillText</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">txt</span><span class="p">,</span><span class="nx">obj</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span><span class="nx">obj</span><span class="p">.</span><span class="nx">y</span><span class="p">);</span>
+
+        <span class="kd">let</span> <span class="nx">fontHeight</span> <span class="o">=</span> <span class="nx">setting</span><span class="p">.</span><span class="nx">font</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">\d</span><span class="sr">+/</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="na">txt</span><span class="p">:</span><span class="nx">obj</span><span class="p">.</span><span class="nx">txt</span><span class="p">,</span>
+            <span class="na">txtWidth</span><span class="p">:</span><span class="nx">cxt</span><span class="p">.</span><span class="nx">measureText</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">txt</span><span class="p">).</span><span class="nx">width</span><span class="p">,</span>
+            <span class="na">txtHeight</span><span class="p">:</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">fontHeight</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <span class="na">source</span><span class="p">:</span><span class="nx">obj</span>
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="7批量合成二维码">7.批量合成二维码</h1>
+
+<blockquote>
+  <p>方法：synthesisQrcode</p>
+</blockquote>
+
+<blockquote>
+  <p>说明：批量合成二维码</p>
+</blockquote>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">synthesisQrcode</span><span class="p">(){</span>
+	<span class="kd">let</span> <span class="nb">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+	<span class="kd">let</span> <span class="nx">promises</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="nx">qrcodes</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">val</span><span class="o">=&gt;</span><span class="p">{</span>
+		<span class="k">return</span> <span class="nx">qrcodeSynthesis</span><span class="p">(</span><span class="nx">val</span><span class="p">,</span><span class="nb">self</span><span class="p">.</span><span class="nx">canvas</span><span class="p">);</span>
+	<span class="p">})</span>
+
+	<span class="kd">let</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[];</span>
+	<span class="nb">Promise</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">promises</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">urls</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nb">self</span><span class="p">.</span><span class="nx">qrcodes</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="nx">qrcodes</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">v</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span><span class="o">=&gt;</span><span class="p">{</span>
+			<span class="nx">v</span><span class="p">.</span><span class="nx">synthesis</span> <span class="o">=</span> <span class="nx">urls</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+			<span class="k">return</span> <span class="nx">v</span><span class="p">;</span>
+		<span class="p">})</span>
+	<span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+:ET

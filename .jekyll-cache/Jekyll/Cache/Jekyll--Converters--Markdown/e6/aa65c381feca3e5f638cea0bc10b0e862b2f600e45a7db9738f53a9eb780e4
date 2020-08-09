@@ -1,0 +1,48 @@
+I"
+<p>多线程多进程处理模式：一个线程只处理一个流的i/o事件。如果想要同时处理多个流，
+要么多进程，要么多线程，很不幸这两种方法效率不算高。</p>
+
+<h1 id="1常见的http服务">1.常见的http服务</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>市场上常见的http服务 apache、IIS、GWS	
+</code></pre></div></div>
+
+<h1 id="2io非阻塞模式">2.IO非阻塞模式</h1>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">while</span> <span class="kc">true</span><span class="p">{</span>
+	<span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">stream</span><span class="p">[];{</span>
+		<span class="k">if</span> <span class="nx">i</span> <span class="nx">has</span> <span class="nx">data</span>
+		<span class="nx">read</span> <span class="nx">until</span> <span class="nx">unavailable</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>缺点：如果所有的流都没有数据，那么只会白白浪费cup</p>
+
+<h1 id="3io复用内核模式种类">3.IO复用内核模式种类</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>* select、poll模型
+* Epoll模型
+</code></pre></div></div>
+
+<h3 id="1select-模型">1.select 模型</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">while</span> <span class="kc">true</span><span class="p">{</span>
+<span class="nx">select</span><span class="p">(</span><span class="nx">streams</span><span class="p">[])</span>
+	<span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">streams</span><span class="p">[]{</span>
+		<span class="k">if</span> <span class="nx">i</span> <span class="nx">has</span> <span class="nx">data</span>
+		<span class="nx">read</span> <span class="nx">until</span> <span class="nx">unavailable</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="2epoll模型优势">2.Epoll模型优势</h3>
+
+<p>优势一、解决SELECT模型对于文件具柄FD打开限制</p>
+
+<p>优势二、采用callback函数回调机制优化模型效率</p>
+
+<h1 id="4cpu亲和">4.cpu亲和</h1>
+
+<p>是一种把CPU核心和Nginx工作进程绑定方式。把每个worker进程固定在一个CPU上执行，
+减少切换cpu的cache miss，获得更好的性能。</p>
+
+:ET

@@ -1,0 +1,288 @@
+I"�C<p>nginx Rewrite规则可以让网站的url中达到某种状态时定向/跳转到某个规则，可以实现很多功能。</p>
+
+<ul>
+  <li>url访问跳转，支持开发设计，页面跳转、兼容性支持、展示效果、301重定向等。</li>
+  <li>SEO优化</li>
+  <li>维护，流量转发</li>
+  <li>安全，如伪静态</li>
+</ul>
+
+<h4 id="内置的全局变量">内置的全局变量</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>变量名</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>$args</td>
+      <td>这个变量等于请求行中的参数，同$query_string</td>
+    </tr>
+    <tr>
+      <td>$content_length</td>
+      <td>请求头中的Content-length字段</td>
+    </tr>
+    <tr>
+      <td>$content_type</td>
+      <td>请求头中的Content-Type字段</td>
+    </tr>
+    <tr>
+      <td>$document_root</td>
+      <td>当前请求在root指令中指定的值</td>
+    </tr>
+    <tr>
+      <td>$host</td>
+      <td>请求主机头字段，否则为服务器名称</td>
+    </tr>
+    <tr>
+      <td>$http_user_agent</td>
+      <td>客户端agent信息</td>
+    </tr>
+    <tr>
+      <td>$http_cookie</td>
+      <td>客户端cookie信息</td>
+    </tr>
+    <tr>
+      <td>$limit_rate</td>
+      <td>这个变量可以限制连接速率</td>
+    </tr>
+    <tr>
+      <td>$request_method</td>
+      <td>客户端请求的动作，通常为GET或POST</td>
+    </tr>
+    <tr>
+      <td>$remote_addr</td>
+      <td>客户端的IP地址</td>
+    </tr>
+    <tr>
+      <td>$remote_port</td>
+      <td>客户端的端口</td>
+    </tr>
+    <tr>
+      <td>$remote_user</td>
+      <td>已经经过Auth Basic Module验证的用户名</td>
+    </tr>
+    <tr>
+      <td>$request_filename</td>
+      <td>当前请求的文件路径，由root或alias指令与URI请求生成</td>
+    </tr>
+    <tr>
+      <td>$scheme</td>
+      <td>HTTP方法（如http，https）</td>
+    </tr>
+    <tr>
+      <td>$server_protocol</td>
+      <td>请求使用的协议，通常是HTTP/1.0或HTTP/1.1</td>
+    </tr>
+    <tr>
+      <td>$server_addr</td>
+      <td>服务器地址，在完成一次系统调用后可以确定这个值</td>
+    </tr>
+    <tr>
+      <td>$server_name</td>
+      <td>服务器名称</td>
+    </tr>
+    <tr>
+      <td>$server_port</td>
+      <td>请求到达服务器的端口号</td>
+    </tr>
+    <tr>
+      <td>$request_uri</td>
+      <td>包含请求参数的原始URI，不包含主机名，如：”/foo/bar.php?arg=baz”</td>
+    </tr>
+    <tr>
+      <td>$uri</td>
+      <td>不带请求参数的当前URI，$uri不包含主机名，如”/foo/bar.html”</td>
+    </tr>
+    <tr>
+      <td>$document_uri</td>
+      <td>与$uri相同</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="1rewrite模块">1.rewrite模块</h1>
+
+<p>rewrite配置项属于<code class="language-plaintext highlighter-rouge">ngx_http_rewrite_module</code>模块<a href="http://nginx.org/en/docs/http/ngx_http_rewrite_module.html" title="http://nginx.org/en/docs/http/ngx_http_rewrite_module.html" target="_blank">传送门</a></p>
+
+<h4 id="rewrite">rewrite</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">rewrite</span> <span class="s">regex</span> <span class="s">replacement</span> <span class="s">[flag]</span><span class="p">;</span>  <span class="c1">#匹配规则 定向路径 标志参数</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">server,</span> <span class="s">location,</span> <span class="s">if</span>
+</code></pre></div></div>
+
+<p>　　</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>flag选项</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>break</td>
+      <td>匹配到之后会在替换后的目录下面去查找</td>
+    </tr>
+    <tr>
+      <td>last</td>
+      <td>匹配到之后会在替换后重新用新地址发起请求</td>
+    </tr>
+    <tr>
+      <td>redirect</td>
+      <td>返回带有302代码的临时重定向;如果替换字符串不以“http：//”，“https：//”或“$scheme”</td>
+    </tr>
+    <tr>
+      <td>permanent</td>
+      <td>返回301代码的永久重定向</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="break">break</h4>
+
+<p>停止处理当前的ngx_http_rewrite_module指令集。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">break</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">server,</span> <span class="s">location,</span> <span class="s">if</span>
+</code></pre></div></div>
+
+<h4 id="if">if</h4>
+
+<p>如果为true，则执行在大括号内指定的此模块指令，并在if指令内为该请求分配配置</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">if</span> <span class="s">(condition)</span> <span class="p">{</span> <span class="kn">...</span> <span class="err">}</span>
+<span class="s">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<p>条件可以是以下任何一种：</p>
+
+<ul>
+  <li>如果变量的值为空字符串或“0”，则为false;</li>
+  <li>使用<code class="language-plaintext highlighter-rouge">=</code>和`!=运算符比较变量和字符串;</li>
+  <li>使用<code class="language-plaintext highlighter-rouge">~</code>（对于区分大小写的匹配）和<code class="language-plaintext highlighter-rouge">~*</code>（对于不区分大小写的匹配）运算符，将变量与正则表达式进行匹配。正则表达式可以包含可供以后在$1 .. $9变量中重用的捕获。负操作符<code class="language-plaintext highlighter-rouge">!~</code>和<code class="language-plaintext highlighter-rouge">!~*</code>也可用。如果正则表达式包含<code class="language-plaintext highlighter-rouge">}</code>或<code class="language-plaintext highlighter-rouge">;</code>字符，则整个表达式应包含在单引号或双引号中。</li>
+  <li>使用<code class="language-plaintext highlighter-rouge">-f</code>和<code class="language-plaintext highlighter-rouge">!-f</code>运算符检查文件是否存在</li>
+  <li>使用<code class="language-plaintext highlighter-rouge">-d</code>和<code class="language-plaintext highlighter-rouge">!-d</code>运算符检查目录是否存在</li>
+  <li>使用<code class="language-plaintext highlighter-rouge">-e</code>和<code class="language-plaintext highlighter-rouge">!-e</code>运算符检查文件，目录或符号链接是否存在</li>
+  <li>使用<code class="language-plaintext highlighter-rouge">-x</code>和<code class="language-plaintext highlighter-rouge">!-x</code>运算符检查可执行文件。</li>
+</ul>
+
+<h4 id="return">return</h4>
+
+<p>该指令用于结束规则的执行并返回状态码给客户端。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">return</span> <span class="s">code</span> <span class="s">[text]</span><span class="p">;</span>
+	<span class="k">return</span> <span class="s">code</span> <span class="s">URL</span><span class="p">;</span>
+	<span class="k">return</span> <span class="s">URL</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">server,</span> <span class="s">location,</span> <span class="s">if</span>
+</code></pre></div></div>
+
+<h4 id="set">set</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">set</span> <span class="nv">$variable</span> <span class="s">value</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">server,</span> <span class="s">location,</span> <span class="s">if</span>
+</code></pre></div></div>
+
+<h1 id="2调试rewrite是否正确">2.调试rewrite是否正确</h1>
+
+<p>nginx中要检测rewrite是否正确，就需要开启<code class="language-plaintext highlighter-rouge">rewrite_log</code>才能排错，rewrite_log会打印错误。检测完后，建议将rewrite_log关闭。</p>
+
+<h4 id="rewrite_log">rewrite_log</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">rewrite_log</span> <span class="no">on</span> <span class="s">|</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">rewrite_log</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location,</span> <span class="s">if</span>
+</code></pre></div></div>
+
+<p>示例：</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">rewrite_log</span> <span class="no">on</span><span class="s">；</span>
+<span class="s">error_log</span> <span class="n">/var/log/nginx/rewrite.log</span> <span class="s">notice</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h1 id="3break和last区别">3.break和last区别</h1>
+
+<p>rewrite里面flag中<code class="language-plaintext highlighter-rouge">break</code>和<code class="language-plaintext highlighter-rouge">last</code>是什么区别？请看下面的例子</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">root</span> <span class="n">/opt/app/code</span><span class="p">;</span> 
+
+<span class="k">location</span> <span class="p">~</span> <span class="sr">^/break</span> <span class="p">{</span>
+	<span class="kn">rewrite</span> <span class="s">^/break</span> <span class="n">/test/</span> <span class="s">break</span><span class="p">;</span>
+<span class="p">}</span> 
+
+<span class="k">location</span> <span class="p">~</span> <span class="sr">^/last</span> <span class="p">{</span>
+	 <span class="kn">rewrite</span> <span class="s">^/last</span> <span class="n">/test/</span> <span class="s">last</span><span class="p">;</span>
+<span class="p">}</span>    
+
+<span class="k">location</span> <span class="n">/test/</span> <span class="p">{</span>
+   <span class="kn">default_type</span> <span class="nc">application/json</span><span class="p">;</span>
+   <span class="kn">return</span> <span class="mi">200</span> <span class="s">'</span><span class="p">{</span><span class="kn">"status":"success"</span><span class="err">}</span><span class="s">'</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">break</code>是停止处理当前的ngx_http_rewrite_module指令集，就是说不会在向下匹配新的location，<code class="language-plaintext highlighter-rouge">last</code>停止处理当前的ngx_http_rewrite_module指令集并开始搜索与更改的URI匹配的新位置;</p>
+
+<p>假设我们在页面上访问的url是<code class="language-plaintext highlighter-rouge">http://walidream.com/break</code>，根据上面的nginx规则，肯定会匹配到第一个，匹配到第一个之后，根据rewrite正则，url由原来的<code class="language-plaintext highlighter-rouge">/break</code>变为<code class="language-plaintext highlighter-rouge">/test/</code>但是在root<code class="language-plaintext highlighter-rouge">/opt/code/</code>目录
+下，没有找到<code class="language-plaintext highlighter-rouge">/test/</code>目录下面的内容，所以nginx会返回404错误码。</p>
+
+<p>如果将<code class="language-plaintext highlighter-rouge">http://walidream.com/break</code>换成<code class="language-plaintext highlighter-rouge">http://walidream.com/last</code>，根据上面的nginx规则，会匹配到第二个location，根据location里面rewrite正则，url由原来的<code class="language-plaintext highlighter-rouge">/last</code>变为<code class="language-plaintext highlighter-rouge">/test/</code>，但是会重新
+匹配loction中，可以简单理解就是将替换后url<code class="language-plaintext highlighter-rouge">http://walidream.com/test</code>重新发起一次请求。这个时候会匹配到第三个loaction，根据location里的rewrite正则，会反会200码，并且会返回json内容’{“status”:”success”}’</p>
+
+<h1 id="4redirect和permanent区别">4.redirect和permanent区别</h1>
+
+<p>rewrite里面flag中<code class="language-plaintext highlighter-rouge">redirect</code>(临时重定向)和<code class="language-plaintext highlighter-rouge">permanent</code>(永久重定向)是什么区别？请看下面的例子</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">location</span> <span class="p">~</span> <span class="sr">^/imooc</span> <span class="p">{</span> 
+	<span class="kn">rewrite</span> <span class="s">^/imooc</span> <span class="s">http://www.imooc.com/</span> <span class="s">redirect</span><span class="p">;</span>
+<span class="p">}</span> 
+
+<span class="k">location</span> <span class="p">~</span> <span class="sr">^/wali</span> <span class="p">{</span>
+	<span class="kn">rewrite</span> <span class="s">^/wali</span> <span class="s">http://www.imooc.com/</span> <span class="s">permanent</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">redirect</code>会返回带有302代码的临时重定向，<code class="language-plaintext highlighter-rouge">permanent</code>会返回带有301代码的永久重定向。</p>
+
+<p>假设我们在页面上访问url是<code class="language-plaintext highlighter-rouge">http://walidream.com/imooc</code>，根据nginx匹配规则会匹配到第一个location，会重写url，返回一个带有302状态代码，重写后的url是<code class="language-plaintext highlighter-rouge">http://www.imooc.com</code>，浏览器会重定向到这个网址，
+当我们再次访问<code class="language-plaintext highlighter-rouge">http://walidream.com/imooc</code>，nginx还是会先匹配在替换然后重定向。</p>
+
+<p>如果在页面上输入<code class="language-plaintext highlighter-rouge">http://walidream.com/wali</code>，根据nginx匹配规则会匹配到第二个location，会重写url，返回一个带有301状态码，重写后的url是<code class="language-plaintext highlighter-rouge">http://www.imooc.com</code>，浏览器会重新定向到这个网址，
+当我们再次访问<code class="language-plaintext highlighter-rouge">http://walidream.com/wali</code>，这个时候浏览器根本不会在经过nginx，而是直接有浏览器重定向到这个网址。</p>
+
+<h1 id="5rewrite优先级">5.rewrite优先级</h1>
+
+<p>我们知道rewrite的执行环境是server,location,if。那就有一个问题，当这三个执行环境中都存在rewrite规则，那么执行优先级是什么。</p>
+
+<p>server &gt; location &gt; if</p>
+
+<h1 id="6利用变量或者return调试">6.利用变量或者return调试</h1>
+
+<p>不知道大家写了这么长时间的nginx有没有感觉nginx很难调试，调试一个错误要很长时间。比如上面rewrite 这个就没办法检测自己规则是否在的正确，没有输出，所以要验证rewrite正则是否正确，就要打开
+rewrite_log日志，如果匹配错了，日志会记录错误信息。</p>
+
+<p>向一般的检测语法，我们可以利用变量return 返回。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">location</span> <span class="p">~</span> <span class="sr">^/wali</span> <span class="p">{</span>
+	<span class="kn">default_type</span> <span class="nc">application/json</span><span class="p">;</span>
+	<span class="kn">return</span> <span class="mi">200</span> <span class="s">'</span><span class="p">{</span><span class="kn">"status":"success"</span><span class="err">}</span><span class="s">'</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kn">location</span> <span class="p">~</span> <span class="sr">^/yagm</span> <span class="p">{</span>
+	<span class="kn">default_type</span> <span class="nc">application/json</span><span class="p">;</span>
+	<span class="kn">return</span> <span class="mi">200</span> <span class="s">'</span><span class="p">{</span><span class="kn">"status":"error"</span><span class="err">}</span><span class="s">'</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>这样有时候在调试时会让我们变得稍微方便一点，还有nginx扩展模块如echo就能直接输出内容或者打印内部变量。我们调试起来就更方便了，下面小菜抽一点时间，来讲讲如何安装echo模块。<a href="/nginx/2019/01/05/nginx-24.html" title="/nginx/2019/01/05/nginx-24.html" target="_blank">nginx echo传送门</a></p>
+
+:ET

@@ -1,0 +1,86 @@
+I"�<p>以前上传图片，文件需要借助插件，不借助插件根本写不了(主要还是太菜)。今天小菜记录下用<code class="language-plaintext highlighter-rouge">formData</code>API上传，非常简单。</p>
+
+<h1 id="1上传图片">1.上传图片</h1>
+
+<p>这个demo是用jq写的，不要问我为什么，jq获取dom太方便了。这个例子可以用js,jq,mvvc框架都可以.</p>
+
+<blockquote>
+  <p>记录angular 1.6 绑定chang方法 <code class="language-plaintext highlighter-rouge">onchange="angular.element(this).scope().uploadPortrait(event)"</code></p>
+</blockquote>
+
+<script async="" src="//jsrun.net/VQqKp/embed/all/light/"></script>
+
+<blockquote>
+  <p>方法：<code class="language-plaintext highlighter-rouge">upLoadImg(event)</code></p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">event</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>event</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>事件对象</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">upLoadImg</span><span class="p">(</span><span class="nx">event</span><span class="p">){</span>
+    <span class="kd">let</span> <span class="nx">imgInfo</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">files</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="c1">//效验</span>
+    <span class="c1">//根据imgInfo中name,size,type,lastModifiedDate来效验</span>
+	
+    <span class="c1">//预览</span>
+    <span class="kd">let</span> <span class="nx">windowURL</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">URL</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">webkitURL</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">imgsrc</span> <span class="o">=</span> <span class="nx">windowURL</span><span class="p">.</span><span class="nx">createObjectURL</span><span class="p">(</span><span class="nx">imgInfo</span><span class="p">);</span>  <span class="c1">//获取二进制路径</span>
+	
+    <span class="c1">//检测图片宽，高</span>
+    <span class="kd">let</span> <span class="nx">_img</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Image</span><span class="p">();</span>
+        <span class="nx">_img</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+            <span class="kd">let</span> <span class="nx">imgW</span> <span class="o">=</span> <span class="nx">_img</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span>
+                <span class="nx">imgH</span><span class="o">=</span><span class="nx">_img</span><span class="p">.</span><span class="nx">height</span><span class="p">;</span>
+            <span class="k">if</span><span class="p">(</span><span class="nx">imgW</span><span class="o">!=</span> <span class="mi">200</span> <span class="o">||</span> <span class="nx">imgH</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">){</span>
+               <span class="nx">alert</span><span class="p">(</span><span class="dl">'</span><span class="s1">请上传200px * 200px 图片</span><span class="dl">'</span><span class="p">);</span>
+               <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+            <span class="p">}</span>			
+        <span class="p">};</span>
+    <span class="nx">_img</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="nx">imgsrc</span><span class="p">;</span>	
+	
+    <span class="c1">//上传</span>
+    <span class="kd">let</span> <span class="nx">formData</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FormData</span><span class="p">();</span>   <span class="c1">//创建 FormData对象</span>
+    <span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">file</span><span class="dl">'</span><span class="p">,</span> <span class="nx">imgInfo</span><span class="p">);</span>  <span class="c1">//添加数据</span>
+	
+    <span class="nx">$</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span><span class="nx">formData</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+      <span class="c1">//上传成功后做某些事</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<h1 id="2获取本地图片base64">2.获取本地图片base64</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   <span class="kd">let</span> <span class="nx">reader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FileReader</span><span class="p">();</span>
+   <span class="nx">reader</span><span class="p">.</span><span class="nx">readAsDataURL</span><span class="p">(</span><span class="nx">imgInfo</span><span class="p">);</span>
+   <span class="nx">reader</span><span class="p">.</span><span class="nx">onload</span><span class="o">=</span><span class="kd">function</span><span class="p">(){</span>
+       <span class="kd">let</span> <span class="nx">imgBase64</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">result</span><span class="p">;</span>
+       <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">imgBase64</span><span class="p">);</span>				
+   <span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="3裁剪图像">3.裁剪图像</h1>
+
+<p>canvas图像裁剪在<code class="language-plaintext highlighter-rouge">canvas/头像裁剪</code>, 头像裁剪传送门<a href="http://waliblog.com/canvas/2018/02/24/portraitNailor.html" title="http://waliblog.com/canvas/2018/02/24/portraitNailor.html">“http://waliblog.com/canvas/2018/02/24/portraitNailor.html”</a></p>
+
+:ET

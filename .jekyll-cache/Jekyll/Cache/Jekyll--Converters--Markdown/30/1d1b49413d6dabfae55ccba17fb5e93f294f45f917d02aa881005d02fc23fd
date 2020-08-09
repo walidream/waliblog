@@ -1,0 +1,280 @@
+I"�=<p>ngx_http_geoip_module是对IP地址进行地域信息的读取。客户端在访问时，通过ip地址能够知道客户端所在的国家，城市。常用于处理不同国家的客户访问。</p>
+
+<p>之前小菜有写过用yum源安装nginx<a href="/nginx/2018/11/10/nginx-3.html" title="/nginx/2018/11/10/nginx-3.html">传送门</a>和nginx平滑升级<a href="/nginx/2019/01/05/nginx-24.html" title="/nginx/2019/01/05/nginx-24.html">传送门</a>如果小伙伴们不记得可以回头找找。
+在nginx平滑升级中介绍到用源码添加模块。</p>
+
+<ul>
+  <li>
+    <p><a href="https://www.vpsee.com/2011/03/install-nginx-with-geoip-module-for-country-targeting/" title="https://www.vpsee.com/2011/03/install-nginx-with-geoip-module-for-country-targeting/" target="_blank">hi@vpsee.com博客</a></p>
+  </li>
+  <li>
+    <p><a href="https://serverfault.com/questions/503909/geoip-for-configuration-into-nginx" title="https://serverfault.com/questions/503909/geoip-for-configuration-into-nginx">编译时出错排错</a></p>
+  </li>
+</ul>
+
+<h1 id="1下载nginx-module-geoip">1.下载nginx-module-geoip</h1>
+
+<p>在第3小节中记录nginx安装中，默认是没有安装这个模块。需要手动下载<code class="language-plaintext highlighter-rouge">ngx_http_geoip_module</code>模块。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum install nginx-module-geoip
+</code></pre></div></div>
+
+<p>安装成功后，会在<code class="language-plaintext highlighter-rouge">/etc/nginx/module</code>文件夹下出现geoip模块。</p>
+
+<h1 id="2安装maxmind的geoip库">2.安装MaxMind的GeoIP库</h1>
+
+<p>将GeoIP库下载目录<code class="language-plaintext highlighter-rouge">/opt/download</code>文件夹下</p>
+
+<pre><code class="language-linux">cd /opt/download  #如果没有手动创建
+wget http://geolite.maxmind.com/download/geoip/api/c/GeoIP.tar.gz
+tar -zxvf GeoIP.tar.gz
+cd GeoIP-1.4.8
+./configure
+make
+make install
+</code></pre>
+
+<p>刚才安装的库自动安装到 /usr/local/lib 下，所以这个目录需要加到动态链接配置里面以便运行相关程序的时候能自动绑定到这个 GeoIP 库：</p>
+
+<pre><code class="language-linux">echo '/usr/local/lib' &gt; /etc/ld.so.conf.d/geoip.conf
+ldconfig
+</code></pre>
+
+<h1 id="3下载ip数据库">3.下载IP数据库</h1>
+
+<p>最终目录结构</p>
+
+<pre><code class="language-txt">/etc/nginx/data/geoip
+|-GeoIP.dat
+|-GeoLiteCity.dat
+</code></pre>
+
+<p>MaxMind 提供了免费的 IP 地域数据库，这个数据库是二进制的，不能用文本编辑器打开，需要上面的 GeoIP 库来读取。小菜在这里放一个官方的下载地址<a href="https://dev.maxmind.com/zh-hans/geoip/legacy/geolite/" title="https://dev.maxmind.com/zh-hans/geoip/legacy/geolite/" target="_blank">官方下载</a>
+需要下载<code class="language-plaintext highlighter-rouge">GeoIP.dat.gz</code>文件和<code class="language-plaintext highlighter-rouge">GeoLiteCity.dat.gz</code>文件。小菜在这里放一个云盘，方便国内小伙伴获取<a href="https://pan.baidu.com/s/120UKQWFILuRQMfn2s-tYHg" title="https://pan.baidu.com/s/120UKQWFILuRQMfn2s-tYHg" target="_blank">云盘地址</a> 提取码[ 5ft5 ]</p>
+
+<pre><code class="language-linux">cd /etc/nginx/data/geoip  #如果没有data，需要手动创建
+
+gunzip GeoIP.dat.gz  #解压
+gunzip GeoLiteCity.dat.gz  #解压
+</code></pre>
+
+<h1 id="4编译安装">4.编译安装</h1>
+
+<p>基本工作准备完成后我们就可以ngx_http_geoip_module编译进nginx。<a href="http://nginx.org/en/docs/http/ngx_http_geoip_module.html" title="http://nginx.org/en/docs/http/ngx_http_geoip_module.html" target="_blank">ngx_http_geoip_module文档</a>
+默认情况下不构建此模块，应使用<code class="language-plaintext highlighter-rouge">--with-http_geoip_module</code>配置参数启用它。</p>
+
+<p>之前在nginx平滑升级中小菜编译nginx的源码包放在<code class="language-plaintext highlighter-rouge">/opt/download/nginx-1.14.2</code>文件夹下。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd /opt/download/nginx-1.14.2
+</code></pre></div></div>
+
+<h4 id="获取编译参数">获取编译参数</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -V
+</code></pre></div></div>
+
+<p>输出</p>
+
+<p>–prefix=/etc/nginx –sbin-path=/usr/sbin/nginx –modules-path=/usr/lib64/nginx/modules –conf-path=/etc/nginx/nginx.conf –error-log-path=/var/log/nginx/error.log –http-log-path=/var/log/nginx/access.log –pid-path=/var/run/nginx.pid –lock-path=/var/run/nginx.lock –http-client-body-temp-path=/var/cache/nginx/client_temp –http-proxy-temp-path=/var/cache/nginx/proxy_temp –http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp –http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp –http-scgi-temp-path=/var/cache/nginx/scgi_temp –user=nginx –group=nginx –with-compat –with-file-aio –with-threads –with-http_addition_module –with-http_auth_request_module –with-http_dav_module –with-http_flv_module –with-http_gunzip_module –with-http_gzip_static_module –with-http_mp4_module –with-http_random_index_module –with-http_realip_module –with-http_secure_link_module –with-http_slice_module –with-http_ssl_module –with-http_stub_status_module –with-http_sub_module –with-http_v2_module –with-mail –with-mail_ssl_module –with-stream –with-stream_realip_module –with-stream_ssl_module –with-stream_ssl_preread_module –with-cc-opt=’-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong –param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -fPIC’ –with-ld-opt=’-Wl,-z,relro -Wl,-z,now -pie’</p>
+
+<h4 id="添加编译参数--with-http_geoip_module">添加编译参数<code class="language-plaintext highlighter-rouge">--with-http_geoip_module</code></h4>
+
+<p><code class="language-plaintext highlighter-rouge">--prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib64/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-cc-opt='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -fPIC' --with-ld-opt='-Wl,-z,relro -Wl,-z,now -pie' --with-http_geoip_module</code></p>
+
+<h4 id="编译">编译</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./configure  上面编译参数 
+</code></pre></div></div>
+
+<h4 id="安装">安装</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make &amp;&amp; make install
+</code></pre></div></div>
+
+<p>如果在编译中有错误，查看最上面的<code class="language-plaintext highlighter-rouge">编译时出错排错</code>。希望对小伙伴们有用</p>
+
+<h4 id="检测">检测</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -V
+</code></pre></div></div>
+
+<p>查看输出编译参数有没有<code class="language-plaintext highlighter-rouge">--with-http_geoip_module</code>，有就证明安装好了。</p>
+
+<h1 id="5配置模块">5.配置模块</h1>
+
+<h4 id="geoip_country">geoip_country</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">geoip_country</span> <span class="s">file</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数名</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>$geoip_country_code</td>
+      <td>两个字母的国家/地区代码，例如“RU”，“US”</td>
+    </tr>
+    <tr>
+      <td>$geoip_country_code3</td>
+      <td>三个字母的国家/地区代码，例如“RUS”，“USA”</td>
+    </tr>
+    <tr>
+      <td>$geoip_country_name</td>
+      <td>国名，例如“俄罗斯联邦”，“美国”</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="geoip_city">geoip_city</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">geoip_city</span> <span class="s">file</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http</span>
+</code></pre></div></div>
+<p><br /></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数名</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>$geoip_area_code</td>
+      <td>电话区号（仅限美国）</td>
+    </tr>
+    <tr>
+      <td>$geoip_city_continent_code</td>
+      <td>两个字母的大陆代码，例如“EU”，“NA”</td>
+    </tr>
+    <tr>
+      <td>$geoip_city_country_code</td>
+      <td>两个字母的国家/地区代码，例如“RU”，“US”</td>
+    </tr>
+    <tr>
+      <td>$geoip_city_country_code3</td>
+      <td>三个字母的国家/地区代码，例如“RUS”，“USA”</td>
+    </tr>
+    <tr>
+      <td>$geoip_city_country_name</td>
+      <td>国名，例如“俄罗斯联邦”，“美国”</td>
+    </tr>
+    <tr>
+      <td>$geoip_dma_code</td>
+      <td>根据Google AdWords API中的地理位置定位，美国的DMA区域代码（也称为“都市代码”）</td>
+    </tr>
+    <tr>
+      <td>$geoip_latitude</td>
+      <td>纬度</td>
+    </tr>
+    <tr>
+      <td>$geoip_longitude</td>
+      <td>经度</td>
+    </tr>
+    <tr>
+      <td>$geoip_region</td>
+      <td>双符号国家区域代码（地区，领土，州，省，联邦土地等），例如“48”，“DC”</td>
+    </tr>
+    <tr>
+      <td>$geoip_region_name</td>
+      <td>国家地区名称（地区，领土，州，省，联邦土地等），例如“莫斯科市”，“哥伦比亚特区”</td>
+    </tr>
+    <tr>
+      <td>$geoip_city</td>
+      <td>城市名称，例如“莫斯科”，“华盛顿”</td>
+    </tr>
+    <tr>
+      <td>$geoip_postal_code</td>
+      <td>邮政编码</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="geoip_org">geoip_org</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">geoip_org</span> <span class="s">file</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http</span>
+</code></pre></div></div>
+<p><br /></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数名</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>$geoip_org</td>
+      <td>组织名称，例如“墨尔本大学”</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="geoip_proxy">geoip_proxy</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">geoip_proxy</span> <span class="s">address</span> <span class="s">|</span> <span class="s">CIDR</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http</span>
+</code></pre></div></div>
+
+<p>定义可信地址。当请求来自可信地址时，将使用来自<code class="language-plaintext highlighter-rouge">X-Forwarded-For</code>请求头字段的地址。</p>
+
+<h4 id="geoip_proxy_recursive">geoip_proxy_recursive</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">geoip_proxy_recursive</span> <span class="no">on</span> <span class="s">|</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">geoip_proxy_recursive</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http</span>
+</code></pre></div></div>
+
+<p>如果禁用递归搜索，则不使用与其中一个可信地址匹配的原始客户端地址，而是使用<code class="language-plaintext highlighter-rouge">X-Forwarded-For</code>中发送的最后一个地址。如果启用递归搜索，则不使用与其中一个可信地址匹配的原始客户端地址，而是使用在<code class="language-plaintext highlighter-rouge">X-Forwarded-For</code>中发送的最后一个不可信地址。</p>
+
+<h1 id="6配置教程">6.配置教程</h1>
+
+<p>服务目录</p>
+
+<pre><code class="language-txt">/etc/nginx/conf.d
+|-geoip.conf
+</code></pre>
+
+<h4 id="geoipconf">geoip.conf</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">geoip_country</span> <span class="n">/etc/nginx/data/geoip/GeoIP.dat</span><span class="p">;</span>
+<span class="k">geoip_city</span> <span class="n">/etc/nginx/data/geoip/GeoLiteCity.dat</span><span class="p">;</span>
+<span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span>       <span class="mi">80</span><span class="p">;</span>
+    <span class="kn">server_name</span>  <span class="s">localhost</span><span class="p">;</span>
+
+    <span class="c1">#charset koi8-r;</span>
+    <span class="kn">access_log</span>  <span class="n">/var/log/nginx/log/geoip.access.log</span>  <span class="s">main</span><span class="p">;</span>
+
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+        <span class="kn">if</span> <span class="s">(</span><span class="nv">$geoip_country_code</span> <span class="s">!=</span> <span class="s">CN)</span> <span class="p">{</span>
+            <span class="kn">return</span> <span class="mi">403</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kn">root</span>   <span class="n">/opt/app/code</span><span class="p">;</span>
+        <span class="kn">index</span>  <span class="s">index.html</span> <span class="s">index.htm</span><span class="p">;</span>
+    <span class="p">}</span>
+
+   <span class="kn">location</span> <span class="n">/myip</span> <span class="p">{</span>
+        <span class="kn">default_type</span> <span class="nc">text/plain</span><span class="p">;</span>
+        <span class="kn">return</span> <span class="mi">200</span> <span class="s">"</span><span class="nv">$remote_addr</span> <span class="nv">$geoip_country_name</span> <span class="nv">$geoip_country_code</span> <span class="nv">$geoip_city</span><span class="s">"</span><span class="p">;</span>
+   <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+:ET

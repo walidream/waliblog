@@ -1,0 +1,126 @@
+I"�!<p>ngx_http_secure_link_module模块用于检查请求链接的真伪，保护资源免受未经授权的访问，限制链接的生命周期。</p>
+
+<p>通过将请求中传递的校验和值与请求计算的值进行比较来验证请求链接的真实性。如果链接的生命周期有限并且时间已过，则该链接将被视为过时。</p>
+
+<p>该模块提供两种备选操作模式。第一种模式<code class="language-plaintext highlighter-rouge">secure_link_secret</code>指令启用，用于检查请求链接的真实性以及保护资源免受未经授权的访问。第二种模式<code class="language-plaintext highlighter-rouge">secure_link</code>和<code class="language-plaintext highlighter-rouge">secure_link_md5</code>指令启用，也用于限制链接生命周期。</p>
+
+<h1 id="1配置模块">1.配置模块</h1>
+
+<h4 id="secure_link">secure_link</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">secure_link</span> <span class="s">expression</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h4 id="secure_link_md5">secure_link_md5</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">secure_link_md5</span> <span class="s">expression</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h4 id="secure_link_secret">secure_link_secret</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">secure_link_secret</span> <span class="s">word</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h1 id="2验证原理">2.验证原理</h1>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_52.jpg" alt="ssl" /></p>
+
+<p>用户在客户端点击下载按钮，服务器收到请求后生成一个<code class="language-plaintext highlighter-rouge">下载地址</code>返回给客户端。客户端在用这个生成的下载地址去请求资源，此时nginx去做校验，校验链接地址真伪和链接地址是否过期。如果链接地址是真的并且链接地址没有过期，就给客户端返回下载资源。（nginx验证和服务器生成密钥规则要一致，否则不会通过的）</p>
+
+<h1 id="3配置教程">3.配置教程</h1>
+
+<p>服务目录</p>
+
+<pre><code class="language-txt">/opt/app
+|-code9
+   |-md5url.sh
+   |-index.html
+   |-download
+       |-tesla.img
+	   
+/etc/nginx/conf.d
+|-download.conf
+</code></pre>
+
+<h4 id="md5urlsh">md5url.sh</h4>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#生成一个测试链接脚本</span>
+<span class="nv">servername</span><span class="o">=</span><span class="s2">"walidream.com"</span>
+<span class="nv">download_file</span><span class="o">=</span><span class="s2">"/download/tesla.img"</span>
+<span class="nv">time_num</span><span class="o">=</span><span class="si">$(</span><span class="nb">date</span> <span class="nt">-d</span> <span class="s2">"2019-1-10 00:00:00"</span> +%s<span class="si">)</span>
+<span class="nv">secret_num</span><span class="o">=</span><span class="s2">"wali"</span>
+
+<span class="nv">res</span><span class="o">=</span><span class="si">$(</span><span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">"</span><span class="k">${</span><span class="nv">time_num</span><span class="k">}${</span><span class="nv">download_file</span><span class="k">}</span><span class="s2"> </span><span class="k">${</span><span class="nv">secret_num</span><span class="k">}</span><span class="s2">"</span>|openssl md5 <span class="nt">-binary</span> | openssl <span class="nb">base64</span> | <span class="nb">tr</span> +/ <span class="nt">-_</span> | <span class="nb">tr</span> <span class="nt">-d</span> <span class="o">=</span><span class="si">)</span>
+
+<span class="nb">echo</span> <span class="s2">"http://</span><span class="k">${</span><span class="nv">servername</span><span class="k">}${</span><span class="nv">download_file</span><span class="k">}</span><span class="s2">?md5=</span><span class="k">${</span><span class="nv">res</span><span class="k">}</span><span class="s2">&amp;expires=</span><span class="k">${</span><span class="nv">time_num</span><span class="k">}</span><span class="s2">"</span>
+</code></pre></div></div>
+
+<h4 id="获取测试链接">获取测试链接</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sh /opt/app/code9/md5url.sh
+</code></pre></div></div>
+
+<p>输出</p>
+
+<p>http://walidream.com/download/tesla.img?md5=T1gCW3YQNsnWCcJHWWbcPg&amp;expires=154704960</p>
+
+<h4 id="indexhtml">index.html</h4>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+	<span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;title&gt;</span>Document<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+	<span class="nt">&lt;h1&gt;</span>欢迎来到瓦力博客<span class="nt">&lt;/h1&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<h4 id="downloadconf">download.conf</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span>       <span class="mi">80</span><span class="p">;</span>
+    <span class="kn">server_name</span>  <span class="s">localhost</span><span class="p">;</span>
+
+    <span class="c1">#charset koi8-r;</span>
+    
+    <span class="kn">root</span> <span class="n">/opt/app/code9</span><span class="p">;</span>
+
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+        <span class="kn">index</span> <span class="s">index.html</span><span class="p">;</span>
+    <span class="p">}</span>
+	
+    <span class="kn">location</span> <span class="n">/download</span> <span class="p">{</span>
+        <span class="kn">secure_link</span> <span class="nv">$arg_md5</span><span class="s">,</span><span class="nv">$arg_expires</span><span class="p">;</span>
+        <span class="kn">secure_link_md5</span> <span class="s">"</span><span class="nv">$secure_link_expires$uri</span> <span class="s">wali"</span><span class="p">;</span>
+	
+        <span class="kn">if</span> <span class="s">(</span><span class="nv">$secure_link</span> <span class="p">=</span> <span class="s">"")</span> <span class="p">{</span>
+            <span class="kn">return</span> <span class="mi">403</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="kn">if</span> <span class="s">(</span><span class="nv">$secure_link</span> <span class="p">=</span> <span class="s">"0")</span> <span class="p">{</span>
+            <span class="kn">return</span> <span class="mi">410</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>	
+</code></pre></div></div>
+
+<p>检测语法并重启</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -tc /etc/nginx/nginx.conf
+nginx -s reload -c /etc/nginx/nginx.conf
+</code></pre></div></div>
+
+<p>我们在浏览器输入<code class="language-plaintext highlighter-rouge">walidream.com</code>会显示欢迎来到瓦力博客，当输入上面测试链接<code class="language-plaintext highlighter-rouge">http://walidream.com/download/tesla.img?md5=T1gCW3YQNsnWCcJHWWbcPg&amp;expires=154704960</code>就可以看到<code class="language-plaintext highlighter-rouge">tesla.img</code>文件在浏览器下载了。</p>
+
+<p>将后面的时间戳随便改写如expires=15470496011，回车，发现网页变为403</p>
+
+:ET

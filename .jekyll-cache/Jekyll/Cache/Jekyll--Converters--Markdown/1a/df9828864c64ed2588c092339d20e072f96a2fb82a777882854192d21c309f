@@ -1,0 +1,23 @@
+I"�<p>WNMP是Windows下的绿色Nginx+Mysql+PHP环境集成套件包。</p>
+
+<h1 id="1wnmp配置">1.wnmp配置</h1>
+
+<p>小菜将wnmp装在E盘，nginx配置就放在<code class="language-plaintext highlighter-rouge">E:\Wnmp\conf\nginx.conf </code></p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">server</span>
+<span class="p">{</span>
+    <span class="kn">listen</span> <span class="mi">80</span><span class="p">;</span>
+    <span class="kn">server_name</span> <span class="s">tky.dev.shbz.com</span><span class="p">;</span>  <span class="kn">[随意起名字]</span>
+    <span class="s">charset</span> <span class="s">utf-8</span><span class="p">;</span>
+    <span class="kn">index</span> <span class="s">index.html</span> <span class="s">index.htm</span> <span class="s">index.php</span><span class="p">;</span>
+    <span class="kn">root</span> <span class="s">"E:/www/tuiKeYi/src"</span><span class="p">;</span>      <span class="kn">[写在www目录中项目的路径]</span> 
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h1 id="2配置windows本地域名">2.配置windows本地域名</h1>
+
+<p>将写好的server_name赋值到路径为 <code class="language-plaintext highlighter-rouge">C:\Windows\System32\drivers\etc</code>，打开hosts文件，在下面添加</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>127.0.0.1	tky.dev.shbz.com
+</code></pre></div></div>
+:ET

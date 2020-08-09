@@ -1,0 +1,84 @@
+I"�<p>防盗链是一种机制，也可以说是一种技术.目的就是防止自己网站上的东西（如图片，文件 etc。）被其他用户采用其他的技术手段来访问或者下载。简单来说就是防止自己站点资源被他人盗用</p>
+
+<h1 id="1盗链">1.盗链</h1>
+
+<p>站点在页面呈现的时候拉取非本站的资源，称为<code class="language-plaintext highlighter-rouge">盗链</code>。准确的说，只有某些时候，这种跨站访问资源，才被称为盗链。假设B站点作为一个商业网站，有很多自主版权
+的图片，自身展示用于商业目的。而A站点，希望在自己的网站上面也展示这些图片，直接使用：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;img src="http://b.com/photo.jpg"/&gt;
+</code></pre></div></div>
+
+<p>这样，大量的客户端在访问A站点时，实际上消耗了B站点的流量，而A站点却从中达成商业目的。从而不劳而获。这样的A站点着实令B站点不快的。</p>
+
+<h1 id="2nginx配置防盗链">2.nginx配置防盗链</h1>
+
+<p>当浏览器向web服务器发送请求的时候，一般会在头信息中带上<code class="language-plaintext highlighter-rouge">Referer</code>字段，告诉服务器我是从哪个页面链接过来的，服务器基此可以获得一些信息用于处理。基于头信息的
+<code class="language-plaintext highlighter-rouge">Referer</code>字段，nginx识别指定的Referer，在客户端请求时，通过匹配referer头域与配置，对于指定放行，对于其他referer视为盗链。</p>
+
+<h3 id="1valid_referers">1.valid_referers</h3>
+
+<p>valid_referers配置项是属于<code class="language-plaintext highlighter-rouge">ngx_http_referer_module</code>模块<a href="http://nginx.org/en/docs/http/ngx_http_referer_module.html" title="http://nginx.org/en/docs/http/ngx_http_referer_module.html" target="_blank">传送门</a></p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">valid_referers</span> <span class="s">none</span> <span class="s">|</span> <span class="s">blocked</span> <span class="s">|</span> <span class="s">server_names</span> <span class="s">|</span> <span class="s">string</span> <span class="s">...</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>none</td>
+      <td>请求标头中缺少”Referer”字段，也就是空Referer</td>
+    </tr>
+    <tr>
+      <td>blocked</td>
+      <td>“Referer”字段出现在请求标头中，但其值已被防火墙或代理服务器删除;这些值是不以”http://”或”https://”开头的字符串</td>
+    </tr>
+    <tr>
+      <td>server_names</td>
+      <td>允许某个域名通过如walidrea.com</td>
+    </tr>
+    <tr>
+      <td>arbitrary string</td>
+      <td>定义服务器名称和可选的URI前缀。服务器名称的开头或结尾可以包含“*”。在检查期间，“Referer”字段中的服务器端口被忽略</td>
+    </tr>
+    <tr>
+      <td>regular expression</td>
+      <td>第一个符号应为“~”。应该注意的是，表达式将与“http：//”或“https：//”之后的文本匹配</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="示例配置">示例配置</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">location</span> <span class="p">~</span> <span class="sr">.*\.(jpg|gif|png)$</span> <span class="p">{</span>
+	<span class="kn">root</span>  <span class="n">/opt/app/code/images</span><span class="p">;</span>
+	<span class="kn">gzip</span> <span class="no">on</span><span class="p">;</span>
+	<span class="kn">gzip_http_version</span> <span class="mi">1</span><span class="s">.1</span><span class="p">;</span>
+	<span class="kn">gzip_comp_level</span> <span class="mi">2</span><span class="p">;</span>
+	<span class="kn">gzip_types</span> <span class="nc">text/plain</span> <span class="nc">application/javascript</span> <span class="nc">application/x-javascript</span> <span class="nc">text/css</span> <span class="nc">application/xml</span> <span class="nc">text/javascript</span> <span class="nc">application/x-httpd-php</span> <span class="nc">image/jpeg</span> <span class="nc">image/gif</span> <span class="nc">image/png</span><span class="p">;</span>
+
+	<span class="kn">valid_referers</span> <span class="s">none</span> <span class="s">blocked</span> <span class="mi">116</span><span class="s">.62.113.218</span> <span class="s">walidream.com</span><span class="p">;</span>
+	<span class="kn">if</span> <span class="s">(</span><span class="nv">$invalid_referer</span><span class="s">)</span> <span class="p">{</span>
+		<span class="kn">return</span> <span class="mi">403</span><span class="p">;</span>
+	<span class="p">}</span>	
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>允许访问服务器图片</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_13.png" alt="ssl" /></p>
+
+<p>不允许访问服务器图片</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_14.png" alt="ssl" /></p>
+
+<p>因为HTTPReferer头信息是可以通过程序来伪装生成的，所以通过Referer信息防盗链并非100%可靠，但是，它能够限制大部分的盗链</p>
+
+:ET

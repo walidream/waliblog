@@ -1,0 +1,52 @@
+I"�<p>之前小菜有自己从网上找的教程，零散的配过一些nginx,最近赶上双11没把持住就买了nginx教程。系统性的学习nginx，将nginx学习过程记录下来。</p>
+
+<p>由于小菜条件有限，小菜用的硬件环境是阿里云服务器，1核，2GB内存。操作系统是centos7.4</p>
+
+<h1 id="1调试环境四项确认">1.调试环境四项确认</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1.确认系统网络，保证能够访问公网
+2.确认yum可用
+3.确认关闭iptables规则 
+4.确认停用selinux
+</code></pre></div></div>
+
+<h3 id="访问公网">访问公网</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ping www.baidu.com
+</code></pre></div></div>
+
+<h3 id="yum安装依赖库">yum安装依赖库</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum -y install gcc gcc-c++ autoconf pcre pcre-devel make automake
+yum -y install wget httpd-tools vim
+</code></pre></div></div>
+
+<h3 id="iptables">iptables</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>查看 
+iptables -L
+关闭 
+iptables -F
+iptables -t nat -L
+iptables -t nat -F
+</code></pre></div></div>
+
+<h3 id="selinux">selinux</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>查看 
+getenforce
+关闭 
+setenforce 0
+</code></pre></div></div>
+
+<h1 id="2初始化目录">2.初始化目录</h1>
+
+<pre><code class="language-txt">cd /opt/
+|
+|--app   		//应用
+|--backup 		//备份
+|--download 	//下载
+|--logs			//日志
+|--work			
+</code></pre>
+
+:ET

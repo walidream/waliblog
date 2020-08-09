@@ -1,0 +1,260 @@
+I"V<p>websocket实现在HTTP连接的基础上，并<code class="language-plaintext highlighter-rouge">通过HTTP中的Upgrade</code>协议头将连接从HTTP升级到Websocket。这样就可以实现多次双向通讯，直到连接被关闭。小菜推荐有兴趣的小伙伴去看下这篇博客</p>
+
+<ul>
+  <li>阮一峰博客<a href="http://www.ruanyifeng.com/blog/2017/05/websocket.html" title="http://www.ruanyifeng.com/blog/2017/05/websocket.html" target="_blank">WebSocket 教程</a></li>
+</ul>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_28.jpg" alt="ssl" /></p>
+
+<h1 id="1nginx代理webscocket">1.nginx代理webscocket</h1>
+
+<p>nginx代理webscocket和代理一般服务请求一样，就是在客户端和服务器做一个转发。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_29.jpg" alt="ssl" /></p>
+
+<h1 id="2websocket代理配置">2.websocket代理配置</h1>
+
+<p>演示websocket配置服务器端用nodejs，因为node环境很容易安装，测试也很简单。这里主要是演示nginx下如何配置websocket代理。</p>
+
+<h4 id="安装node环境">安装node环境</h4>
+
+<p>安装node环境具体请查<a href="/nodejs/2018/12/21/insatlll.html" title="/nodejs/2018/12/21/insatlll.html" target="_blank">nodejs 安装教程</a></p>
+
+<h4 id="安装yarn">安装yarn</h4>
+
+<p>安装yarn，具体查看官方文档<a href="https://www.yarnpkg.com/zh-Hans/docs/install#centos-stable" title="https://www.yarnpkg.com/zh-Hans/docs/install#centos-stable" target="_blank">yarn 安装</a></p>
+
+<p>添加websocket库，cd <code class="language-plaintext highlighter-rouge">/opt/app/websocket</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add ws
+</code></pre></div></div>
+
+<h4 id="演示服务目录">演示服务目录</h4>
+
+<pre><code class="language-txt">/opt/app/websocket
+|-node_modules
+|-package.json
+|-server.js
+|-yarn.lock
+
+/opt/app/code
+|-index.html
+
+/etc/nginx/cond.f
+|-websocket.conf
+</code></pre>
+
+<p><code class="language-plaintext highlighter-rouge">websocket</code>目录下面只需要注意<code class="language-plaintext highlighter-rouge">server.js</code>文件，其他文件都是通过<code class="language-plaintext highlighter-rouge">yarn add ws</code>命令自动生成的。</p>
+
+<h4 id="serverjs">server.js</h4>
+
+<p>server文件是在服务器启动一个服务，端口为8010</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">start NodeServer</span><span class="dl">"</span><span class="p">);</span> 
+<span class="kd">var</span> <span class="nx">msg</span> <span class="o">=</span> <span class="dl">""</span><span class="p">;</span> 
+<span class="kd">var</span> <span class="nx">webSocketServer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">ws</span><span class="dl">'</span><span class="p">).</span><span class="nx">Server</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">wss</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">webSocketServer</span><span class="p">({</span><span class="na">port</span><span class="p">:</span><span class="mi">8010</span><span class="p">});</span>
+
+<span class="nx">wss</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">connection</span><span class="dl">'</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">ws</span><span class="p">){</span>
+   <span class="nx">ws</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="dl">'</span><span class="s1">hello!</span><span class="dl">'</span><span class="p">);</span>
+   <span class="nx">ws</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">message</span><span class="dl">'</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">message</span><span class="p">){</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">message</span><span class="p">);</span>
+      <span class="nx">ws</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+   <span class="p">})</span>  
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h4 id="indexhtml">index.html</h4>
+
+<p>这个demo是自己写的，样式没有分开，主要是做一个简单的演示界面。</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+	<span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;title&gt;</span>Document<span class="nt">&lt;/title&gt;</span>	
+	<span class="nt">&lt;style&gt;</span>
+		<span class="o">*</span><span class="p">{</span>
+			<span class="nl">margin</span><span class="p">:</span><span class="m">0</span><span class="p">;</span>
+			<span class="nl">padding</span><span class="p">:</span><span class="m">0</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nf">#app</span><span class="p">{</span>
+			<span class="nl">margin</span><span class="p">:</span><span class="m">50px</span> <span class="nb">auto</span><span class="p">;</span>
+			<span class="nl">width</span><span class="p">:</span> <span class="m">600px</span><span class="p">;</span>
+			<span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="m">#000</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nt">ul</span><span class="p">{</span>
+            <span class="nl">height</span><span class="p">:</span><span class="m">500px</span><span class="p">;</span>
+            <span class="nl">overflow</span><span class="p">:</span> <span class="nb">auto</span><span class="p">;</span>
+			<span class="nl">list-style-type</span><span class="p">:</span> <span class="nb">none</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nc">.receive</span><span class="p">{</span>
+			<span class="nl">margin</span><span class="p">:</span><span class="m">5px</span> <span class="m">0</span><span class="p">;</span>
+			<span class="nl">display</span><span class="p">:</span> <span class="n">flex</span><span class="p">;</span>			
+			<span class="nl">align-items</span><span class="p">:</span> <span class="nb">center</span><span class="p">;</span>
+			<span class="py">justify-contet</span><span class="p">:</span> <span class="n">flex-start</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nc">.send</span><span class="p">{</span>
+			<span class="nl">margin</span><span class="p">:</span><span class="m">5px</span> <span class="m">0</span><span class="p">;</span>
+			<span class="nl">display</span><span class="p">:</span> <span class="n">flex</span><span class="p">;</span>			
+			<span class="nl">align-items</span><span class="p">:</span> <span class="nb">center</span><span class="p">;</span>
+			<span class="nl">justify-content</span><span class="p">:</span> <span class="n">flex-end</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nc">.s_avatar</span><span class="o">,</span><span class="nc">.f_avatar</span><span class="p">{</span>
+			<span class="nl">display</span><span class="p">:</span><span class="n">inline-block</span><span class="p">;</span>
+			<span class="nl">width</span><span class="p">:</span><span class="m">50px</span><span class="p">;</span>
+			<span class="nl">height</span><span class="p">:</span><span class="m">50px</span><span class="p">;</span>
+			<span class="nl">line-height</span><span class="p">:</span><span class="m">50px</span><span class="p">;</span>
+			<span class="nl">font-size</span><span class="p">:</span><span class="m">14px</span><span class="p">;</span>
+			<span class="nl">text-align</span><span class="p">:</span><span class="nb">center</span><span class="p">;</span>
+			<span class="nl">color</span><span class="p">:</span><span class="m">#fff</span><span class="p">;</span>
+			<span class="nl">background-color</span><span class="p">:</span><span class="m">#FF66FF</span><span class="p">;</span>
+			<span class="nl">border-radius</span><span class="p">:</span><span class="m">50%</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nc">.f_avatar</span><span class="p">{</span>
+			<span class="nl">background-color</span><span class="p">:</span><span class="m">#199ED8</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nt">p</span><span class="p">{</span>
+			<span class="nl">background</span><span class="p">:</span> <span class="m">#86DA51</span><span class="p">;</span>
+			<span class="nl">height</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+			<span class="nl">line-height</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+			<span class="nl">border-radius</span><span class="p">:</span> <span class="m">19px</span><span class="p">;</span>
+			<span class="nl">padding</span><span class="p">:</span> <span class="m">0</span> <span class="m">20px</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nc">.input-box</span><span class="p">{</span>
+			<span class="nl">margin</span><span class="p">:</span><span class="m">30px</span> <span class="m">0</span><span class="p">;</span>
+			<span class="nl">display</span><span class="p">:</span> <span class="n">flex</span><span class="p">;</span>			
+			<span class="nl">justify-content</span><span class="p">:</span> <span class="n">flex-start</span><span class="p">;</span>
+			<span class="nl">align-items</span><span class="p">:</span> <span class="nb">center</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nt">input</span><span class="p">{</span>
+			<span class="nl">width</span><span class="p">:</span><span class="m">500px</span><span class="p">;</span>
+			<span class="nl">height</span><span class="p">:</span><span class="m">50px</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nt">button</span><span class="p">{</span>
+			<span class="nl">width</span><span class="p">:</span><span class="m">100px</span><span class="p">;</span>
+			<span class="nl">height</span><span class="p">:</span><span class="m">50px</span><span class="p">;</span>
+		<span class="p">}</span>
+	<span class="nt">&lt;/style&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+
+
+	<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"app"</span><span class="nt">&gt;</span>
+		<span class="nt">&lt;ul&gt;</span>
+			<span class="nt">&lt;li</span> <span class="na">v-for=</span><span class="s">"mes in message"</span><span class="nt">&gt;</span>
+				<span class="nt">&lt;div</span> <span class="na">:class=</span><span class="s">"[mes.type]"</span> <span class="na">v-if=</span><span class="s">"mes.type == 'receive'"</span><span class="nt">&gt;</span>
+                     <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"s_avatar"</span><span class="nt">&gt;</span>收<span class="nt">&lt;/span&gt;&lt;p&gt;&lt;/p&gt;</span>
+				<span class="nt">&lt;/div&gt;</span>
+				<span class="nt">&lt;div</span> <span class="na">:class=</span><span class="s">"[mes.type]"</span> <span class="na">v-else</span><span class="nt">&gt;</span>
+			        <span class="nt">&lt;p&gt;&lt;/p&gt;&lt;span</span> <span class="na">class=</span><span class="s">"f_avatar"</span><span class="nt">&gt;</span>发<span class="nt">&lt;/span&gt;</span>
+				<span class="nt">&lt;/div&gt;</span>
+			<span class="nt">&lt;/li&gt;</span>
+		<span class="nt">&lt;/ul&gt;</span>
+		<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"input-box"</span><span class="nt">&gt;</span>
+			<span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="err">@</span><span class="na">keyup.enter=</span><span class="s">"send"</span> <span class="na">v-model=</span><span class="s">"input"</span><span class="nt">&gt;</span>
+			<span class="nt">&lt;button</span> <span class="err">@</span><span class="na">click=</span><span class="s">"send"</span><span class="nt">&gt;</span>发送<span class="nt">&lt;/button&gt;</span>
+		<span class="nt">&lt;/div&gt;</span>
+	<span class="nt">&lt;/div&gt;</span>
+	
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"https://cdn.bootcss.com/vue/2.5.21/vue.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script&gt;</span>
+	<span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Vue</span><span class="p">({</span>
+		<span class="na">el</span><span class="p">:</span><span class="dl">'</span><span class="s1">#app</span><span class="dl">'</span><span class="p">,</span>
+		<span class="na">data</span><span class="p">:</span><span class="kd">function</span><span class="p">(){</span>
+			<span class="k">return</span> <span class="p">{</span>
+				<span class="na">input</span><span class="p">:</span><span class="dl">''</span><span class="p">,</span>
+				<span class="na">message</span><span class="p">:[],</span>
+				<span class="na">socket</span><span class="p">:</span><span class="kc">null</span>
+			<span class="p">}</span>
+		<span class="p">},</span>
+		<span class="na">methods</span><span class="p">:{</span>
+			<span class="nx">send</span><span class="p">(){</span>
+				<span class="kd">let</span> <span class="nx">obj</span><span class="o">=</span><span class="p">{</span><span class="dl">'</span><span class="s1">type</span><span class="dl">'</span><span class="p">:</span><span class="dl">'</span><span class="s1">send</span><span class="dl">'</span><span class="p">,</span><span class="na">value</span><span class="p">:</span><span class="k">this</span><span class="p">.</span><span class="nx">input</span><span class="p">}</span>
+				<span class="k">this</span><span class="p">.</span><span class="nx">message</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>
+				<span class="k">this</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">input</span><span class="p">);</span> 
+			<span class="p">}</span>
+		<span class="p">},</span>
+		<span class="nx">mounted</span><span class="p">(){</span>
+			<span class="kd">let</span> <span class="nb">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+			<span class="nb">self</span><span class="p">.</span><span class="nx">socket</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebSocket</span><span class="p">(</span><span class="dl">'</span><span class="s1">ws://walidream.com/websocket</span><span class="dl">'</span><span class="p">);</span>
+			<span class="nb">self</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">onopen</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+				<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">开始连接!</span><span class="dl">'</span><span class="p">);</span>				 
+			<span class="p">};</span>
+			<span class="nb">self</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">onmessage</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+				<span class="kd">let</span> <span class="nx">obj</span><span class="o">=</span><span class="p">{</span><span class="dl">'</span><span class="s1">type</span><span class="dl">'</span><span class="p">:</span><span class="dl">'</span><span class="s1">receive</span><span class="dl">'</span><span class="p">,</span><span class="na">value</span><span class="p">:</span><span class="nx">event</span><span class="p">.</span><span class="nx">data</span><span class="p">}</span>
+				<span class="nb">self</span><span class="p">.</span><span class="nx">message</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>
+				<span class="c1">//socket.close();</span>
+			<span class="p">};</span>
+			<span class="nb">self</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">onclose</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+				<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">关闭连接!</span><span class="dl">'</span><span class="p">);</span>
+			<span class="p">};</span>
+			<span class="nb">self</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">onerror</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+				<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">关闭连接出错!</span><span class="dl">'</span><span class="p">);</span>
+			<span class="p">};</span>
+			
+		<span class="p">}</span>
+	
+	<span class="p">})</span>
+<span class="nt">&lt;/script&gt;</span>
+</code></pre></div></div>
+
+<h4 id="websocketconf">websocket.conf</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">map</span> <span class="nv">$http_upgrade</span> <span class="nv">$connection_upgrade</span> <span class="p">{</span>
+    <span class="kn">default</span> <span class="s">upgrade</span><span class="p">;</span>
+    <span class="kn">''</span> <span class="s">close</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">upstream</span> <span class="s">websocket</span> <span class="p">{</span>
+    <span class="kn">server</span> <span class="nf">127.0.0.1</span><span class="p">:</span><span class="mi">8010</span><span class="p">;</span>  <span class="c1">#监听8010端口</span>
+<span class="p">}</span>
+
+<span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span>       <span class="mi">80</span><span class="p">;</span>
+    <span class="kn">server_name</span>  <span class="s">localhost</span><span class="p">;</span>
+
+    <span class="c1">#charset koi8-r;</span>
+    <span class="kn">access_log</span>  <span class="n">/var/log/nginx/host.access.log</span>  <span class="s">main</span><span class="p">;</span>
+
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+        <span class="kn">root</span> <span class="n">/opt/app/code</span><span class="p">;</span>
+        <span class="kn">index</span> <span class="s">index.html</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kn">location</span> <span class="p">~</span> <span class="sr">^/websocket</span> <span class="p">{</span>
+        <span class="kn">proxy_pass</span> <span class="s">http://websocket</span><span class="p">;</span>
+        <span class="kn">proxy_http_version</span> <span class="mi">1</span><span class="s">.1</span><span class="p">;</span>
+        <span class="kn">proxy_set_header</span> <span class="s">Upgrade</span> <span class="nv">$http_upgrade</span><span class="p">;</span>
+        <span class="kn">proxy_set_header</span> <span class="s">Connection</span> <span class="nv">$connection_upgrade</span><span class="p">;</span>       
+    <span class="p">}</span>
+
+    <span class="c1">#error_page  404              /404.html;</span>
+
+    <span class="c1"># redirect server error pages to the static page /50x.html</span>
+    <span class="c1">#</span>
+    <span class="kn">error_page</span>   <span class="mi">500</span> <span class="mi">502</span> <span class="mi">503</span> <span class="mi">504</span>  <span class="n">/50x.html</span><span class="p">;</span>
+    <span class="kn">location</span> <span class="p">=</span> <span class="n">/50x.html</span> <span class="p">{</span>
+        <span class="kn">root</span>   <span class="n">/usr/share/nginx/html</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="启动8010端口服务">启动8010端口服务</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd /opt/app/websocket
+</code></pre></div></div>
+
+<p>运行</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node ./server.js
+</code></pre></div></div>
+
+<p>在浏览器上输入域名访问<code class="language-plaintext highlighter-rouge">http://www.walidream.com</code>,下面是小菜配置好的demo</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_30.jpg" alt="ssl" /></p>
+
+:ET

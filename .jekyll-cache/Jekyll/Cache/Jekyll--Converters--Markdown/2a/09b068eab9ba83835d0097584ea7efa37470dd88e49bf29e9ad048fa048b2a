@@ -1,0 +1,51 @@
+I"�$<p>简单描述下这几个函数的曲线</p>
+
+<script async="" src="//jsrun.net/f5qKp/embed/all/light/"></script>
+
+<h1 id="1函数曲线">1.函数曲线</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">funcCurve</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">easeInQuad</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pos</span><span class="p">){</span>
+          <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+      <span class="p">},</span>
+      <span class="na">easeOutQuad</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pos</span><span class="p">){</span>
+          <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">((</span><span class="nx">pos</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+      <span class="p">},</span>
+      <span class="na">easeInOutQuad</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pos</span><span class="p">){</span>
+          <span class="k">if</span> <span class="p">((</span><span class="nx">pos</span><span class="o">/=</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+          <span class="k">return</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="nx">pos</span><span class="o">-=</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="nx">pos</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
+      <span class="p">},</span>
+      <span class="na">easeInCubic</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pos</span><span class="p">){</span>
+          <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+      <span class="p">},</span>
+      <span class="na">easeOutCubic</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pos</span><span class="p">){</span>
+          <span class="k">return</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">((</span><span class="nx">pos</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span> <span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+      <span class="p">},</span>
+      <span class="na">easeInOutCubic</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pos</span><span class="p">){</span>
+          <span class="k">if</span> <span class="p">((</span><span class="nx">pos</span><span class="o">/=</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
+          <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">((</span><span class="nx">pos</span><span class="o">-</span><span class="mi">2</span><span class="p">),</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">);</span>
+      <span class="p">},</span>
+      <span class="na">easeInQuart</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pos</span><span class="p">){</span>
+          <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+      <span class="p">},</span>
+      <span class="na">easeOutQuart</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pos</span><span class="p">){</span>
+          <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">((</span><span class="nx">pos</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+      <span class="p">},</span>
+      <span class="na">easeInOutQuart</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pos</span><span class="p">){</span>
+          <span class="k">if</span> <span class="p">((</span><span class="nx">pos</span><span class="o">/=</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span><span class="mi">4</span><span class="p">);</span>
+          <span class="k">return</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="nx">pos</span><span class="o">-=</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
+      <span class="p">},</span>
+      <span class="na">easeInQuint</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pos</span><span class="p">){</span>
+          <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+      <span class="p">},</span>
+      <span class="na">easeOutQuint</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pos</span><span class="p">){</span>
+          <span class="k">return</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">((</span><span class="nx">pos</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span> <span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+      <span class="p">},</span>
+      <span class="na">easeInOutQuint</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pos</span><span class="p">){</span>
+          <span class="k">if</span> <span class="p">((</span><span class="nx">pos</span><span class="o">/=</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span>
+          <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">((</span><span class="nx">pos</span><span class="o">-</span><span class="mi">2</span><span class="p">),</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">);</span>
+      <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+:ET

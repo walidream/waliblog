@@ -1,0 +1,83 @@
+I"�<p>ss是Socket Statistics的缩写。顾名思义，ss命令可以用来获取socket统计信息，它可以显示和netstat类似的内容。但ss的优势在于它能够显示更多更详细的有关TCP和连接状态的信息，而且比netstat更快速更高效。</p>
+
+<h1 id="1语法">1.语法</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ss [参数] 
+
+ss [参数] [过滤]
+</code></pre></div></div>
+
+<h1 id="2选项">2.选项</h1>
+
+<pre><code class="language-linux">-h：显示帮助信息
+-V：显示指令版本信息
+-n：不解析服务器名称，以数字方式显示
+-a：显示所有的套接字
+-l：显示处于监听状态的套接字
+-o：显示计时器信息
+-m：显示套接字的内存使用情况
+-p：显示使用 套接字的进程信息
+-i：显示内容的TCP信息
+-4：只显示ipv4的套接字
+-6：只显示ipv6的套接字
+-t：只显示tcp套接字
+-u：只显示udp套接字
+-d：只显示dccp套接字
+-w：仅显示RAW套接字
+-x：仅显示UNIX域套接字
+</code></pre>
+
+<p>命令可以连着写，如<code class="language-plaintext highlighter-rouge">ss -t -a</code> 可以写成 <code class="language-plaintext highlighter-rouge">ss -ta</code></p>
+
+<h1 id="3实例">3.实例</h1>
+
+<h3 id="1显示tcp连接">1.显示TCP连接</h3>
+
+<p>命令</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ss -ta
+</code></pre></div></div>
+
+<p>输出</p>
+<pre><code class="language-linux">State      Recv-Q Send-Q Local Address:Port                 Peer Address:Port                
+LISTEN     0      128          *:http                       *:*                    
+LISTEN     0      128          *:ssh                        *:*                    
+ESTAB      0      0      172.19.139.239:45662                100.100.30.25:http                 
+ESTAB      0      52     172.19.139.239:ssh                  180.172.224.80:64711  
+</code></pre>
+
+<h3 id="2显示sockets摘要">2.显示Sockets摘要</h3>
+
+<p>命令</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ss -s
+</code></pre></div></div>
+
+<p>输出</p>
+<pre><code class="language-linux">Total: 92 (kernel 192)
+TCP:   4 (estab 2, closed 0, orphaned 0, synrecv 0, timewait 0/0), ports 0
+
+Transport Total     IP        IPv6
+*	  192       -         -        
+RAW	  0         0         0        
+UDP	  4         3         1        
+TCP	  4         4         0        
+INET  8         7         1        
+FRAG  0         0         0 
+</code></pre>
+
+<h3 id="3列出所有打开网络连接端口">3.列出所有打开网络连接端口</h3>
+
+<p>命令</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ss -l
+</code></pre></div></div>
+
+<p>输出</p>
+<pre><code class="language-linux">udp    UNCONN     0      0         *:ntp                     *:*                    
+udp    UNCONN     0      0        :::ntp                    :::*                    
+tcp    LISTEN     0      128       *:http                    *:*                    
+tcp    LISTEN     0      128       *:ssh                     *:*  
+</code></pre>
+
+:ET

@@ -1,0 +1,166 @@
+I"30<p>Go语言的数据类型分为基础数据类型和复合数据类型。</p>
+
+<blockquote>
+  <p>基础数据类型：<code class="language-plaintext highlighter-rouge">整型、浮点型、复数、布尔型、字符串</code></p>
+</blockquote>
+
+<blockquote>
+  <p>复合数据类型：<code class="language-plaintext highlighter-rouge">数组、Slice(切片)、Map、结构体、JSON</code></p>
+</blockquote>
+
+<p>Go语言中关于算术运算、逻辑运算和比较运算的二元运算符，它们按照优先级递减的顺序排列</p>
+
+<ul>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>*</td>
+          <td>/</td>
+          <td>%</td>
+          <td>«</td>
+          <td>»</td>
+          <td>&amp;</td>
+          <td>&amp;^</td>
+        </tr>
+        <tr>
+          <td>+</td>
+          <td>-</td>
+          <td>|</td>
+          <td>^</td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+        </tr>
+        <tr>
+          <td>==</td>
+          <td>!=</td>
+          <td>&lt;</td>
+          <td>&lt;=</td>
+          <td>&gt;</td>
+          <td>&gt;=</td>
+          <td> </td>
+        </tr>
+        <tr>
+          <td>&amp;&amp;</td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+        </tr>
+        <tr>
+          <td>||</td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ul>
+
+<p>二元运算符有五种优先级。在同一个优先级，使用左优先结合规则，但是使用括号可以明确优先顺序</p>
+
+<h1 id="1整型">1.整型</h1>
+
+<p>Go语言同时提供了<code class="language-plaintext highlighter-rouge">有符号</code>(int)和<code class="language-plaintext highlighter-rouge">无符号</code>(uint)类型的整数运算。</p>
+
+<blockquote>
+  <p>int：int8、int16、int32、int64</p>
+</blockquote>
+
+<blockquote>
+  <p>uint：uint8、uint16、uint32、uint64</p>
+</blockquote>
+
+<p>一个n-bit的有符号数的值域是从<code class="language-plaintext highlighter-rouge">$-2^{n-1}$</code>到<code class="language-plaintext highlighter-rouge">$2^{n-1}-1$</code>。如<code class="language-plaintext highlighter-rouge">int8</code>范围-127-127，<code class="language-plaintext highlighter-rouge">uint</code>范围0-255</p>
+
+<p>Unicode字符rune类型是和int32等价的类型，通常用于表示一个Unicode码点。</p>
+
+<p>byte也是uint8类型的等价类型，byte类型一般用于强调数值是一个原始的数据而不是一个小的整数</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">a</span> <span class="nx">uint8</span> <span class="o">=</span> <span class="mi">255</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">a</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="nx">a</span><span class="o">*</span><span class="nx">a</span><span class="p">)</span>  <span class="c1">//"255,0,1"</span>
+
+<span class="kd">var</span> <span class="nx">b</span> <span class="nx">int8</span> <span class="o">=</span> <span class="mi">127</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span><span class="nx">b</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="nx">b</span><span class="o">*</span><span class="nx">b</span><span class="p">)</span>  <span class="c1">//"127,-128,1"</span>
+
+</code></pre></div></div>
+<p>一个算术运算的结果，不管是有符号或者是无符号的，如果需要更多的bit位才能正确表示的话，就说明计算结果溢出了。上面的例子就属于计算结果溢出，在声明变量是需要考虑计算结果是否会溢出，否则最后的结果可能和预期会有偏差。</p>
+
+<h1 id="2浮点数">2.浮点数</h1>
+
+<p>Go语言提供了两种精度的浮点数，float32和float64。浮点数的范围极限值可以在<code class="language-plaintext highlighter-rouge">math</code>包找到。常量math.MaxFloat32表示float32能表示最大数值，大约<code class="language-plaintext highlighter-rouge">3.4e38</code>;对应的math.MaxFloat64常量大约是<code class="language-plaintext highlighter-rouge">1.8e308</code>。</p>
+
+<h1 id="3复数">3.复数</h1>
+
+<p>Go语言提供了两种精度的复数类型：complex64和complex128，分别对应float32和float64两种浮点数精度，内置的complex函数用于构建复数，内建的real和imag函数分别返回复数的实部和虚部</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">x</span> <span class="nx">complex128</span> <span class="o">=</span> <span class="nx">complex</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1">// 1+2i</span>
+<span class="kd">var</span> <span class="nx">y</span> <span class="nx">complex128</span> <span class="o">=</span> <span class="nx">complex</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="c1">// 3+4i</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">x</span><span class="o">*</span><span class="nx">y</span><span class="p">)</span>                 <span class="c1">// "(-5+10i)"</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">real</span><span class="p">(</span><span class="nx">x</span><span class="o">*</span><span class="nx">y</span><span class="p">))</span>           <span class="c1">// "-5"</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">imag</span><span class="p">(</span><span class="nx">x</span><span class="o">*</span><span class="nx">y</span><span class="p">))</span>           <span class="c1">// "10"</span>
+</code></pre></div></div>
+
+<h1 id="4布尔型">4.布尔型</h1>
+
+<p>布尔类型的值只有两种：true和false，if和for语句的条件部分都是布尔类型的值，并且==和&lt;等比较操作也会产生布尔值。</p>
+
+<h1 id="5字符串">5.字符串</h1>
+
+<p>一个字符串是一个不可改变的字节序列。字符串可以包含任意的数据，包括byte值0，但是通常是用来包含人类可读的文本。文本字符串通常被解释为采用UTF8编码的Unicode码点（rune）序列</p>
+
+<p>内置的len函数可以返回一个字符串中的字节数目（不是rune字符数目），索引操作s[i]返回第i个字节的字节值，i必须满足0 ≤ i&lt; len(s)条件约束</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">s</span> <span class="p">:</span><span class="o">=</span> <span class="dl">"</span><span class="s2">hello,world</span><span class="dl">"</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">len</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span>     <span class="c1">// 12</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">s</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nx">s</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>  <span class="c1">// "104 119" ('h' and 'w')</span>
+
+<span class="nx">c</span> <span class="p">:</span><span class="o">=</span> <span class="nx">s</span><span class="p">[</span><span class="nx">len</span><span class="p">(</span><span class="nx">s</span><span class="p">)]</span>  <span class="c1">//报错，访问超出字符串索引范围的字节将会导致panic异常</span>
+
+</code></pre></div></div>
+
+<p>字符串的值是不可变的：一个字符串包含的字节序列永远不会被改变，当然我们也可以给一个字符串变量分配一个新字符串值</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">s</span> <span class="p">:</span><span class="o">=</span> <span class="dl">"</span><span class="s2">left foot</span><span class="dl">"</span>
+<span class="nx">t</span> <span class="p">:</span><span class="o">=</span> <span class="nx">s</span>
+<span class="nx">s</span> <span class="o">+=</span> <span class="dl">"</span><span class="s2">, right foot</span><span class="dl">"</span>
+
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="c1">// "left foot, right foot"</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="c1">// "left foot"</span>
+
+<span class="c1">//因为字符串是不可修改的，因此尝试修改字符串内部数据的操作也是被禁止的</span>
+<span class="nx">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">L</span><span class="dl">'</span> <span class="c1">// compile error: cannot assign to s[0]</span>
+</code></pre></div></div>
+
+<p>一个原生的字符串面值形式是<code class="language-plaintext highlighter-rouge">...</code>，使用反引号代替双引号。可以用于HTML模板、JSON面值、命令行提示等。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">str</span> <span class="nx">string</span> <span class="o">=</span> <span class="s2">` a
+b
+`</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span>
+<span class="c1">// a </span>
+<span class="c1">//b</span>
+</code></pre></div></div>
+
+<h3 id="01unicode">01.unicode</h3>
+
+<p>Unicode码点的数据类型是int32，也就是Go语言中rune对应的类型。最大65536</p>
+
+<h3 id="02utf8">02.UTF8</h3>
+
+<p>UTF8是一个将Unicode码点编码为字节序列的变长编码。UTF8编码使用1到4个字节来表示每个Unicode码点，ASCII部分字符只使用1个字节，常用字符部分使用2或3个字节表示.每个符号编码后第一个字节的高端bit位用于表示总共有多少编码个字节。如果第一个字节的高端bit为0，则表示对应7bit的ASCII字符，ASCII字符每个字符依然是一个字节，和传统的ASCII编码兼容。如果第一个字节的高端bit是110，则说明需要2个字节；后续的每个高端bit都以10开头。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">0</span><span class="nx">xxxxxxx</span>                             <span class="c1">//runes 0-127    (ASCII)</span>
+<span class="mi">110</span><span class="nx">xxxxx</span> <span class="mi">10</span><span class="nx">xxxxxx</span>                    <span class="c1">//128-2047       (values &lt;128 unused)</span>
+<span class="mi">1110</span><span class="nx">xxxx</span> <span class="mi">10</span><span class="nx">xxxxxx</span> <span class="mi">10</span><span class="nx">xxxxxx</span>           <span class="c1">//2048-65535     (values &lt;2048 unused)</span>
+<span class="mi">11110</span><span class="nx">xxx</span> <span class="mi">10</span><span class="nx">xxxxxx</span> <span class="mi">10</span><span class="nx">xxxxxx</span> <span class="mi">10</span><span class="nx">xxxxxx</span>  <span class="c1">//65536-0x10ffff (other values unused)</span>
+</code></pre></div></div>
+
+:ET

@@ -1,0 +1,174 @@
+I"�0<p>什么是nginx平滑升级？</p>
+
+<p>当官方发布一个新的稳定版，我们很有可能需要进行版本升级。新版本不仅会修复之前版本的bug,还会添加一些新的功能(当然还得视个人情况决定是否升级)。所谓的平滑升级就是不要让用户感受到，我们在
+升级nginx,旧版本的nginx还在正常运行，当我们更新nginx版后，切换到新版本，这个过程不会中断服务，让用户感受不到服务卡顿。</p>
+
+<p>平滑升级和添加模块是一样，升级需要下载最新的nginx包，而添加模块下载的当前版本的nginx包。小菜这篇博客是基于之前<a href="/nginx/2018/11/10/nginx-3.html" title="/nginx/2018/11/10/nginx-3.html" target="_blank">nginx的安装 卸载(3)</a>
+来进行，所以小伙伴们最好还是保持一致。升级是不需要卸载nginx的。</p>
+
+<p>小菜是阿里云服务器，操作系统centos 7</p>
+
+<h1 id="1安装编译源码环境">1.安装编译源码环境</h1>
+
+<p>由于我们下载的是源码包，所以要对nginx进行编译，那么编译环境就必不可少。</p>
+
+<p>安装gcc</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum install gcc 
+</code></pre></div></div>
+
+<p>安装PCRE</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum install pcre pcre-devel
+</code></pre></div></div>
+
+<p>安装zlib（zlib库提供了开发人员的压缩算法，在Nginx的各种模块中需要使用gzip压缩。如同安装PCRE一样，同样需要安装库和它的源代码：zlib和zlib-devel）</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum install zlib zlib-devel
+</code></pre></div></div>
+
+<p>安装OpenSSL（在Nginx中，如果服务器提供安全网页时则会用到OpenSSL库，我们需要安装库文件和它的开发安装包 openssl和 openssl-devel）</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum install openssl openssl-devel
+</code></pre></div></div>
+
+<h1 id="2下载nginx包">2.下载nginx包</h1>
+
+<p>下载nginx包需要去<a href="http://nginx.org/en/download.html" title="http://nginx.org/en/download.html" target="_blank">nginx 官方网站</a>，如果升级就找最新稳定版本的包，如果添加模块就找当自己当前版本
+一样的包。找到之后，复制下载链接地址，小菜找的是当前最稳定版本<code class="language-plaintext highlighter-rouge">https://nginx.org/download/nginx-1.14.2.tar.gz</code></p>
+
+<h1 id="3添加模块">3.添加模块</h1>
+
+<p>nginx调试是很麻烦的，所以小菜就添加一个<a href="https://github.com/openresty/echo-nginx-module" title="https://github.com/openresty/echo-nginx-module" target="_blank">echo-nginx-module</a>模块，它的版本
+<a href="https://github.com/openresty/echo-nginx-module/tags" title="https://github.com/openresty/echo-nginx-module/tags" target="_blank">最新版本</a>，找到自己要下载包，复制下载链接地址，小菜找到最新包<code class="language-plaintext highlighter-rouge">https://github.com/openresty/echo-nginx-module/archive/v0.61.tar.gz</code></p>
+
+<h1 id="4下载">4.下载</h1>
+
+<p>我们将刚才找的包地址下载下来。下载到<code class="language-plaintext highlighter-rouge">/opt/download</code></p>
+
+<pre><code class="language-txt">/opt
+|-app
+|-download
+|-backup
+</code></pre>
+
+<p>进入<code class="language-plaintext highlighter-rouge">download</code>文件夹</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd /opt/download
+</code></pre></div></div>
+
+<p>下载nginx包</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://nginx.org/download/nginx-1.14.2.tar.gz
+</code></pre></div></div>
+
+<p>解压nginx包</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tar -xvf nginx-1.14.2.tar.gz
+</code></pre></div></div>
+
+<p>下载echo-nginx-module模块</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://github.com/openresty/echo-nginx-module/archive/v0.61.tar.gz
+</code></pre></div></div>
+
+<p>解压echo-nginx-module包</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tar -xvf v0.61.tar.gz
+</code></pre></div></div>
+
+<h1 id="5编译nginx源码">5.编译nginx源码</h1>
+
+<p>为了和之前nginx版本的参数保持一致，我们先查看之前的nginx编译参数</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -V
+</code></pre></div></div>
+
+<p>输出：</p>
+
+<p><code class="language-plaintext highlighter-rouge">
+--prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib64/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-cc-opt='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -fPIC' --with-ld-opt='-Wl,-z,relro -Wl,-z,now -pie'
+</code></p>
+
+<p>进入解压好<code class="language-plaintext highlighter-rouge">nginx-1.14.2</code>文件夹</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd nginx-1.14.2
+</code></pre></div></div>
+
+<p>将echo-nginx-module添加到编译参数中去，添加到最后</p>
+
+<p><code class="language-plaintext highlighter-rouge">
+--prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib64/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-cc-opt='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -fPIC' --with-ld-opt='-Wl,-z,relro -Wl,-z,now -pie' --add-module=/opt/download/echo-nginx-module-0.61
+</code></p>
+
+<p>编译</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./configure 编译参数
+</code></pre></div></div>
+
+<p>./configure –prefix=/etc/nginx –sbin-path=/usr/sbin/nginx –modules-path=/usr/lib64/nginx/modules –conf-path=/etc/nginx/nginx.conf –error-log-path=/var/log/nginx/error.log –http-log-path=/var/log/nginx/access.log –pid-path=/var/run/nginx.pid –lock-path=/var/run/nginx.lock –http-client-body-temp-path=/var/cache/nginx/client_temp –http-proxy-temp-path=/var/cache/nginx/proxy_temp –http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp –http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp –http-scgi-temp-path=/var/cache/nginx/scgi_temp –user=nginx –group=nginx –with-compat –with-file-aio –with-threads –with-http_addition_module –with-http_auth_request_module –with-http_dav_module –with-http_flv_module –with-http_gunzip_module –with-http_gzip_static_module –with-http_mp4_module –with-http_random_index_module –with-http_realip_module –with-http_secure_link_module –with-http_slice_module –with-http_ssl_module –with-http_stub_status_module –with-http_sub_module –with-http_v2_module –with-mail –with-mail_ssl_module –with-stream –with-stream_realip_module –with-stream_ssl_module –with-stream_ssl_preread_module –with-cc-opt=’-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong –param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -fPIC’ –with-ld-opt=’-Wl,-z,relro -Wl,-z,now -pie’ –add-module=/opt/download/echo-nginx-module-0.61</p>
+
+<p>安装</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make &amp;&amp; make install
+</code></pre></div></div>
+
+<p>检测是否安装成功</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -v
+</code></pre></div></div>
+
+<p>输出<code class="language-plaintext highlighter-rouge">nginx version: nginx/1.14.2</code>就算安装成功了</p>
+
+<h1 id="6检测echo-nginx-module">6.检测echo-nginx-module</h1>
+
+<p>前面几步我们将echo-nginx-module模块编译到nginx，下面检测echo-nginx-module</p>
+
+<pre><code class="language-txt">/etc/nginx/conf.d
+|-echo.conf
+</code></pre>
+
+<h4 id="echoconf">echo.conf</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span>       <span class="mi">9001</span><span class="p">;</span>
+    <span class="kn">server_name</span>  <span class="s">localhost</span><span class="p">;</span>
+
+
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span> 
+        <span class="kn">default_type</span> <span class="nc">text/html</span><span class="p">;</span>
+        <span class="kn">echo</span> <span class="s">"&lt;h1&gt;欢迎来到瓦力博客&lt;/h1&gt;"</span><span class="p">;</span>
+    <span class="p">}</span>   
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>重启nginx</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -s reload -c /etc/nginx/nginx.conf
+</code></pre></div></div>
+
+<p>检测9001端口，看9001端口是否监听</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ss -luntp | grep nginx
+</code></pre></div></div>
+
+<p>在页面上输入<code class="language-plaintext highlighter-rouge">http://walidream.com:9001</code>，输出中文可能会有乱码，出现乱码需要将编码改为utf-8</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_51.jpg" alt="ssl" /></p>
+
+<h1 id="7echo调试">7.echo调试</h1>
+
+<p>我们有了echo模块，在调试nginx时就变得容易多了。</p>
+
+<h4 id="输出字符串">输出字符串</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">echo</span> <span class="s">"hello"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h4 id="输入变量">输入变量</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">echo</span> <span class="nv">$remote_addr</span><span class="p">;</span>
+</code></pre></div></div>
+
+:ET

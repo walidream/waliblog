@@ -1,0 +1,39 @@
+I"�<h3 id="1ajax">1.ajax</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#save</span><span class="dl">'</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,</span><span class="kd">function</span><span class="p">(){</span>
+		
+	<span class="c1">//定义http请求</span>
+	<span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>	
+	<span class="nx">request</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="dl">'</span><span class="s1">post</span><span class="dl">'</span><span class="p">,</span><span class="dl">'</span><span class="s1">test.php</span><span class="dl">'</span><span class="p">,</span><span class="kc">true</span><span class="p">);</span>
+
+	<span class="c1">//获取数据</span>
+	<span class="kd">var</span> <span class="nx">data</span><span class="o">=</span><span class="p">{</span>
+		<span class="na">username</span><span class="p">:</span><span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#user</span><span class="dl">'</span><span class="p">).</span><span class="nx">val</span><span class="p">(),</span>
+		<span class="na">password</span><span class="p">:</span><span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#pass</span><span class="dl">'</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span>
+	<span class="p">}</span>
+	<span class="nx">data</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">param</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+		
+	<span class="c1">//设置响应头</span>
+	<span class="nx">request</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="dl">"</span><span class="s2">Content-type</span><span class="dl">"</span><span class="p">,</span><span class="dl">"</span><span class="s2">application/x-www-form-urlencoded</span><span class="dl">"</span><span class="p">);</span>
+	
+	<span class="nx">request</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+	
+	<span class="c1">//监听</span>
+	<span class="nx">request</span><span class="p">.</span><span class="nx">onreadystatechange</span><span class="o">=</span><span class="kd">function</span><span class="p">(){</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">readyState</span><span class="o">===</span><span class="mi">4</span><span class="p">){</span> <span class="c1">//表示完成</span>
+			<span class="k">if</span> <span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">status</span><span class="o">===</span><span class="mi">200</span><span class="p">)</span> <span class="p">{</span>  <span class="c1">//表示请求成功</span>
+				<span class="c1">//成功之后做的事情</span>
+				 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">成功</span><span class="dl">'</span><span class="p">,</span><span class="nx">request</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
+			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>  
+				<span class="c1">//表示失败</span>
+				<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">发生错误：</span><span class="dl">"</span><span class="p">,</span> <span class="nx">request</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span>
+			<span class="p">}</span>
+			
+		<span class="p">}</span>
+	<span class="p">}</span>
+		
+<span class="p">})</span>
+
+</code></pre></div></div>
+
+:ET

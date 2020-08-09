@@ -1,0 +1,276 @@
+I"�g<h1 id="1将小于9的字符串前缀补零">1.将小于9的字符串前缀补零</h1>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">n</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>n</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>n:0-9数字</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">formatNumber</span> <span class="o">=</span> <span class="nx">n</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">n</span> <span class="o">=</span> <span class="nx">n</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>
+  <span class="k">return</span> <span class="nx">n</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">?</span> <span class="nx">n</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">0</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">n</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="2将时间戳格式化年月日时分秒">2.将时间戳格式化年月日时分秒</h1>
+
+<blockquote>
+  <p>功能：YYYY-MM-DD hh:mm:ss</p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">date</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>date</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>日期对象</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">formatTimeYMDhms</span> <span class="o">=</span> <span class="nx">date</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">year</span> <span class="o">=</span> <span class="nx">date</span><span class="p">.</span><span class="nx">getFullYear</span><span class="p">();</span>
+  <span class="kd">const</span> <span class="nx">month</span> <span class="o">=</span> <span class="nx">date</span><span class="p">.</span><span class="nx">getMonth</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="kd">const</span> <span class="nx">day</span> <span class="o">=</span> <span class="nx">date</span><span class="p">.</span><span class="nx">getDate</span><span class="p">();</span>
+  <span class="kd">const</span> <span class="nx">hour</span> <span class="o">=</span> <span class="nx">date</span><span class="p">.</span><span class="nx">getHours</span><span class="p">();</span>
+  <span class="kd">const</span> <span class="nx">minute</span> <span class="o">=</span> <span class="nx">date</span><span class="p">.</span><span class="nx">getMinutes</span><span class="p">();</span>
+  <span class="kd">const</span> <span class="nx">second</span> <span class="o">=</span> <span class="nx">date</span><span class="p">.</span><span class="nx">getSeconds</span><span class="p">();</span>
+  <span class="k">return</span> <span class="p">[</span><span class="nx">year</span><span class="p">,</span> <span class="nx">month</span><span class="p">,</span> <span class="nx">day</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="nx">formatNumber</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">)</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span> <span class="o">+</span> <span class="p">[</span><span class="nx">hour</span><span class="p">,</span> <span class="nx">minute</span><span class="p">,</span> <span class="nx">second</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="nx">formatNumber</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">:</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="3将时间戳格式化年月日">3.将时间戳格式化年月日</h1>
+
+<blockquote>
+  <p>功能：YYYY-MM-DD</p>
+</blockquote>
+
+<blockquote>
+  <p>方法：formatTimeYMD(date)</p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">date</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>date</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>日期对象</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">formatTimeYMD</span> <span class="o">=</span> <span class="nx">date</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">year</span> <span class="o">=</span> <span class="nx">date</span><span class="p">.</span><span class="nx">getFullYear</span><span class="p">();</span>
+  <span class="kd">const</span> <span class="nx">month</span> <span class="o">=</span> <span class="nx">date</span><span class="p">.</span><span class="nx">getMonth</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="kd">const</span> <span class="nx">day</span> <span class="o">=</span> <span class="nx">date</span><span class="p">.</span><span class="nx">getDate</span><span class="p">();</span>
+  <span class="k">return</span> <span class="p">[</span><span class="nx">year</span><span class="p">,</span> <span class="nx">month</span><span class="p">,</span> <span class="nx">day</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="nx">formatNumber</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">-</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="4生成一段时间">4.生成一段时间</h1>
+
+<blockquote>
+  <p>功能：生成一组num天到当天字符串日期</p>
+</blockquote>
+
+<blockquote>
+  <p>方法：createTimeDate(num)</p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">date</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>date</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>日期对象</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">createTimeDate</span> <span class="o">=</span> <span class="nx">num</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">arrDay</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">num</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+    <span class="kd">let</span> <span class="nx">tmpDay</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">setDate</span><span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getDate</span><span class="p">()</span> <span class="o">-</span> <span class="nx">i</span><span class="p">);</span>
+    <span class="kd">let</span> <span class="nx">str</span> <span class="o">=</span> <span class="nx">timeUtil</span><span class="p">.</span><span class="nx">formatTimeYMD</span><span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">tmpDay</span><span class="p">))</span>
+    <span class="nx">arrDay</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">str</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">arrDay</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="5将不存在时间段数据补零">5.将不存在时间段数据补零</h1>
+
+<blockquote>
+  <p>方法：mergeTimeDate(arr ,num); 返回：返回合并后的时间段</p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">arr</code> <code class="language-plaintext highlighter-rouge">num</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>arr</td>
+      <td>Array</td>
+      <td>是</td>
+      <td>日期数组</td>
+    </tr>
+    <tr>
+      <td>num</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>天数</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">mergeTimeDate</span> <span class="o">=</span> <span class="p">(</span><span class="nx">arr</span> <span class="p">,</span><span class="nx">num</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">brr</span> <span class="o">=</span> <span class="nx">createTimeDate</span><span class="p">(</span><span class="nx">num</span><span class="p">);</span>
+  <span class="kd">let</span> <span class="nx">crr</span> <span class="o">=</span> <span class="nx">brr</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">val</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">tmpObj</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="nx">tmpObj</span><span class="p">.</span><span class="nx">date</span> <span class="o">=</span> <span class="nx">val</span><span class="p">;</span>
+    <span class="nx">tmpObj</span><span class="p">.</span><span class="nx">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="nx">arr</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">v</span><span class="p">)</span><span class="o">=&gt;</span><span class="p">{</span>
+      <span class="k">if</span><span class="p">(</span><span class="nx">val</span> <span class="o">==</span> <span class="nx">v</span><span class="p">.</span><span class="nx">date</span><span class="p">){</span>
+        <span class="nx">tmpObj</span><span class="p">.</span><span class="nx">count</span> <span class="o">=</span> <span class="nx">v</span><span class="p">.</span><span class="nx">count</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+    <span class="k">return</span> <span class="nx">tmpObj</span><span class="p">;</span>
+  <span class="p">});</span>
+  <span class="k">return</span> <span class="nx">crr</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="6封装成工具">6.封装成工具</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//在utils文件加下建一个 time.js</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">TimeUtil</span><span class="p">{</span>
+  <span class="kd">constructor</span><span class="p">(</span><span class="nx">dat</span><span class="p">){</span>
+    <span class="k">if</span><span class="p">(</span><span class="dl">''</span> <span class="o">==</span> <span class="nx">dat</span> <span class="o">||</span> <span class="o">!</span><span class="nx">dat</span><span class="p">)</span> <span class="k">return</span> <span class="dl">''</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">$date</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">convert</span><span class="p">(</span><span class="nx">dat</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">year</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$date</span><span class="p">.</span><span class="nx">getFullYear</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">month</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$date</span><span class="p">.</span><span class="nx">getMonth</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">day</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$date</span><span class="p">.</span><span class="nx">getDate</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hour</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$date</span><span class="p">.</span><span class="nx">getHours</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">minute</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$date</span><span class="p">.</span><span class="nx">getMinutes</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">second</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$date</span><span class="p">.</span><span class="nx">getSeconds</span><span class="p">();</span>
+  <span class="p">}</span>
+  <span class="c1">//将参数转成date对象</span>
+  <span class="nx">convert</span><span class="p">(</span><span class="nx">par</span><span class="p">){</span>
+    <span class="k">if</span><span class="p">(</span><span class="dl">''</span> <span class="o">==</span> <span class="nx">par</span><span class="p">)</span> <span class="k">return</span> <span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">type</span> <span class="o">=</span> <span class="k">typeof</span> <span class="nx">par</span><span class="p">;</span>
+    <span class="k">switch</span> <span class="p">(</span><span class="nx">type</span><span class="p">){</span>
+      <span class="k">case</span> <span class="dl">'</span><span class="s1">object</span><span class="dl">'</span><span class="p">:</span><span class="k">return</span> <span class="nx">par</span><span class="p">;</span><span class="k">break</span><span class="p">;</span>
+      <span class="k">case</span> <span class="dl">'</span><span class="s1">number</span><span class="dl">'</span><span class="p">:</span><span class="k">return</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">par</span><span class="p">);</span><span class="k">break</span><span class="p">;</span>
+      <span class="k">case</span> <span class="dl">'</span><span class="s1">string</span><span class="dl">'</span><span class="p">:</span> <span class="kd">let</span> <span class="nx">tmp</span> <span class="o">=</span> <span class="nx">par</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">\-</span><span class="sr">/g</span><span class="p">,</span> <span class="dl">"</span><span class="s2">/</span><span class="dl">"</span><span class="p">);</span><span class="k">return</span>  <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">tmp</span><span class="p">);</span><span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="c1">//将小于9的字符串前缀补零</span>
+  <span class="nx">formatNumber</span><span class="p">(</span><span class="nx">n</span><span class="p">){</span>
+    <span class="nx">n</span> <span class="o">=</span> <span class="nx">n</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>
+    <span class="k">return</span> <span class="nx">n</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">?</span> <span class="nx">n</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">0</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">n</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="c1">//将时间对象转换 YYYY/MM/DD hh:mm:ss</span>
+  <span class="nx">timeYMDHMS</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">year</span><span class="p">,</span><span class="k">this</span><span class="p">.</span><span class="nx">month</span><span class="p">,</span><span class="k">this</span><span class="p">.</span><span class="nx">day</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">formatNumber</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">)</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span> <span class="o">+</span> <span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">hour</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">minute</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">second</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">formatNumber</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">:</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="c1">//将时间对象转换YYYY-MM-DD hh:mm:ss</span>
+  <span class="nx">timeYMDHMS1</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">year</span><span class="p">,</span><span class="k">this</span><span class="p">.</span><span class="nx">month</span><span class="p">,</span><span class="k">this</span><span class="p">.</span><span class="nx">day</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">formatNumber</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">-</span><span class="dl">'</span><span class="p">)</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span> <span class="o">+</span> <span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">hour</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">minute</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">second</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">formatNumber</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">:</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="c1">//将时间对象转换YYYY.MM.DD</span>
+  <span class="nx">timeYMD</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">year</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">month</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">day</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">formatNumber</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">.</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="c1">//将时间对象转换YYYY-MM-DD</span>
+  <span class="nx">timeYMD1</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">year</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">month</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">day</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">formatNumber</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">-</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="c1">//将时间对象转换YYYY-MM-DD</span>
+  <span class="nx">timeYMD2</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">year</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">month</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">day</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">formatNumber</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="c1">//将时间对象转换 4月1日 ,昨天,今天,明天</span>
+  <span class="nx">timeMD</span><span class="p">(){</span>
+    <span class="k">if</span><span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getDate</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">day</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)){</span>
+      <span class="k">return</span> <span class="dl">'</span><span class="s1">昨天</span><span class="dl">'</span><span class="p">;</span>
+    <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getDate</span><span class="p">()</span> <span class="o">==</span> <span class="k">this</span><span class="p">.</span><span class="nx">day</span><span class="p">){</span>
+      <span class="k">return</span> <span class="dl">'</span><span class="s1">今天</span><span class="dl">'</span><span class="p">;</span>
+    <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getDate</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">day</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)){</span>
+      <span class="k">return</span> <span class="dl">'</span><span class="s1">明天</span><span class="dl">'</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">month</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">月</span><span class="dl">'</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">day</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">日</span><span class="dl">'</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="c1">//将时间对象转换 hh:mm:ss</span>
+  <span class="nx">timeHMS</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">hour</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">minute</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">second</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">formatNumber</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">:</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+:ET

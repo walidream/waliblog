@@ -1,0 +1,15 @@
+I"�	<h1 id="1利用h5api在移动端上传图片">1.利用H5Api在移动端上传图片</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">onUpload</span><span class="p">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
+	<span class="kd">let</span> <span class="nx">formData</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FormData</span><span class="p">();</span>
+	<span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">file</span><span class="dl">'</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+	<span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">type</span><span class="dl">'</span><span class="p">,</span><span class="dl">'</span><span class="s1">test</span><span class="dl">'</span><span class="p">);</span>  <span class="c1">//添加测试数据</span>
+	<span class="nx">axios</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">upload</span><span class="p">.</span><span class="nx">img</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span><span class="nx">formData</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">data</span> <span class="o">=&gt;</span><span class="p">{</span>
+		<span class="nb">self</span><span class="p">.</span><span class="nx">$data</span><span class="p">.</span><span class="nx">userPhoto1</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+	<span class="p">}).</span><span class="k">catch</span><span class="p">(</span><span class="nx">err</span> <span class="o">=&gt;</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">));</span>
+<span class="p">}</span>
+
+
+</code></pre></div></div>
+
+:ET

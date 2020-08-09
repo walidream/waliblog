@@ -1,0 +1,503 @@
+I"-�<blockquote>
+  <p>裁剪完后请参考<code class="language-plaintext highlighter-rouge">javascrip/图片上传</code> 传送门<a href="http://waliblog.com/javascript/2018/01/29/upload.html" title="http://waliblog.com/javascript/2018/01/29/upload.html">“http://waliblog.com/javascript/2018/01/29/upload.html”</a></p>
+</blockquote>
+
+<p>这篇canvas头像裁剪，没有用jq去写demo主要是因为操作dom太麻烦，这个demo最初是用angular写的(工作需要)，个人觉得用vue更方便！大家可以根据自己的需求把触发的事件换一下就可以了。</p>
+
+<p>原本写这个demo想未大家封装成一个jq插件，但后来由于时间问题就没有做了，感兴趣的小伙伴可以自己玩玩。小菜把demo放在个人github上，想下载的点击页面上按钮。别忘了在github上给个星哦！</p>
+
+<blockquote>
+  <p>备用演示地址 <a href="http://walidream.com/example/js/portraitNailor/" title="http://walidream.com/example/js/portraitNailor/" target="_blank">http://walidream.com/example/js/portraitNailor/</a></p>
+</blockquote>
+
+<script async="" src="//jsrun.net/X2gKp/embed/all/light/"></script>
+
+<h1 id="1判断本地图片宽度和高度">1.判断本地图片宽度和高度</h1>
+
+<blockquote>
+  <p>方法：<code class="language-plaintext highlighter-rouge">isUpImgWH(width,height,box)</code></p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">width</code> <code class="language-plaintext highlighter-rouge">height</code> <code class="language-plaintext highlighter-rouge">box</code></p>
+</blockquote>
+
+<blockquote>
+  <p>说明：1.让本地图片不失真展示在canvas中，2.让canvas在黑色盒子水平或垂直居中</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>width</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>本地图片的宽度</td>
+    </tr>
+    <tr>
+      <td>height</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>本地图片的高度</td>
+    </tr>
+    <tr>
+      <td>box</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>黑色背景盒子的宽度和高度</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>参数: <code class="language-plaintext highlighter-rouge">box</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>width</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>黑色背景盒子的宽度</td>
+    </tr>
+    <tr>
+      <td>height</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>黑色背景盒子的高度</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">isUpImgWH</span><span class="p">(</span><span class="nx">width</span><span class="p">,</span><span class="nx">height</span><span class="p">,</span><span class="nx">box</span><span class="p">){</span>
+    <span class="kd">let</span> <span class="nx">canW</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">canH</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">offsetTop</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>  <span class="c1">//画布偏移top</span>
+    <span class="kd">let</span> <span class="nx">offsetLeft</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//画布偏移left</span>
+    <span class="c1">//本地图片宽度大于高度</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">width</span> <span class="o">&gt;</span> <span class="nx">height</span><span class="p">){</span>
+        <span class="nx">canW</span> <span class="o">=</span> <span class="nx">box</span><span class="p">.</span><span class="nx">width</span><span class="p">;</span>
+        <span class="nx">canH</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">((</span><span class="nx">canW</span> <span class="o">*</span> <span class="nx">height</span><span class="p">)</span><span class="o">/</span> <span class="nx">width</span><span class="p">);</span>
+        
+        <span class="k">if</span><span class="p">(</span><span class="nx">canH</span> <span class="o">&gt;</span> <span class="nx">box</span><span class="p">.</span><span class="nx">width</span><span class="p">)</span> <span class="nx">canH</span> <span class="o">=</span> <span class="nx">box</span><span class="p">.</span><span class="nx">width</span><span class="p">;</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">canH</span> <span class="o">==</span> <span class="nx">box</span><span class="p">.</span><span class="nx">width</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">offsetTop</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="nx">offsetLeft</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">canH</span> <span class="o">&lt;</span> <span class="nx">box</span><span class="p">.</span><span class="nx">width</span><span class="p">){</span>
+            <span class="nx">offsetTop</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">((</span><span class="nx">box</span><span class="p">.</span><span class="nx">width</span> <span class="o">-</span> <span class="nx">canH</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">);</span>
+            <span class="nx">offsetLeft</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="c1">//本地图片高度大于等于宽度</span>
+	<span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="nx">canH</span> <span class="o">=</span> <span class="nx">box</span><span class="p">.</span><span class="nx">height</span><span class="p">;</span>
+        <span class="nx">canW</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">((</span><span class="nx">width</span> <span class="o">*</span> <span class="nx">canH</span><span class="p">)</span><span class="o">/</span><span class="nx">height</span><span class="p">);</span>
+        
+        <span class="k">if</span><span class="p">(</span><span class="nx">canW</span> <span class="o">&gt;</span> <span class="nx">box</span><span class="p">.</span><span class="nx">height</span><span class="p">)</span> <span class="nx">canW</span> <span class="o">=</span> <span class="nx">box</span><span class="p">.</span><span class="nx">height</span><span class="p">;</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">canW</span> <span class="o">==</span> <span class="nx">box</span><span class="p">.</span><span class="nx">height</span><span class="p">){</span>
+            <span class="nx">offsetTop</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="nx">offsetLeft</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">canW</span> <span class="o">&lt;</span> <span class="nx">box</span><span class="p">.</span><span class="nx">height</span><span class="p">){</span>
+            <span class="nx">offsetLeft</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">((</span><span class="nx">box</span><span class="p">.</span><span class="nx">height</span> <span class="o">-</span> <span class="nx">canW</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">);</span>
+            <span class="nx">offsetTop</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">}</span>
+	<span class="p">}</span>
+	
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="na">width</span><span class="p">:</span><span class="nx">canW</span><span class="p">,</span>
+        <span class="na">height</span><span class="p">:</span><span class="nx">canH</span><span class="p">,</span>
+        <span class="na">top</span><span class="p">:</span><span class="nx">offsetTop</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">px</span><span class="dl">'</span><span class="p">,</span>
+        <span class="na">left</span><span class="p">:</span><span class="nx">offsetLeft</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">px</span><span class="dl">'</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="2绘制头像">2.绘制头像</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//绘制头像</span>
+<span class="kd">function</span> <span class="nx">clipProtrait</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>  
+  <span class="kd">let</span> <span class="nx">canWidth</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">drawCanvas</span><span class="p">.</span><span class="nx">width</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">canHeight</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">drawCanvas</span><span class="p">.</span><span class="nx">height</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">point</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">circle</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">ctx</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">drawCanvas</span><span class="p">.</span><span class="nx">ctx</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">radius</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">circle</span><span class="p">.</span><span class="nx">r</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">handle</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">handle</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">handleImg</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">handleImg</span><span class="p">;</span>
+
+  <span class="c1">//碰壁检测</span>
+  <span class="k">if</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">circle</span><span class="p">.</span><span class="nx">x</span> <span class="o">&lt;</span> <span class="nx">radius</span><span class="p">)</span> <span class="nx">data</span><span class="p">.</span><span class="nx">circle</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="nx">radius</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">circle</span><span class="p">.</span><span class="nx">x</span> <span class="o">&gt;</span> <span class="nx">canWidth</span> <span class="o">-</span> <span class="nx">radius</span><span class="p">)</span> <span class="nx">data</span><span class="p">.</span><span class="nx">circle</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="nx">canWidth</span> <span class="o">-</span> <span class="nx">radius</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">circle</span><span class="p">.</span><span class="nx">y</span> <span class="o">&lt;</span> <span class="nx">radius</span><span class="p">)</span> <span class="nx">data</span><span class="p">.</span><span class="nx">circle</span><span class="p">.</span><span class="nx">y</span> <span class="o">=</span> <span class="nx">radius</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">circle</span><span class="p">.</span><span class="nx">y</span> <span class="o">&gt;</span> <span class="nx">canHeight</span> <span class="o">-</span> <span class="nx">radius</span><span class="p">)</span> <span class="nx">data</span><span class="p">.</span><span class="nx">circle</span><span class="p">.</span><span class="nx">y</span> <span class="o">=</span> <span class="nx">canHeight</span> <span class="o">-</span> <span class="nx">radius</span><span class="p">;</span>
+  
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">clearRect</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nx">canWidth</span><span class="p">,</span><span class="nx">canHeight</span><span class="p">);</span>
+  <span class="nx">drawRect</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nx">canWidth</span><span class="p">,</span><span class="nx">canHeight</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="dl">'</span><span class="s1">rgba(0,0,0,0.6)</span><span class="dl">'</span><span class="p">);</span>
+    
+  <span class="c1">//绘制头像</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">save</span><span class="p">();</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">();</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">arc</span><span class="p">(</span><span class="nx">point</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span><span class="nx">point</span><span class="p">.</span><span class="nx">y</span><span class="p">,</span><span class="nx">radius</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">clip</span><span class="p">();</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">drawImage</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">negativeImg</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nx">canWidth</span><span class="p">,</span><span class="nx">canHeight</span><span class="p">);</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">restore</span><span class="p">();</span>
+  <span class="c1">//绘制手柄</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">save</span><span class="p">();</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">();</span>
+  <span class="kd">let</span> <span class="nx">tmpPonit</span> <span class="o">=</span> <span class="nx">getCircle</span><span class="p">({</span><span class="na">x</span><span class="p">:</span><span class="nx">point</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span><span class="na">y</span><span class="p">:</span><span class="nx">point</span><span class="p">.</span><span class="nx">y</span><span class="p">,</span><span class="na">r</span><span class="p">:</span><span class="nx">radius</span><span class="p">},</span><span class="mi">45</span><span class="p">);</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">arc</span><span class="p">(</span><span class="nx">tmpPonit</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span><span class="nx">tmpPonit</span><span class="p">.</span><span class="nx">y</span><span class="p">,</span><span class="nx">handle</span><span class="p">.</span><span class="nx">r</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="nx">data</span><span class="p">.</span><span class="nx">handle</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="nx">tmpPonit</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span>
+  <span class="nx">data</span><span class="p">.</span><span class="nx">handle</span><span class="p">.</span><span class="nx">y</span> <span class="o">=</span> <span class="nx">tmpPonit</span><span class="p">.</span><span class="nx">y</span><span class="p">;</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">fillStyle</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">#fff</span><span class="dl">'</span><span class="p">;</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">fill</span><span class="p">();</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">clip</span><span class="p">();</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">restore</span><span class="p">();</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">drawImage</span><span class="p">(</span><span class="nx">handleImg</span><span class="p">,</span><span class="nx">tmpPonit</span><span class="p">.</span><span class="nx">x</span> <span class="o">-</span> <span class="nx">handle</span><span class="p">.</span><span class="nx">r</span> <span class="o">-</span> <span class="mi">3</span><span class="p">,</span><span class="nx">tmpPonit</span><span class="p">.</span><span class="nx">y</span> <span class="o">-</span> <span class="nx">handle</span><span class="p">.</span><span class="nx">r</span> <span class="o">-</span> <span class="mi">3</span><span class="p">,</span><span class="mi">26</span><span class="p">,</span><span class="mi">26</span><span class="p">);</span>
+  <span class="nx">data</span><span class="p">.</span><span class="nx">drawCanvas</span><span class="p">.</span><span class="nx">ctx</span> <span class="o">=</span> <span class="nx">ctx</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="nx">data</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="3绘制矩形">3.绘制矩形</h1>
+
+<blockquote>
+  <p>方法：<code class="language-plaintext highlighter-rouge">drawRect(cxt,x,y,width,height,BW,BC,fillColor)</code></p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">ctx</code> <code class="language-plaintext highlighter-rouge">x</code> <code class="language-plaintext highlighter-rouge">y</code> <code class="language-plaintext highlighter-rouge">width</code> <code class="language-plaintext highlighter-rouge">height</code> <code class="language-plaintext highlighter-rouge">BW</code> <code class="language-plaintext highlighter-rouge">BC</code> <code class="language-plaintext highlighter-rouge">fillColor</code></p>
+</blockquote>
+
+<blockquote>
+  <p>说明：将canvas的底色填充灰色</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>cxt</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>canvas 2d绘图环境</td>
+    </tr>
+    <tr>
+      <td>x</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>矩形初始x坐标</td>
+    </tr>
+    <tr>
+      <td>y</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>矩形初始y坐标</td>
+    </tr>
+    <tr>
+      <td>width</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>矩形宽度</td>
+    </tr>
+    <tr>
+      <td>height</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>矩形高度</td>
+    </tr>
+    <tr>
+      <td>BW</td>
+      <td>String</td>
+      <td>是</td>
+      <td>矩形边框宽度</td>
+    </tr>
+    <tr>
+      <td>BC</td>
+      <td>String</td>
+      <td>是</td>
+      <td>线条颜色</td>
+    </tr>
+    <tr>
+      <td>fillColor</td>
+      <td>String</td>
+      <td>是</td>
+      <td>矩形填充色</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">drawRect</span><span class="p">(</span><span class="nx">cxt</span><span class="p">,</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="p">,</span><span class="nx">width</span><span class="p">,</span><span class="nx">height</span><span class="p">,</span><span class="nx">BW</span><span class="p">,</span><span class="nx">BC</span><span class="p">,</span><span class="nx">fillColor</span><span class="p">){</span>
+   <span class="nx">cxt</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">();</span>
+   <span class="nx">cxt</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="p">);</span>
+   <span class="nx">cxt</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="nx">x</span><span class="o">+</span><span class="nx">width</span><span class="p">,</span><span class="nx">y</span><span class="p">);</span>
+   <span class="nx">cxt</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="nx">x</span><span class="o">+</span><span class="nx">width</span><span class="p">,</span><span class="nx">y</span><span class="o">+</span><span class="nx">height</span><span class="p">);</span>
+   <span class="nx">cxt</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="o">+</span><span class="nx">height</span><span class="p">);</span>
+   <span class="nx">cxt</span><span class="p">.</span><span class="nx">closePath</span><span class="p">();</span>
+   
+   <span class="nx">cxt</span><span class="p">.</span><span class="nx">lineWidth</span> <span class="o">=</span> <span class="nx">BW</span><span class="p">;</span>
+   <span class="nx">cxt</span><span class="p">.</span><span class="nx">fillStyle</span> <span class="o">=</span> <span class="nx">fillColor</span><span class="p">;</span>
+   <span class="nx">cxt</span><span class="p">.</span><span class="nx">strokeStyle</span> <span class="o">=</span> <span class="nx">BC</span><span class="p">;</span>
+   
+   <span class="nx">cxt</span><span class="p">.</span><span class="nx">fill</span><span class="p">();</span>
+   <span class="nx">cxt</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="4预览">4.预览</h1>
+
+<blockquote>
+  <p>方法：<code class="language-plaintext highlighter-rouge">previewProtrait(data)</code></p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">data</code></p>
+</blockquote>
+
+<blockquote>
+  <p>说明：将选中区域的图片等比裁剪，并返回base64</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>data</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>需要用到的参数</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">previewProtrait</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+  <span class="kd">let</span> <span class="nx">imgW</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">negativeImg</span><span class="p">.</span><span class="nx">width</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">imgH</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">negativeImg</span><span class="p">.</span><span class="nx">height</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">point</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">circle</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">k</span> <span class="o">=</span> <span class="nx">imgW</span> <span class="o">/</span> <span class="nx">data</span><span class="p">.</span><span class="nx">drawCanvas</span><span class="p">.</span><span class="nx">width</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">sx</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">((</span><span class="nx">point</span><span class="p">.</span><span class="nx">x</span> <span class="o">-</span> <span class="nx">data</span><span class="p">.</span><span class="nx">circle</span><span class="p">.</span><span class="nx">r</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nx">imgW</span> <span class="o">/</span> <span class="nx">data</span><span class="p">.</span><span class="nx">drawCanvas</span><span class="p">.</span><span class="nx">width</span><span class="p">))</span> <span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">sy</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">((</span><span class="nx">point</span><span class="p">.</span><span class="nx">y</span> <span class="o">-</span> <span class="nx">data</span><span class="p">.</span><span class="nx">circle</span><span class="p">.</span><span class="nx">r</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nx">imgH</span> <span class="o">/</span> <span class="nx">data</span><span class="p">.</span><span class="nx">drawCanvas</span><span class="p">.</span><span class="nx">height</span><span class="p">));</span>
+  <span class="kd">let</span> <span class="nx">sW</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">point</span><span class="p">.</span><span class="nx">r</span> <span class="o">*</span> <span class="nx">k</span><span class="p">);</span>
+  <span class="kd">let</span> <span class="nx">sH</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">point</span><span class="p">.</span><span class="nx">r</span> <span class="o">*</span> <span class="nx">k</span><span class="p">);</span>
+
+  <span class="kd">let</span> <span class="nx">canvas</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">'</span><span class="s1">canvas</span><span class="dl">'</span><span class="p">);</span>
+  <span class="kd">let</span> <span class="nx">ctx</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="dl">'</span><span class="s1">2d</span><span class="dl">'</span><span class="p">);</span>
+  <span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span> <span class="o">=</span> <span class="mi">290</span><span class="p">;</span>   <span class="c1">//设置裁剪完成后图片的大小</span>
+  <span class="nx">canvas</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="mi">290</span><span class="p">;</span>
+  <span class="nx">drawRect</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">height</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="dl">'</span><span class="s1">#000</span><span class="dl">'</span><span class="p">);</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">drawImage</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">negativeImg</span><span class="p">,</span><span class="nx">sx</span><span class="p">,</span><span class="nx">sy</span><span class="p">,</span><span class="nx">sW</span><span class="p">,</span><span class="nx">sH</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">height</span><span class="p">);</span>
+  <span class="kd">let</span> <span class="nx">imgData</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">toDataURL</span><span class="p">(</span><span class="dl">"</span><span class="s2">image/jpeg</span><span class="dl">"</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">imgData</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="5获取圆上任意地点坐标">5.获取圆上任意地点坐标</h1>
+
+<blockquote>
+  <p>方法：<code class="language-plaintext highlighter-rouge">getCircle(circle,angle)</code></p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">circle</code> <code class="language-plaintext highlighter-rouge">angle</code></p>
+</blockquote>
+
+<blockquote>
+  <p>说明：将选中区域的图片等比裁剪，并返回base64</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>circle</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>圆的坐标x,y,r</td>
+    </tr>
+    <tr>
+      <td>angle</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆上角度</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">circle</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>x</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆x坐标</td>
+    </tr>
+    <tr>
+      <td>y</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆y坐标</td>
+    </tr>
+    <tr>
+      <td>r</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆的半径</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">getCircle</span><span class="p">(</span><span class="nx">circle</span><span class="p">,</span><span class="nx">angle</span><span class="p">){</span>
+  <span class="kd">let</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{};</span>
+  <span class="nx">obj</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="nx">circle</span><span class="p">.</span><span class="nx">x</span> <span class="o">+</span> <span class="nx">circle</span><span class="p">.</span><span class="nx">r</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">cos</span><span class="p">(</span><span class="nx">angle</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">/</span> <span class="mi">180</span><span class="p">);</span>
+  <span class="nx">obj</span><span class="p">.</span><span class="nx">y</span> <span class="o">=</span> <span class="nx">circle</span><span class="p">.</span><span class="nx">y</span> <span class="o">+</span> <span class="nx">circle</span><span class="p">.</span><span class="nx">r</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sin</span><span class="p">(</span><span class="nx">angle</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">/</span> <span class="mi">180</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">obj</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="6两点间的距离">6.两点间的距离</h1>
+
+<blockquote>
+  <p>方法：<code class="language-plaintext highlighter-rouge">getPointDistance(point1,point2)</code></p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">point1</code> <code class="language-plaintext highlighter-rouge">point2</code></p>
+</blockquote>
+
+<blockquote>
+  <p>说明：计算两个点之间的距离，这里主要计算鼠标是在头像上还是在手柄上</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>point1</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>坐标点x,y</td>
+    </tr>
+    <tr>
+      <td>point2</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>坐标点x,y</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">getPointDistance</span><span class="p">(</span><span class="nx">point1</span><span class="p">,</span><span class="nx">point2</span><span class="p">){</span>
+  <span class="kd">let</span> <span class="nx">count</span> <span class="o">=</span> <span class="p">(</span><span class="nx">point1</span><span class="p">.</span><span class="nx">x</span> <span class="o">*</span> <span class="nx">point1</span><span class="p">.</span><span class="nx">x</span><span class="p">)</span> <span class="o">-</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">point1</span><span class="p">.</span><span class="nx">x</span> <span class="o">*</span> <span class="nx">point2</span><span class="p">.</span><span class="nx">x</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nx">point2</span><span class="p">.</span><span class="nx">x</span> <span class="o">*</span> <span class="nx">point2</span><span class="p">.</span><span class="nx">x</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nx">point1</span><span class="p">.</span><span class="nx">y</span> <span class="o">*</span> <span class="nx">point1</span><span class="p">.</span><span class="nx">y</span><span class="p">)</span> <span class="o">-</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">point1</span><span class="p">.</span><span class="nx">y</span> <span class="o">*</span> <span class="nx">point2</span><span class="p">.</span><span class="nx">y</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nx">point2</span><span class="p">.</span><span class="nx">y</span> <span class="o">*</span> <span class="nx">point2</span><span class="p">.</span><span class="nx">y</span><span class="p">);</span>
+  <span class="kd">let</span> <span class="nx">tmpd1</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sqrt</span><span class="p">(</span> <span class="nx">count</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="nx">point1</span><span class="p">.</span><span class="nx">r</span> <span class="o">&gt;</span> <span class="nx">tmpd1</span><span class="p">){</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="7将以base64的图片url数据转换为file">7.将以base64的图片url数据转换为file</h1>
+
+<blockquote>
+  <p>方法：<code class="language-plaintext highlighter-rouge">convertBase64UrlToBlob(urlData)</code></p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">urlData</code></p>
+</blockquote>
+
+<blockquote>
+  <p>说明：将base64转换成file</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>urlData</td>
+      <td>String</td>
+      <td>是</td>
+      <td>图像Base64数据</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">convertBase64UrlToBlob</span><span class="p">(</span><span class="nx">urlData</span><span class="p">){</span>
+  <span class="kd">var</span> <span class="nx">bytes</span><span class="o">=</span><span class="nb">window</span><span class="p">.</span><span class="nx">atob</span><span class="p">(</span><span class="nx">urlData</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1">,</span><span class="dl">'</span><span class="p">)[</span><span class="mi">1</span><span class="p">]);</span>        <span class="c1">//去掉url的头，并转换为byte</span>
+  <span class="c1">//处理异常,将ascii码小于0的转换为大于0</span>
+  <span class="kd">var</span> <span class="nx">ab</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">ArrayBuffer</span><span class="p">(</span><span class="nx">bytes</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">ia</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Uint8Array</span><span class="p">(</span><span class="nx">ab</span><span class="p">);</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">bytes</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">ia</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">bytes</span><span class="p">.</span><span class="nx">charCodeAt</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="k">new</span> <span class="nx">Blob</span><span class="p">(</span> <span class="p">[</span><span class="nx">ab</span><span class="p">]</span> <span class="p">,</span> <span class="p">{</span><span class="na">type</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">image/png</span><span class="dl">'</span><span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+:ET

@@ -1,0 +1,3 @@
+I"�<p>uWSGI是一个Web服务器，它实现了WSGI协议、uwsgi、http等协议。Nginx中HttpUwsgiModule的作用是与uWSGI服务器进行交换。fastcgi应用于php语言，
+uwsgi应用于Python语言。</p>
+:ET

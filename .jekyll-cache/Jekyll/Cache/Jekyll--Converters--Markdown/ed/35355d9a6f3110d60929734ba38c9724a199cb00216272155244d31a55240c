@@ -1,0 +1,121 @@
+I"<p>上一篇记录fastcgi反向代理设置，这篇继续上一篇的环境搭建wordPress博客，如果小伙伴没有配置环境，请参考上一篇博客先搭建环境。</p>
+
+<ul>
+  <li>wordPress<a href="https://codex.wordpress.org/zh-cn:%E5%AE%89%E8%A3%85WordPress" title="https://codex.wordpress.org/zh-cn:%E5%AE%89%E8%A3%85WordPress" target="_blank">官方安装教程</a></li>
+</ul>
+
+<h1 id="1获取wordpress">1.获取wordPress</h1>
+
+<p>打开<a href="https://wordpress.org/download/" title="https://wordpress.org/download/" target="_blank">wordPress官方下载</a>，复制下载链接地址</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_35.jpg" alt="ssl" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd /opt/app/wdcode  #如果没有wdcode，则创建 mkdir wdcode
+
+wget https://wordpress.org/latest.tar.gz
+
+tar xzvf ./latest.tar.gz
+
+cd wordPress
+</code></pre></div></div>
+
+<h1 id="2创建数据库">2.创建数据库</h1>
+
+<p>如果没有安装mysql,请参考上一篇博客。</p>
+
+<p>登录数据库</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mysql -uroot -p #密码为空，按回车
+</code></pre></div></div>
+
+<p>创建数据库</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>create database wds;  #创建数据库
+
+show databases;       #查看创建的数据库
+
+#为wds数据库赋予所以权限，限定wds只能有localhost登录，密码为wds0k
+grant all privileges on wds.* to wds@'localhost' identified by 'wds0k';
+</code></pre></div></div>
+
+<p>登录wds数据，检测上面是否配置正确</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mysql -uwds -p'wds0k'
+</code></pre></div></div>
+
+<h1 id="3nginx配置">3.nginx配置</h1>
+
+<p>服务目录</p>
+
+<pre><code class="language-txt">/etc/nginx/conf.d
+|--wordpress.conf
+</code></pre>
+<h4 id="wordpressconf">wordpress.conf</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span>       <span class="mi">80</span><span class="p">;</span> 
+    <span class="kn">server_name</span>  <span class="s">localhost</span><span class="p">;</span>
+
+    <span class="c1">#charset koi8-r;</span>
+    <span class="kn">access_log</span>  <span class="n">/var/log/nginx/host.access.log</span>  <span class="s">main</span><span class="p">;</span>
+	
+	<span class="kn">root</span> <span class="n">/opt/app/wdcode/wordpress</span><span class="p">;</span>  <span class="c1">#设置根路径</span>
+	
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span> 
+		<span class="c1">#如果访问的不是/(根路径)，就/index.php?$args(参数)访问</span>
+        <span class="kn">try_files</span> <span class="nv">$uri</span> <span class="nv">$uri</span><span class="n">/</span> <span class="n">/index.php?</span><span class="nv">$args</span><span class="p">;</span>  
+        <span class="kn">index</span>  <span class="s">index.php</span><span class="p">;</span>
+    <span class="p">}</span>   
+    
+    <span class="kn">location</span> <span class="p">~</span> <span class="sr">\.php$</span> <span class="p">{</span>
+        <span class="kn">fastcgi_pass</span> <span class="nf">127.0.0.1</span><span class="p">:</span><span class="mi">9000</span><span class="p">;</span>
+        <span class="kn">fastcgi_index</span> <span class="s">index.php</span><span class="p">;</span>
+        <span class="kn">include</span> <span class="s">fastcgi_params</span><span class="p">;</span>
+        <span class="kn">fastcgi_param</span> <span class="s">SCRIPT_FILENAME</span> <span class="nv">$document_root$fastcgi_script_name</span><span class="p">;</span>
+    <span class="p">}</span>   
+<span class="p">}</span>    
+</code></pre></div></div>
+
+<h4 id="为wordpress文件添加权限">为wordpress文件添加权限</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd /opt/app/wdcode 
+
+ll  #查看wordpress文件权限，会发现wdcode 的操作权限nobody
+
+chown -R nginx ./wordpress
+</code></pre></div></div>
+
+<p>在输入<code class="language-plaintext highlighter-rouge">ll</code>会发现wordpress文件的权限变为nginx</p>
+
+<p><code class="language-plaintext highlighter-rouge">注意：</code></p>
+
+<p>这个操作者不一定是<code class="language-plaintext highlighter-rouge">nginx</code>，小菜这么设置的，后面就报了一个没有权限写入的错误。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim /etc/opt/remi/php72/php-fpm.d/www.conf
+
+/user  查看user的值是谁，然后在
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_36.jpg" alt="ssl" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>chown -R 'user的值' ./wordpress
+</code></pre></div></div>
+
+<p>检测配置重启nginx</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -tc /etc/nginx/nginx.conf
+
+nginx -s reload -c /etc/nginx/nginx.conf
+</code></pre></div></div>
+
+<p>然后访问自己的域名http://walidream.com</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_37.jpg" alt="ssl" /></p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_38.jpg" alt="ssl" /></p>
+
+<p>这里需要注意的还是之前那个修改wordpress文件操作者，之后就没有什么问题，最后成功就是这个页面</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_39.jpg" alt="ssl" /></p>
+
+:ET

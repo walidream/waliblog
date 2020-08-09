@@ -1,0 +1,56 @@
+I"U<p>小菜今天看到网上有个css3的打字动画，觉得不错就给收藏下来了。下面是demo</p>
+
+<script async="" src="//jsrun.net/gDhKp/embed/all/light/"></script>
+
+<h1 id="1html结构">1.html结构</h1>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;h1&gt;</span>瓦力的博客 http://waliblog.com<span class="nt">&lt;/h1&gt;</span>
+</code></pre></div></div>
+
+<h1 id="2css样式">2.css样式</h1>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">@keyframes</span> <span class="n">typing</span> <span class="p">{</span>
+	<span class="nt">from</span> <span class="p">{</span>
+	  <span class="nl">width</span><span class="p">:</span><span class="m">0</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">@keyframes</span> <span class="n">blink-caret</span> <span class="p">{</span>
+	<span class="err">50</span><span class="o">%</span> <span class="p">{</span>
+	<span class="nl">border-color</span><span class="p">:</span><span class="nb">transparent</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nt">h1</span> <span class="p">{</span>
+  <span class="c">/* # of 字体颜色渐变 # of chars */</span>
+  <span class="nl">color</span><span class="p">:</span> <span class="m">#f35626</span><span class="p">;</span>
+	<span class="nl">background-image</span><span class="p">:</span> <span class="n">-webkit-linear-gradient</span><span class="p">(</span><span class="m">92deg</span><span class="p">,</span><span class="m">#f35626</span><span class="p">,</span><span class="m">#feab3a</span><span class="p">);</span>
+	<span class="nl">-webkit-background-clip</span><span class="p">:</span> <span class="nb">text</span><span class="p">;</span>
+	<span class="nl">-webkit-text-fill-color</span><span class="p">:</span> <span class="nb">transparent</span><span class="p">;</span>
+  
+	<span class="nl">font</span><span class="p">:</span><span class="nb">bold</span> <span class="m">200%</span> <span class="n">Consolas</span><span class="p">,</span><span class="n">Monaco</span><span class="p">,</span><span class="nb">monospace</span><span class="p">;</span>
+	<span class="nl">border-right</span><span class="p">:</span><span class="m">.1em</span> <span class="nb">solid</span><span class="p">;</span>
+	<span class="nl">width</span><span class="p">:</span><span class="m">16.5em</span><span class="p">;</span>
+	<span class="c">/* fallback */</span>
+	<span class="nl">width</span><span class="p">:</span><span class="m">30ch</span><span class="p">;</span>
+	<span class="c">/* # of chars */</span>
+	<span class="nl">margin</span><span class="p">:</span><span class="m">2em</span> <span class="m">1em</span><span class="p">;</span>
+	<span class="nl">white-space</span><span class="p">:</span><span class="nb">nowrap</span><span class="p">;</span>
+	<span class="nl">overflow</span><span class="p">:</span><span class="nb">hidden</span><span class="p">;</span>
+	<span class="nl">animation</span><span class="p">:</span><span class="n">typing</span> <span class="m">3s</span> <span class="n">steps</span><span class="p">(</span><span class="m">30</span><span class="p">,</span><span class="n">end</span><span class="p">),</span><span class="c">/* # of steps = # of chars */</span>
+		 <span class="n">blink-caret</span> <span class="m">.5s</span> <span class="n">step-end</span> <span class="n">infinite</span> <span class="n">alternate</span><span class="p">,</span>
+     <span class="n">hue</span> <span class="m">60s</span> <span class="n">infinite</span> <span class="n">linear</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">@-webkit-keyframes</span> <span class="n">hue</span> <span class="p">{</span>
+  <span class="nt">from</span> <span class="p">{</span>
+    <span class="nl">-webkit-filter</span><span class="p">:</span> <span class="n">hue-rotate</span><span class="p">(</span><span class="m">0deg</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="nt">to</span> <span class="p">{</span>
+			<span class="nl">-webkit-filter</span><span class="p">:</span> <span class="n">hue-rotate</span><span class="p">(</span><span class="m">-360deg</span><span class="p">);</span>
+		  <span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+:ET

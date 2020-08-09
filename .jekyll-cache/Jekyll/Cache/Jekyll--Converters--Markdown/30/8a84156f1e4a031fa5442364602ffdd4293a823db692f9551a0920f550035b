@@ -1,0 +1,354 @@
+I"�a<p>nginx代理服务，所谓的代理简单理解就是代为办理。生活中常见的代理（代理理财、代理收货等等）。在没有nginx作为代理服务时，客户端直接发送请求，服务端直接响应请求</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_15.jpg?1234" alt="ssl" /></p>
+
+<p>当出现nginx代理服务时，客户端所有的请求由nginx接收在转发给服务端，服务单响应给nginx在有nginx响应给客户端。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_16.jpg?1234" alt="ssl" /></p>
+
+<h1 id="1代理分类">1.代理分类</h1>
+
+<p>代理分类按照应用场景模式分为两类，一个是<code class="language-plaintext highlighter-rouge">正向代理</code>，正向代理代理的对象是客户端，为客户端提供服务，另一个是<code class="language-plaintext highlighter-rouge">反向代理</code>，反向代理代理的对象服务端，为服务端提供服务。</p>
+
+<p>正向代理和反向代理区分是看nginx代理的是客户端还是服务端，如果nginx代理的是客户端就是正向代理，代理的是服务端就是反向代理。</p>
+
+<h1 id="2正向代理">2.正向代理</h1>
+
+<p>正向代理也就是代理，他的工作原理就像一个跳板，简单的说，我访问不了google.com，但是我能访问一个代理服务器A，A能访问google.com，于是我先连上代理服务器A，告诉他我需要google.com的内容，A就去取回来，然后返回给我。从网站的角度，只在代理服务器来取内容的时候有一次记录，有时候并不知道是用户的请求，也隐藏了用户的资料，这取决于代理告不告诉网站。</p>
+
+<p>结论就是，正向代理是一个位于客户端和原始服务器(origin server)之间的服务器。为了从原始服务器取得内容，客户端向代理发送一个请求并指定目标(原始服务器)，然后代理向原始服务器转交请求并将获得的内容返回给客户端。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_17.png?1234" alt="ssl" /></p>
+
+<h1 id="3反向代理">3.反向代理</h1>
+
+<p>举个例子，比如我想访问 http://www.test.com/readme，但www.test.com上并不存在readme页面，于是他是偷偷从另外一台服务器上取回来，然后作为自己的内容返回用户，但用户并不知情。这里所提到的 www.test.com 这个域名对应的服务器就设置了反向代理功能。</p>
+
+<p>结论就是，反向代理正好相反，对于客户端而言它就像是原始服务器，并且客户端不需要进行任何特别的设置。客户端向反向代理的命名空间(name-space)中的内容发送普通请求，接着反向代理将判断向何处(原始服务器)转交请求，并将获得的内容返回给客户端，就像这些内容原本就是它自己的一样。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_18.png?1234" alt="ssl" /></p>
+
+<h1 id="4nginx支持的代理协议">4.nginx支持的代理协议</h1>
+
+<p>nginx支持非常多的代理协议，支持http、https、websocket、GRPC、ICMP/POP/IMAP、RTMP。http是web服务中常用超文本协议，https是当前主流的一个加密协议，websocket是在http1.1版本之上
+客户端与服务端常连接通信协议，GRPC是GO开发中远程过程调用协议，ICMP/POP/IMAP是邮件收发协议，RTMP是应用流媒体服务协议(直播)。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_19.jpg" alt="ssl" /></p>
+
+<h3 id="常见的nginx作为反向代理支持协议">常见的nginx作为反向代理支持协议</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_21.jpg" alt="ssl" /></p>
+
+<h3 id="反向代理模式与nginx代理模块">反向代理模式与nginx代理模块</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_20.jpg" alt="ssl" /></p>
+
+<h3 id="常见的nginx作为正向代理支持协议">常见的nginx作为正向代理支持协议</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_22.jpg" alt="ssl" /></p>
+
+<h1 id="5配置模块">5.配置模块</h1>
+
+<h3 id="proxy_pass">proxy_pass</h3>
+
+<p>proxy_pass配置项属于<code class="language-plaintext highlighter-rouge">ngx_http_proxy_module</code>模块<a href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html" title="http://nginx.org/en/docs/http/ngx_http_proxy_module.html" target="_blank">传送门</a></p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">proxy_pass</span> <span class="s">URL</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">location,</span> <span class="s">if</span> <span class="s">in</span> <span class="s">location,</span> <span class="s">limit_except</span>
+</code></pre></div></div>
+
+<h1 id="6反向代理配置">6.反向代理配置</h1>
+
+<p>服务目录如下</p>
+<pre><code class="language-txt">/opt/app  #应用目录
+   |--code1
+     |--index.html
+   |--code2
+     |--testproxy.html
+
+/etc/nginx/conf.d/ #配置目录
+   |
+   |--fs_proxy.conf
+   |--realserver.conf
+</code></pre>
+
+<h4 id="indexhtml">index.html</h4>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+	<span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;title&gt;</span>Document<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+	<span class="nt">&lt;h1&gt;</span>瓦力博客<span class="nt">&lt;/h1&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<h4 id="testproxyhtml">testproxy.html</h4>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+	<span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;title&gt;</span>Document<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+	<span class="nt">&lt;h1&gt;</span>代理测试页面<span class="nt">&lt;/h1&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<h4 id="fs_proxyconf">fs_proxy.conf</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span>       <span class="mi">80</span><span class="p">;</span> 
+    <span class="kn">server_name</span>  <span class="s">localhost</span><span class="p">;</span>
+ 
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span> 
+        <span class="kn">root</span>   <span class="n">/opt/app/code1</span><span class="p">;</span>
+        <span class="kn">index</span>  <span class="s">index.html</span> <span class="s">index.htm</span><span class="p">;</span>
+    <span class="p">}</span>      
+
+    <span class="kn">location</span> <span class="p">~</span> <span class="sr">/testproxy.html$</span> <span class="p">{</span>  <span class="c1">#设置代理</span>
+        <span class="kn">proxy_pass</span> <span class="s">http://127.0.0.1:9000</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="realserverconf">realserver.conf</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span>       <span class="mi">9000</span><span class="p">;</span> 
+    <span class="kn">server_name</span>  <span class="s">localhost</span><span class="p">;</span>
+ 
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span> 
+        <span class="kn">root</span>   <span class="n">/opt/app/code2</span><span class="p">;</span>
+        <span class="kn">index</span>  <span class="s">index.html</span> <span class="s">index.htm</span><span class="p">;</span>
+    <span class="p">}</span>      
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="检测重启nginx">检测重启nginx</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -tc /etc/nginx/nginx.conf  #检测语法
+
+nginx -s reload -c /etc/nginx/nginx.conf #重启
+</code></pre></div></div>
+
+<p>上面创建了两个应用分别为<code class="language-plaintext highlighter-rouge">code1</code>和<code class="language-plaintext highlighter-rouge">code2</code>。code1分配的是80端口，code2分配的9000端口，默认80端口可以在公网访问，而9000端口不能
+在公网上访问，code1的nginx配置为<code class="language-plaintext highlighter-rouge">fs_proxy.conf</code>，code2的nginx配置为<code class="language-plaintext highlighter-rouge">realserver.conf</code>。通过nginx反向代理设置我们就
+可以在公网上访问code2的应用，访问地址<code class="language-plaintext highlighter-rouge">http://walidream.com/testproxy.html</code>。通过fs_proxy.conf配置匹配<code class="language-plaintext highlighter-rouge">/testproxy.html$</code></p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">location</span> <span class="p">~</span> <span class="sr">/testproxy.html$</span> <span class="p">{</span>  <span class="c1">#设置代理</span>
+	<span class="kn">proxy_pass</span> <span class="s">http://127.0.0.1:9000</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_23.png" alt="ssl" /></p>
+
+<h1 id="7正向代理配置">7.正向代理配置</h1>
+
+<p>测试正向代理需要两台服务器，小菜呢刚好有两台服务器就来玩一玩。server1: <code class="language-plaintext highlighter-rouge">www.walidream.com</code>，server2:<code class="language-plaintext highlighter-rouge">www.yagm.xin</code>。</p>
+
+<h3 id="server1服务目录">server1服务目录</h3>
+
+<pre><code class="language-txt">/etc/nginx/conf.d/  #配置
+    |
+	|--zx_proxy.conf
+</code></pre>
+
+<h4 id="zx_proxyconfserver1服务器">zx_proxy.conf(server1服务器)</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span>       <span class="mi">80</span><span class="p">;</span> 
+    <span class="kn">server_name</span>  <span class="s">localhost</span><span class="p">;</span>
+	
+    <span class="kn">resolver</span> <span class="mi">8</span><span class="s">.8.8.8</span><span class="p">;</span>
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span> 
+        <span class="kn">proxy_set_header</span> <span class="s">X-Forwarded-For</span> <span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span> 
+        <span class="kn">proxy_pass</span> <span class="s">http://yagm.xin</span><span class="p">;</span>
+    <span class="p">}</span>      
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>这里面需要注意的是<code class="language-plaintext highlighter-rouge">resolver</code>dns解析，因为正向代理的dns解析在代理上面。</p>
+
+<h3 id="server2服务目录">server2服务目录</h3>
+
+<pre><code class="language-txt">/home/app #应用
+    |
+	|--index.html
+	
+/etc/nginx/conf.d/  #配置
+    |
+	|--admin.conf
+</code></pre>
+
+<h4 id="indexhtmlserver2服务器">index.html(server2服务器)</h4>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+	<span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;title&gt;</span>Document<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+	<span class="nt">&lt;h1&gt;</span>洋洋的一米阳光<span class="nt">&lt;/h1&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<h4 id="adminconfserver2服务器">admin.conf(server2服务器)</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span>       <span class="mi">80</span><span class="p">;</span> 
+    <span class="kn">server_name</span>  <span class="s">localhost</span><span class="p">;</span>
+	
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span> 
+        <span class="kn">if</span> <span class="s">(</span> <span class="nv">$http_x_forwarded_for</span> <span class="s">!~*</span> <span class="s">"^99</span><span class="err">\</span><span class="s">.99</span><span class="err">\</span><span class="s">.99</span><span class="err">\</span><span class="s">.99"</span> <span class="s">)</span> <span class="p">{</span> 
+            <span class="kn">return</span> <span class="mi">403</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kn">root</span>   <span class="n">/home/app</span><span class="p">;</span>
+        <span class="kn">index</span>  <span class="s">index.html</span> <span class="s">index.htm</span><span class="p">;</span>
+    <span class="p">}</span>      
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="检测重启nginx-1">检测重启nginx</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -tc /etc/nginx/nginx.conf  #检测语法
+
+nginx -s reload -c /etc/nginx/nginx.conf #重启
+</code></pre></div></div>
+
+<p>上面两个应用分别在两个服务器上，server1: <code class="language-plaintext highlighter-rouge">www.walidream.com</code>，server2:<code class="language-plaintext highlighter-rouge">www.yagm.xin</code>。server2服务器只允许server1服务器来访问，其他访问拒绝。通过在server1
+服务器上配置nginx的正向代理来访问server2上面的服务</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_24.png" alt="ssl" /></p>
+
+<blockquote>
+  <p>特别注意</p>
+</blockquote>
+
+<p>上面配置语法中的IP<code class="language-plaintext highlighter-rouge">99.99.99.99</code>不是server2服务器的公网ip。小菜用的服务器是阿里云的服务器，但是这个里面<code class="language-plaintext highlighter-rouge">$http_x_forwarded_for</code>是代理做转发的ip。第一次填写成
+阿里云服务器的公网IP返回总是403。后面查看日志时，发现日志中打印的<code class="language-plaintext highlighter-rouge">http_x_forwarded_for</code>的IP值和填写的阿里云公网IP不一样，小菜呢猜想，虽然用阿里云给的公网IP
+能够访问的到阿里云服务器。但是不能保证阿里云没有给自己的服务器做代理。小菜将<code class="language-plaintext highlighter-rouge">99.99.99.99</code>换成了日志中的<code class="language-plaintext highlighter-rouge">$http_x_forwarded_for</code>的值，然后就ok了。</p>
+
+<p>访问http://www.walidream.com就可以看到http://www.yagm.xin服务器上的内容</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_25.jpg" alt="ssl" /></p>
+
+<h1 id="8添加代理常用配置项">8.添加代理常用配置项</h1>
+
+<p>下面介绍的配置项都属于<code class="language-plaintext highlighter-rouge">ngx_http_proxy_module</code>模块<a href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html" title="http://nginx.org/en/docs/http/ngx_http_proxy_module.html" target="_blank">传送门</a></p>
+
+<h3 id="1proxy_redirect">1.proxy_redirect</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">proxy_redirect</span> <span class="s">default</span><span class="p">;</span>
+	<span class="k">proxy_redirect</span> <span class="no">off</span><span class="p">;</span>
+	<span class="k">proxy_redirect</span> <span class="s">redirect</span> <span class="s">replacement</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">proxy_redirect</span> <span class="s">default</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="2proxy_set_header">2.proxy_set_header</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span> <span class="s">proxy_set_header</span> <span class="s">field</span> <span class="s">value</span><span class="p">;</span>
+<span class="k">Default:proxy_set_header</span> <span class="s">Host</span> <span class="nv">$proxy_host</span><span class="p">;</span>
+	<span class="k">proxy_set_header</span> <span class="s">Connection</span> <span class="s">close</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="3proxy_connect_timeout">3.proxy_connect_timeout</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">proxy_connect_timeout</span> <span class="s">time</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">proxy_connect_timeout</span> <span class="s">60s</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="4proxy_send_timeout">4.proxy_send_timeout</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">proxy_send_timeout</span> <span class="s">time</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">proxy_send_timeout</span> <span class="s">60s</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="5proxy_read_timeout">5.proxy_read_timeout</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">proxy_read_timeout</span> <span class="s">time</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">proxy_read_timeout</span> <span class="s">60s</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="6proxy_buffer_size">6.proxy_buffer_size</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">proxy_buffer_size</span> <span class="s">size</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">proxy_buffer_size</span> <span class="mi">4k</span><span class="s">|8k</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="7proxy_buffering">7.proxy_buffering</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">proxy_buffering</span> <span class="no">on</span> <span class="s">|</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">proxy_buffering</span> <span class="no">on</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="8proxy_buffers">8.proxy_buffers</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">proxy_buffers</span> <span class="s">number</span> <span class="s">size</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">proxy_buffers</span> <span class="mi">8</span> <span class="mi">4k</span><span class="s">|8k</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="9proxy_busy_buffers_size">9.proxy_busy_buffers_size</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">proxy_busy_buffers_size</span> <span class="s">size</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">proxy_busy_buffers_size</span> <span class="mi">8k</span><span class="s">|16k</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="10proxy_max_temp_file_size">10.proxy_max_temp_file_size</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">proxy_max_temp_file_size</span> <span class="s">size</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">proxy_max_temp_file_size</span> <span class="mi">1024m</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<p>上面的配置项都是在设置代理时常用到的配置，小菜建议将常用的配置放在一个文件里。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim /etc/nginx/proxy_pass
+</code></pre></div></div>
+
+<p>创建好proxy_pass文件之后，将下面内容拷贝进去。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#proxy_pass 代理常用配置</span>
+
+<span class="k">proxy_redirect</span> <span class="s">default</span><span class="p">;</span>
+
+<span class="k">proxy_set_header</span> <span class="s">Host</span> <span class="nv">$http_host</span><span class="p">;</span>
+<span class="k">proxy_set_header</span> <span class="s">X-Real-IP</span> <span class="nv">$remote_addr</span><span class="p">;</span>
+
+<span class="k">proxy_connect_timeout</span> <span class="mi">30</span><span class="p">;</span>
+<span class="k">proxy_send_timeout</span> <span class="mi">60</span><span class="p">;</span>
+<span class="k">proxy_read_timeout</span> <span class="mi">60</span><span class="p">;</span>
+
+<span class="k">proxy_buffer_size</span> <span class="mi">32k</span><span class="p">;</span>
+<span class="k">proxy_buffering</span> <span class="no">on</span><span class="p">;</span>
+<span class="k">proxy_buffers</span> <span class="mi">4</span> <span class="mi">128k</span><span class="p">;</span>
+<span class="k">proxy_busy_buffers_size</span> <span class="mi">256k</span><span class="p">;</span>
+<span class="k">proxy_max_temp_file_size</span> <span class="mi">256k</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>在配置代理时，只需要将文件内容导入nginx配置就成了。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">location</span> <span class="n">/</span> <span class="p">{</span>
+	<span class="kn">proxy_pass</span> <span class="s">http://127.0.0.1:8080</span><span class="p">;</span>
+	<span class="kn">include</span> <span class="s">proxy_params</span><span class="p">;</span>  <span class="c1">#将配置文件导入</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+:ET

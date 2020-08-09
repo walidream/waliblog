@@ -1,0 +1,386 @@
+I",<p>Go的标准库提供了100多个包，以支持常见功能，如输入、输出、排序以及文本处理。比如fmt包，就含有格式化输出、接收输入的函数。</p>
+
+<blockquote>
+  <p>Println是其中一个基础函数，可以打印以空格间隔的一个或多个值，并在最后添加一个换行符，从而输出一整行。</p>
+</blockquote>
+
+<blockquote>
+  <p>fmt.Printf(“%s”,’string’),错误写法。fmt.Printf(“%s”,”string”)字符串要用<code class="language-plaintext highlighter-rouge">""</code>引起来</p>
+</blockquote>
+
+<h1 id="1general常规">1.General(常规)</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>格式符</th>
+      <th>说明</th>
+      <th>例</th>
+      <th>输出</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>%v</td>
+      <td>打印变量的值(默认)</td>
+      <td>fmt.Printf(“%v\r\n”,123)</td>
+      <td><code class="language-plaintext highlighter-rouge">123</code></td>
+    </tr>
+    <tr>
+      <td>%T</td>
+      <td>打印变量的类型</td>
+      <td>fmt.Printf(“%v 类型为 %T\r\n”,123)</td>
+      <td><code class="language-plaintext highlighter-rouge">123 类型为 int</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="2integer整型">2.Integer(整型)</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>格式符</th>
+      <th>说明</th>
+      <th>例</th>
+      <th>输出</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>%+d</td>
+      <td>带符号的整型</td>
+      <td>fmt.Printf(“%+d”, 123)</td>
+      <td><code class="language-plaintext highlighter-rouge">+123</code></td>
+    </tr>
+    <tr>
+      <td>%o</td>
+      <td>不带零的八进制</td>
+      <td>fmt.Printf(“%o”,7)</td>
+      <td><code class="language-plaintext highlighter-rouge">7</code></td>
+    </tr>
+    <tr>
+      <td>%#o</td>
+      <td>带零的八进制</td>
+      <td>fmt.Printf(“%#o”,7)</td>
+      <td><code class="language-plaintext highlighter-rouge">07</code></td>
+    </tr>
+    <tr>
+      <td>%x</td>
+      <td>小写的十六进制</td>
+      <td>fmt.Printf(“%x”,10)</td>
+      <td><code class="language-plaintext highlighter-rouge">a</code></td>
+    </tr>
+    <tr>
+      <td>%X</td>
+      <td>大写的十六进制</td>
+      <td>fmt.Printf(“%X”,10)</td>
+      <td><code class="language-plaintext highlighter-rouge">A</code></td>
+    </tr>
+    <tr>
+      <td>%#x</td>
+      <td>小写带0x的十六进制</td>
+      <td>fmt.Printf(“%#x”,10)</td>
+      <td><code class="language-plaintext highlighter-rouge">0xa</code></td>
+    </tr>
+    <tr>
+      <td>%#X</td>
+      <td>大写带0x的十六进制</td>
+      <td>fmt.Printf(“%#X”,10)</td>
+      <td><code class="language-plaintext highlighter-rouge">0xA</code></td>
+    </tr>
+    <tr>
+      <td>%c</td>
+      <td>相应Unicode码点所表示的字符</td>
+      <td>fmt.Printf(“%c”,0x4E2D)</td>
+      <td><code class="language-plaintext highlighter-rouge">中</code></td>
+    </tr>
+    <tr>
+      <td>%U</td>
+      <td>打印Unicode字符</td>
+      <td>fmt.Printf(“%U”,0x4E2D)</td>
+      <td><code class="language-plaintext highlighter-rouge">U+4E2D</code></td>
+    </tr>
+    <tr>
+      <td>%#U</td>
+      <td>打印带字符的Unicode</td>
+      <td>fmt.Printf(“%#U”,0x4E2D)</td>
+      <td><code class="language-plaintext highlighter-rouge">U+4E2D '中'</code></td>
+    </tr>
+    <tr>
+      <td>%b</td>
+      <td>打印整型的二进制</td>
+      <td>fmt.Printf(“%b”,5)</td>
+      <td><code class="language-plaintext highlighter-rouge">101</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="3integer-width整型宽度">3.Integer width(整型宽度)</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>格式符</th>
+      <th>说明</th>
+      <th>例</th>
+      <th>输出</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>%5d</td>
+      <td>表示该整型最大长度是5</td>
+      <td>fmt.Printf(“|%5d|”, 1)</td>
+      <td><code class="language-plaintext highlighter-rouge">| 　 1|</code></td>
+    </tr>
+    <tr>
+      <td>%-5d</td>
+      <td>则相反，打印结果会自动左对齐</td>
+      <td>fmt.Printf(“|%5d|”, 1234567)</td>
+      <td><code class="language-plaintext highlighter-rouge">|1234567|</code></td>
+    </tr>
+    <tr>
+      <td>%05d</td>
+      <td>会在数字前面补零</td>
+      <td>fmt.Printf(“%05d\n”,1)</td>
+      <td><code class="language-plaintext highlighter-rouge">00001</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="4float浮点型">4.Float(浮点型)</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>格式符</th>
+      <th>说明</th>
+      <th>例</th>
+      <th>输出</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>%f</td>
+      <td>(=%.6f) 6位小数点</td>
+      <td>fmt.Printf(“%f\n”,0.1)</td>
+      <td><code class="language-plaintext highlighter-rouge">0.100000</code></td>
+    </tr>
+    <tr>
+      <td>%e</td>
+      <td>(=%.6e) 6位小数点（科学计数法）</td>
+      <td>fmt.Printf(“%e\n”,10.2)</td>
+      <td><code class="language-plaintext highlighter-rouge">1.020000e+01</code></td>
+    </tr>
+    <tr>
+      <td>%g</td>
+      <td>用最少的数字来表示</td>
+      <td>fmt.Printf(“%g\n”,0.0100)</td>
+      <td><code class="language-plaintext highlighter-rouge">0.01</code></td>
+    </tr>
+    <tr>
+      <td>%.3g</td>
+      <td>最多3位数字来表示</td>
+      <td>fmt.Printf(“%.3g\n”,0.0100)</td>
+      <td><code class="language-plaintext highlighter-rouge">0.01</code></td>
+    </tr>
+    <tr>
+      <td>%.3f</td>
+      <td>最多3位小数来表示</td>
+      <td>fmt.Printf(“%.3f\n”,0.0111)</td>
+      <td><code class="language-plaintext highlighter-rouge">0.011</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="5string字符型">5.String(字符型)</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>格式符</th>
+      <th>说明</th>
+      <th>例</th>
+      <th>输出</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>%s</td>
+      <td>正常输出字符串</td>
+      <td>fmt.Printf(“%s”,”string”)</td>
+      <td><code class="language-plaintext highlighter-rouge">string</code></td>
+    </tr>
+    <tr>
+      <td>%q</td>
+      <td>字符串带双引号，字符串中的引号带转义符</td>
+      <td>fmt.Printf(“%q”,string)</td>
+      <td><code class="language-plaintext highlighter-rouge">"string"</code></td>
+    </tr>
+    <tr>
+      <td>%#q</td>
+      <td>字符串带反引号，如果字符串内有反引号，就用双引号代替</td>
+      <td>fmt.Printf(“%#q,%#q\n”,”string”,”str`i`ing”)</td>
+      <td>`string`,”str`i`ing”</td>
+    </tr>
+    <tr>
+      <td>%x</td>
+      <td>将字符串转换为小写的16进制格式</td>
+      <td>fmt.Printf(“%x\n”,”string”)</td>
+      <td><code class="language-plaintext highlighter-rouge">737472696e67</code></td>
+    </tr>
+    <tr>
+      <td>%X</td>
+      <td>将字符串转换为大写的16进制格式</td>
+      <td>fmt.Printf(“%X\n”,”string”)</td>
+      <td><code class="language-plaintext highlighter-rouge">737472696E67</code></td>
+    </tr>
+    <tr>
+      <td>% x</td>
+      <td>带空格的16进制格式</td>
+      <td>fmt.Printf(“% x\n”,”string”)</td>
+      <td><code class="language-plaintext highlighter-rouge">73 74 72 69 6E 67</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="6string-width字符型宽度">6.String Width(字符型宽度)</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>格式符</th>
+      <th>说明</th>
+      <th>例</th>
+      <th>输出</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>%5s</td>
+      <td>最小宽度为5</td>
+      <td>fmt.Printf(“%5s,%5s\n”,”abc”,”abcdef”)</td>
+      <td><code class="language-plaintext highlighter-rouge">　abc,abcdef</code></td>
+    </tr>
+    <tr>
+      <td>%-5s</td>
+      <td>最小宽度为5（左对齐）</td>
+      <td>fmt.Printf(“%-5s,%-5s\n”,”abc”,”abcdef”)</td>
+      <td><code class="language-plaintext highlighter-rouge">abc　,abcdef</code></td>
+    </tr>
+    <tr>
+      <td>%.5s</td>
+      <td>最大宽度为5</td>
+      <td>fmt.Printf(“%.5s,%.5s\n”,”abc”,”abcefgh”)</td>
+      <td><code class="language-plaintext highlighter-rouge">abc,abcef</code></td>
+    </tr>
+    <tr>
+      <td>%5.7s</td>
+      <td>最小宽度为5，最大宽度为7</td>
+      <td>fmt.Printf(“%5.7s,%5.7s\n”,”abc”,”abcdefgh”)</td>
+      <td><code class="language-plaintext highlighter-rouge">　abc,abcdefg</code></td>
+    </tr>
+    <tr>
+      <td>%-5.7s</td>
+      <td>最小宽度为5，最大宽度为7（左对齐）</td>
+      <td>fmt.Printf(“%-5.7s%-5.7ss\n”,”abc”,”abcdefgh”)</td>
+      <td><code class="language-plaintext highlighter-rouge">abc　abcdefgs</code></td>
+    </tr>
+    <tr>
+      <td>%5.3s</td>
+      <td>如果宽度大于3，则截断</td>
+      <td>fmt.Printf(“%5.3s\n”,”abcdefgh”)</td>
+      <td><code class="language-plaintext highlighter-rouge">　abc</code></td>
+    </tr>
+    <tr>
+      <td>%05s</td>
+      <td>如果宽度小于5，就会在字符串前面补零</td>
+      <td>fmt.Printf(“%05s,%05s\n”,”abc”,”abcdefgh”)</td>
+      <td><code class="language-plaintext highlighter-rouge">00abc,abcdefgh</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="7struct结构体">7.Struct(结构体)</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>格式符</th>
+      <th>说明</th>
+      <th>例</th>
+      <th>输出</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>%v</td>
+      <td>正常打印</td>
+      <td>fmt.Printf(“%v”,”{sam {12345 67890}}”)</td>
+      <td><code class="language-plaintext highlighter-rouge">{sam {12345 67890}}</code></td>
+    </tr>
+    <tr>
+      <td>%+v</td>
+      <td>带字段名称</td>
+      <td>fmt.Printf(“%+v\n”,”{name:sam phone:{mobile:12345 office:67890}”)</td>
+      <td><code class="language-plaintext highlighter-rouge">{name:sam phone:{mobile:12345 office:67890}</code></td>
+    </tr>
+    <tr>
+      <td>%#v</td>
+      <td>用Go的语法打印</td>
+      <td>fmt.Printf(“%#v\n”,”main.People{name:”sam”, phone:main.Phone{mobile:”12345”, office:”67890”}}”)</td>
+      <td><code class="language-plaintext highlighter-rouge">{sam {12345 67890}}</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="8boolean布尔型">8.Boolean(布尔型)</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>格式符</th>
+      <th>说明</th>
+      <th>例</th>
+      <th>输出</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>%t</td>
+      <td>打印true或false</td>
+      <td>fmt.Printf(“%t”,true)</td>
+      <td><code class="language-plaintext highlighter-rouge">true</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="9pointer指针">9.Pointer(指针)</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>格式符</th>
+      <th>说明</th>
+      <th>例</th>
+      <th>输出</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>%p</td>
+      <td>带0x的指针</td>
+      <td>a :=1;fmt.Printf(“%p\n”,&amp;a)</td>
+      <td><code class="language-plaintext highlighter-rouge">0xc042056088</code></td>
+    </tr>
+    <tr>
+      <td>%#p</td>
+      <td>不带0x的指针</td>
+      <td>a :=1;fmt.Printf(“%p\n”,&amp;a)</td>
+      <td><code class="language-plaintext highlighter-rouge">c042056088</code></td>
+    </tr>
+  </tbody>
+</table>
+
+:ET

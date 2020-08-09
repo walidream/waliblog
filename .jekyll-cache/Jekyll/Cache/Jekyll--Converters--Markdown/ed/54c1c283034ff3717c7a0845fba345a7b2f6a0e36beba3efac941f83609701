@@ -1,0 +1,91 @@
+I":<p>大家经常在写网页中会遇到设计中各种各样的弹窗，而这种弹窗只能手动去写，不能使用插件，但是手写在弹出和取消时会有闪动。</p>
+
+<p>例如：<a href="http://www.lanlanlife.com/" title="http://www.lanlanlife.com/">http://www.lanlanlife.com/</a>大家可以点下<code class="language-plaintext highlighter-rouge">立即推广</code>，就会有弹窗，这个弹窗显然就会有些粗糙。这里不是刻意的批评谁，只是小菜恰好找到这个弹窗例子，在此举列下，绝无恶意。</p>
+
+<p>下面接给大家展现一下demo,内容随便找到，不必在意，目的只为撑高浏览器出现滚动条。</p>
+
+<script async="" src="//jsfiddle.net/waliblog/opf7h4cg/embed/result,js,html,css/?disableModals"></script>
+
+<h1 id="1禁止与取消">1.禁止与取消</h1>
+
+<blockquote>
+  <p>禁止滚动条方法：<code class="language-plaintext highlighter-rouge">scoll().forbid(sele)</code></p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">sele</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>sele</td>
+      <td>String</td>
+      <td>是</td>
+      <td>选择目标对象</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>取消滚动条方法：<code class="language-plaintext highlighter-rouge">scoll().cancel(sele)</code></p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">sele</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>sele</td>
+      <td>String</td>
+      <td>是</td>
+      <td>选择目标对象</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">scoll</span><span class="o">=</span><span class="kd">function</span><span class="p">(){</span>
+    <span class="c1">//禁止滚动</span>
+    <span class="kd">let</span> <span class="nx">forbid</span><span class="o">=</span><span class="kd">function</span> <span class="p">(</span><span class="nx">sele</span><span class="p">){</span>
+        <span class="kd">let</span> <span class="nx">H</span><span class="o">=</span><span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">html</span><span class="dl">'</span><span class="p">);</span>
+        <span class="nx">w1</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">();</span>
+        <span class="nx">H</span><span class="p">.</span><span class="nx">addClass</span><span class="p">(</span><span class="dl">'</span><span class="s1">fancybox-lock-test</span><span class="dl">'</span><span class="p">);</span>
+        <span class="nx">w2</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">();</span>
+        <span class="nx">H</span><span class="p">.</span><span class="nx">removeClass</span><span class="p">(</span><span class="dl">'</span><span class="s1">fancybox-lock-test</span><span class="dl">'</span><span class="p">);</span>
+        <span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">&lt;style type='text/css'&gt;.fancybox-margin{margin-right:</span><span class="dl">"</span> <span class="o">+</span> <span class="p">(</span><span class="nx">w2</span> <span class="o">-</span> <span class="nx">w1</span><span class="p">)</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">px; overflow: hidden !important;}&lt;/style&gt;</span><span class="dl">"</span><span class="p">).</span><span class="nx">appendTo</span><span class="p">(</span><span class="dl">"</span><span class="s2">head</span><span class="dl">"</span><span class="p">);</span>
+        <span class="nx">$</span><span class="p">(</span><span class="nx">sele</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="dl">'</span><span class="s1">fancybox-margin</span><span class="dl">'</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="c1">//取消滚动</span>
+    <span class="kd">let</span> <span class="nx">cancel</span><span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">sele</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">(</span><span class="nx">sele</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="dl">'</span><span class="s1">fancybox-margin</span><span class="dl">'</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="na">forbid</span><span class="p">:</span><span class="nx">forbid</span><span class="p">,</span>
+        <span class="na">cancel</span><span class="p">:</span><span class="nx">cancel</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">//使用</span>
+<span class="nx">scoll</span><span class="p">().</span><span class="nx">forbid</span><span class="p">(</span><span class="dl">'</span><span class="s1">body,.tky_rightfavorable</span><span class="dl">'</span><span class="p">);</span>  
+<span class="nx">scoll</span><span class="p">().</span><span class="nx">cancel</span><span class="p">(</span><span class="dl">'</span><span class="s1">body,.tky_rightfavorable</span><span class="dl">'</span><span class="p">);</span>
+
+</code></pre></div></div>
+:ET

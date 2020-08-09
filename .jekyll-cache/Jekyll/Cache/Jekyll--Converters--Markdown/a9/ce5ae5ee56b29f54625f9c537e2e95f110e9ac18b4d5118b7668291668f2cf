@@ -1,0 +1,960 @@
+I"W�<p>最近在项目中用到canvas绘图，有点心得，在此小记。</p>
+
+<p>原本打算用百度<code class="language-plaintext highlighter-rouge">echarts</code>，百度echarts有饼状图，但后来没有用。主要有两方面原因。</p>
+
+<blockquote>
+  <p>1.小菜的技术有限，不能直接拿来用。</p>
+</blockquote>
+
+<blockquote>
+  <p>2.如果要用echarts那就得熟读echarts的api文档，小菜时间有限。</p>
+</blockquote>
+
+<p>按照小菜的尿性，先把demo放出来</p>
+
+<script async="" src="//jsrun.net/IUhKp/embed/all/light/"></script>
+
+<blockquote>
+  <p>备用演示地址<a href="http://walidream.com/example/canvas/pieChart/" title="http://walidream.com/example/canvas/pieChart/" target="_blank">http://walidream.com/example/canvas/pieChart/</a></p>
+</blockquote>
+
+<h1 id="1绘实线圆">1.绘实线圆</h1>
+
+<blockquote>
+  <p>方法：<code class="language-plaintext highlighter-rouge">drawSolidRound(ctx,x,y,round)</code></p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">ctx</code> <code class="language-plaintext highlighter-rouge">x</code> <code class="language-plaintext highlighter-rouge">y</code> <code class="language-plaintext highlighter-rouge">round</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ctx</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>canvas 2d绘图环境</td>
+    </tr>
+    <tr>
+      <td>x</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆心x坐标</td>
+    </tr>
+    <tr>
+      <td>y</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆心y坐标</td>
+    </tr>
+    <tr>
+      <td>round</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>圆的基本参数</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">round</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>starAngle</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>起始角度</td>
+    </tr>
+    <tr>
+      <td>endAngle</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>结束角度</td>
+    </tr>
+    <tr>
+      <td>anticlockwise</td>
+      <td>Boolean</td>
+      <td>是</td>
+      <td>true(顺时针),false(逆时针)</td>
+    </tr>
+    <tr>
+      <td>radius</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆半径</td>
+    </tr>
+    <tr>
+      <td>border</td>
+      <td>Array</td>
+      <td>是</td>
+      <td>[0]:是线条宽度值,[1]:线条颜色值</td>
+    </tr>
+    <tr>
+      <td>bgColor</td>
+      <td>String</td>
+      <td>是</td>
+      <td>背景色</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">drawSolidRound</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="p">,</span><span class="nx">round</span><span class="p">){</span>
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">()</span>
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineWidth</span> <span class="o">=</span> <span class="nx">round</span><span class="p">.</span><span class="nx">border</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>   
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">strokeStyle</span> <span class="o">=</span> <span class="nx">round</span><span class="p">.</span><span class="nx">border</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> 
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">closePath</span><span class="p">();</span>
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">arc</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">round</span><span class="p">.</span><span class="nx">radius</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">getRads</span><span class="p">(</span><span class="nx">round</span><span class="p">.</span><span class="nx">starAngle</span><span class="p">),</span><span class="k">this</span><span class="p">.</span><span class="nx">getRads</span><span class="p">(</span><span class="nx">round</span><span class="p">.</span><span class="nx">endAngle</span><span class="p">),</span><span class="nx">round</span><span class="p">.</span><span class="nx">anticlockwise</span><span class="p">);</span> 
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">fillStyle</span> <span class="o">=</span> <span class="nx">round</span><span class="p">.</span><span class="nx">bgColor</span><span class="p">;</span>
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">fill</span><span class="p">();</span>
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<h1 id="2绘虚线圆">2.绘虚线圆</h1>
+
+<blockquote>
+  <p>方法：<code class="language-plaintext highlighter-rouge">drawDashRound (ctx, x, y, dashround)</code></p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">ctx</code> <code class="language-plaintext highlighter-rouge">x</code> <code class="language-plaintext highlighter-rouge">y</code> <code class="language-plaintext highlighter-rouge">dashround</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ctx</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>canvas 2d绘图环境</td>
+    </tr>
+    <tr>
+      <td>x</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆心x坐标</td>
+    </tr>
+    <tr>
+      <td>y</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆心y坐标</td>
+    </tr>
+    <tr>
+      <td>dashround</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>基本参数</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">dashround</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>step</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>虚线间距(值越大，间距越大)</td>
+    </tr>
+    <tr>
+      <td>starAngle</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>起始角度</td>
+    </tr>
+    <tr>
+      <td>endAngle</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>结束角度</td>
+    </tr>
+    <tr>
+      <td>anticlockwise</td>
+      <td>Boolean</td>
+      <td>是</td>
+      <td>true(顺时针),false(逆时针)</td>
+    </tr>
+    <tr>
+      <td>radius</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆半径</td>
+    </tr>
+    <tr>
+      <td>border</td>
+      <td>Array</td>
+      <td>是</td>
+      <td>[0]:线条宽度,[1]:线条颜色值</td>
+    </tr>
+    <tr>
+      <td>bgColor</td>
+      <td>String</td>
+      <td>是</td>
+      <td>背景色</td>
+    </tr>
+    <tr>
+      <td>innerBorder</td>
+      <td>Array</td>
+      <td>[0]:内环线条宽度,[1]:内环线条颜色值</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>innerBgColor</td>
+      <td>String</td>
+      <td>是</td>
+      <td>内环背景色</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">drawDashRound</span> <span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">dashround</span><span class="p">){</span>    
+     <span class="kd">let</span> <span class="nx">step</span> <span class="o">=</span> <span class="nx">dashround</span><span class="p">.</span><span class="nx">step</span> <span class="o">/</span> <span class="mi">180</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span><span class="p">;</span>
+     <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">e</span> <span class="o">=</span> <span class="nx">step</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span> <span class="nx">e</span> <span class="o">&lt;=</span> <span class="nx">dashround</span><span class="p">.</span><span class="nx">endAngle</span><span class="p">;</span> <span class="nx">b</span> <span class="o">+=</span> <span class="nx">step</span><span class="p">,</span> <span class="nx">e</span> <span class="o">+=</span> <span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
+       <span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">()</span>
+       <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineWidth</span> <span class="o">=</span> <span class="nx">dashround</span><span class="p">.</span><span class="nx">border</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+       <span class="nx">ctx</span><span class="p">.</span><span class="nx">strokeStyle</span> <span class="o">=</span> <span class="nx">dashround</span><span class="p">.</span><span class="nx">border</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+       <span class="nx">ctx</span><span class="p">.</span><span class="nx">closePath</span><span class="p">();</span>
+       <span class="nx">ctx</span><span class="p">.</span><span class="nx">arc</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">dashround</span><span class="p">.</span><span class="nx">radius</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">e</span><span class="p">);</span>
+       <span class="nx">ctx</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span>
+     <span class="p">}</span>
+     <span class="c1">//填充内圈</span>
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">()</span>
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineWidth</span> <span class="o">=</span> <span class="nx">dashround</span><span class="p">.</span><span class="nx">innerBorder</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">strokeStyle</span><span class="o">=</span> <span class="nx">dashround</span><span class="p">.</span><span class="nx">innerBorder</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">closePath</span><span class="p">();</span>
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">arc</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">dashround</span><span class="p">.</span><span class="nx">radius</span> <span class="o">-</span> <span class="nx">dashround</span><span class="p">.</span><span class="nx">border</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="k">this</span><span class="p">.</span><span class="nx">getRads</span><span class="p">(</span><span class="nx">dashround</span><span class="p">.</span><span class="nx">starAngle</span><span class="p">),</span> <span class="k">this</span><span class="p">.</span><span class="nx">getRads</span><span class="p">(</span><span class="nx">dashround</span><span class="p">.</span><span class="nx">endAngle</span><span class="p">));</span>
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">fillStyle</span><span class="o">=</span> <span class="nx">dashround</span><span class="p">.</span><span class="nx">innerBgColor</span><span class="p">;</span>
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">fill</span><span class="p">();</span>
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span>
+	 
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<h1 id="3画等份线">3.画等份线</h1>
+
+<blockquote>
+  <p>方法：<code class="language-plaintext highlighter-rouge">drawAngleSolid(ctx,x,y,line)</code></p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">ctx</code> <code class="language-plaintext highlighter-rouge">x</code> <code class="language-plaintext highlighter-rouge">y</code> <code class="language-plaintext highlighter-rouge">line</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ctx</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>canvas 2d绘图环境</td>
+    </tr>
+    <tr>
+      <td>x</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆心x坐标</td>
+    </tr>
+    <tr>
+      <td>y</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆心y坐标</td>
+    </tr>
+    <tr>
+      <td>line</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>基本参数</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">line</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>width</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>线条长度</td>
+    </tr>
+    <tr>
+      <td>border</td>
+      <td>Array</td>
+      <td>是</td>
+      <td>[0]:是线条宽度值,[1]:线条颜色值</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">drawAngleSolid</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="p">,</span><span class="nx">line</span><span class="p">){</span>
+     <span class="kd">let</span> <span class="nx">s</span> <span class="o">=</span> <span class="p">{</span>
+     	<span class="na">x</span><span class="p">:</span><span class="nx">x</span><span class="p">,</span>
+     	<span class="na">y</span><span class="p">:</span><span class="nx">y</span><span class="p">,</span>
+     	<span class="na">r</span><span class="p">:</span><span class="nx">line</span><span class="p">.</span><span class="nx">width</span>
+     <span class="p">}</span>
+     <span class="kd">let</span> <span class="nx">num</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">allTagValues</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>   <span class="c1">//获取等份</span>
+     <span class="kd">let</span> <span class="nx">sang</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getsolidPointAngle</span><span class="p">(</span><span class="nx">num</span><span class="p">);</span>   <span class="c1">//获取等份角度	</span>
+     <span class="kd">let</span> <span class="nx">spoint</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getCircle</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span><span class="nx">sang</span><span class="p">);</span>		<span class="c1">//获取等份角度点坐标		</span>
+     
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineWidth</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">border</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+     <span class="nx">ctx</span><span class="p">.</span><span class="nx">strokeStyle</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">border</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+     
+     <span class="kd">let</span> <span class="nx">nleng</span> <span class="o">=</span> <span class="nx">spoint</span><span class="p">.</span><span class="nx">length</span><span class="o">/</span><span class="mi">2</span><span class="p">;</span>
+     <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">spoint</span><span class="p">.</span><span class="nx">length</span><span class="o">/</span><span class="mi">2</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+     	<span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">();</span>
+     	<span class="nx">ctx</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="nx">spoint</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">x</span><span class="p">,</span><span class="nx">spoint</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">y</span><span class="p">);</span>
+     	<span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="nx">spoint</span><span class="p">[</span><span class="nx">i</span><span class="o">+</span><span class="nx">nleng</span><span class="p">].</span><span class="nx">x</span><span class="p">,</span><span class="nx">spoint</span><span class="p">[</span><span class="nx">i</span><span class="o">+</span><span class="nx">nleng</span><span class="p">].</span><span class="nx">y</span><span class="p">);</span>
+     	<span class="nx">ctx</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span>
+     	<span class="nx">ctx</span><span class="p">.</span><span class="nx">closePath</span><span class="p">();</span>
+     <span class="p">}</span>
+	
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="4画多弧">4.画多弧</h1>
+
+<blockquote>
+  <p>方法：<code class="language-plaintext highlighter-rouge">drawMoreScreen(ctx)</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ctx</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>canvas 2d绘图环境</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">drawMoreScreen</span><span class="p">(</span><span class="nx">ctx</span><span class="p">){</span>
+    <span class="kd">let</span> <span class="nb">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">screenArr</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">tagValueUUIDs</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">allScreenArr</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">allTagValusUUIDs</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">angle</span> <span class="o">=</span> <span class="mi">360</span> <span class="o">/</span> <span class="nx">allScreenArr</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">angleArr</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getsolidPointAngle</span><span class="p">(</span><span class="nx">allScreenArr</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+    <span class="kd">let</span> <span class="nx">tmpArr</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="nx">screenArr</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span> <span class="nx">val</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    	<span class="kd">let</span> <span class="nx">tmpobj</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">isArrayValue</span><span class="p">(</span><span class="nx">val</span><span class="p">,</span><span class="nx">allScreenArr</span><span class="p">);</span>
+    	<span class="k">if</span><span class="p">(</span><span class="nx">tmpobj</span><span class="p">.</span><span class="nx">flag</span><span class="p">){</span>
+    		<span class="kd">let</span> <span class="nx">ang</span> <span class="o">=</span> <span class="nx">angleArr</span><span class="p">[</span><span class="nx">tmpobj</span><span class="p">.</span><span class="nx">ind</span><span class="p">];</span>
+    		<span class="nx">tmpArr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">ang</span><span class="p">);</span>
+    	<span class="p">}</span>
+    <span class="p">});</span>				
+    <span class="nx">tmpArr</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span> <span class="nx">val</span> <span class="o">=&gt;</span><span class="p">{</span>
+    	<span class="nb">self</span><span class="p">.</span><span class="nx">drawScreen</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">height</span><span class="p">,</span><span class="k">this</span><span class="p">.</span><span class="nx">activeStyle</span><span class="p">.</span><span class="nx">screen</span><span class="p">,</span><span class="k">this</span><span class="p">.</span><span class="nx">getRads</span><span class="p">(</span><span class="nx">val</span><span class="p">),</span><span class="k">this</span><span class="p">.</span><span class="nx">getRads</span><span class="p">(</span><span class="nx">val</span><span class="o">+</span><span class="nx">angle</span><span class="p">));</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="5画单弧">5.画单弧</h1>
+
+<blockquote>
+  <p>方法：drawScreen (ctx,canvasWidth,canvasHeight,screen,sDeg,eDeg)</p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">ctx</code> <code class="language-plaintext highlighter-rouge">canvasWidth</code> <code class="language-plaintext highlighter-rouge">canvasHeight</code> <code class="language-plaintext highlighter-rouge">screen</code> <code class="language-plaintext highlighter-rouge">sDeg</code> <code class="language-plaintext highlighter-rouge">eDeg</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ctx</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>canvas 2d绘图环境</td>
+    </tr>
+    <tr>
+      <td>canvasWidth</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>画布宽度</td>
+    </tr>
+    <tr>
+      <td>canvasHeight</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>画布高度</td>
+    </tr>
+    <tr>
+      <td>screen</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>基本参数</td>
+    </tr>
+    <tr>
+      <td>sDeg</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>起始弧度</td>
+    </tr>
+    <tr>
+      <td>eDeg</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>结束弧度</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">screen</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>radius</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆半径</td>
+    </tr>
+    <tr>
+      <td>border</td>
+      <td>Array</td>
+      <td>是</td>
+      <td>[0]:弧宽度,[1]:弧颜色值</td>
+    </tr>
+    <tr>
+      <td>bgColor</td>
+      <td>String</td>
+      <td>是</td>
+      <td>背景色</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">drawScreen</span> <span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="nx">canvasWidth</span><span class="p">,</span><span class="nx">canvasHeight</span><span class="p">,</span><span class="nx">screen</span><span class="p">,</span><span class="nx">sDeg</span><span class="p">,</span><span class="nx">eDeg</span><span class="p">)</span> <span class="p">{</span> 
+<span class="kd">let</span> <span class="nx">arc</span> <span class="o">=</span> <span class="p">{</span> 
+        <span class="na">x</span><span class="p">:</span> <span class="nx">canvasWidth</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+    	<span class="na">y</span><span class="p">:</span> <span class="nx">canvasHeight</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+    	<span class="na">r</span><span class="p">:</span> <span class="nx">screen</span><span class="p">.</span><span class="nx">radius</span> 
+    <span class="p">},</span> 
+    <span class="nx">w</span> <span class="o">=</span> <span class="nx">canvasWidth</span><span class="p">,</span> 
+    <span class="nx">h</span> <span class="o">=</span> <span class="nx">canvasHeight</span><span class="p">;</span> 
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">save</span><span class="p">();</span> 
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineWidth</span> <span class="o">=</span> <span class="nx">screen</span><span class="p">.</span><span class="nx">border</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> 	
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">strokeStyle</span> <span class="o">=</span> <span class="nx">screen</span><span class="p">.</span><span class="nx">border</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>			
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">fillStyle</span> <span class="o">=</span> <span class="nx">screen</span><span class="p">.</span><span class="nx">bgColor</span><span class="p">;</span> 
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">();</span> <span class="c1">// 起始点设置在圆心处 </span>
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="nx">arc</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">arc</span><span class="p">.</span><span class="nx">y</span><span class="p">);</span>
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">arc</span><span class="p">(</span><span class="nx">arc</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">arc</span><span class="p">.</span><span class="nx">y</span><span class="p">,</span> <span class="nx">arc</span><span class="p">.</span><span class="nx">r</span><span class="p">,</span><span class="nx">sDeg</span><span class="p">,</span><span class="nx">eDeg</span><span class="p">);</span> <span class="c1">// 闭合路径</span>
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">closePath</span><span class="p">();</span>
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">fill</span><span class="p">();</span>
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h1 id="6画小圈圈">6.画小圈圈</h1>
+
+<blockquote>
+  <p>方法：drawSmallCircle(ctx,x,y,smallRound)</p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">ctx</code> <code class="language-plaintext highlighter-rouge">x</code> <code class="language-plaintext highlighter-rouge">y</code> <code class="language-plaintext highlighter-rouge">smallRound</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ctx</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>canvas 2d绘图环境</td>
+    </tr>
+    <tr>
+      <td>x</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆心x坐标</td>
+    </tr>
+    <tr>
+      <td>y</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆心y坐标</td>
+    </tr>
+    <tr>
+      <td>smallRound</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>基本参数</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">smallRound</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>starAngle</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>起始角度</td>
+    </tr>
+    <tr>
+      <td>endAngle</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>结束角度</td>
+    </tr>
+    <tr>
+      <td>radius</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆半径</td>
+    </tr>
+    <tr>
+      <td>fatherRadius</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>位于父圆上的半径</td>
+    </tr>
+    <tr>
+      <td>border</td>
+      <td>Arrray</td>
+      <td>是</td>
+      <td>[0]:线条宽度,[1]:线条颜色值</td>
+    </tr>
+    <tr>
+      <td>noBorder</td>
+      <td>Array</td>
+      <td>是</td>
+      <td>[0]:未被选中线条宽度,[1]:未被选中线条颜色值</td>
+    </tr>
+    <tr>
+      <td>bgColor</td>
+      <td>String</td>
+      <td>是</td>
+      <td>背景色</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">drawSmallCircle</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="p">,</span><span class="nx">smallRound</span><span class="p">){</span>
+    <span class="kd">let</span> <span class="nb">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">c</span> <span class="o">=</span><span class="p">{</span>
+    	<span class="na">x</span><span class="p">:</span><span class="nx">x</span><span class="p">,</span>
+    	<span class="na">y</span><span class="p">:</span><span class="nx">y</span><span class="p">,</span>
+    	<span class="na">r</span><span class="p">:</span><span class="nx">smallRound</span><span class="p">.</span><span class="nx">fatherRadius</span>
+    <span class="p">}</span>
+    <span class="kd">let</span> <span class="nx">num</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">allTagValues</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="c1">//获取等分</span>
+    <span class="kd">let</span> <span class="nx">angles</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAngles</span><span class="p">(</span><span class="nx">num</span><span class="p">);</span>	
+    <span class="kd">let</span> <span class="nx">quan</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getCircle</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span><span class="nx">angles</span><span class="p">);</span>  <span class="c1">//画小圈圈	</span>
+    
+    <span class="nx">quan</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">val</span><span class="p">){</span>
+    	<span class="nb">self</span><span class="p">.</span><span class="nx">drawSolidRound</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="nx">val</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span><span class="nx">val</span><span class="p">.</span><span class="nx">y</span><span class="p">,</span><span class="nx">smallRound</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="7绘制矩形">7.绘制矩形</h1>
+
+<blockquote>
+  <p>方法：drawRect(cxt,x,y,width,height,BW,BC,fillColor)</p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">cxt</code> <code class="language-plaintext highlighter-rouge">x</code> <code class="language-plaintext highlighter-rouge">y</code> <code class="language-plaintext highlighter-rouge">width</code> <code class="language-plaintext highlighter-rouge">height</code> <code class="language-plaintext highlighter-rouge">BW</code> <code class="language-plaintext highlighter-rouge">BC</code> <code class="language-plaintext highlighter-rouge">fillColor</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ctx</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>canvas 2d绘图环境</td>
+    </tr>
+    <tr>
+      <td>x</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>起始坐标x</td>
+    </tr>
+    <tr>
+      <td>y</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>起始坐标y</td>
+    </tr>
+    <tr>
+      <td>width</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>矩形宽度</td>
+    </tr>
+    <tr>
+      <td>height</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>矩形高度</td>
+    </tr>
+    <tr>
+      <td>BW</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>边框线条宽度值</td>
+    </tr>
+    <tr>
+      <td>BW</td>
+      <td>String</td>
+      <td>是</td>
+      <td>边框线条颜色值</td>
+    </tr>
+    <tr>
+      <td>fillColor</td>
+      <td>String</td>
+      <td>是</td>
+      <td>矩形填充色</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">drawRect</span><span class="p">(</span><span class="nx">cxt</span><span class="p">,</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="p">,</span><span class="nx">width</span><span class="p">,</span><span class="nx">height</span><span class="p">,</span><span class="nx">BW</span><span class="p">,</span><span class="nx">BC</span><span class="p">,</span><span class="nx">fillColor</span><span class="p">){</span>
+    <span class="nx">cxt</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">();</span>
+    <span class="nx">cxt</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="p">);</span>
+    <span class="nx">cxt</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="nx">x</span><span class="o">+</span><span class="nx">width</span><span class="p">,</span><span class="nx">y</span><span class="p">);</span>
+    <span class="nx">cxt</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="nx">x</span><span class="o">+</span><span class="nx">width</span><span class="p">,</span><span class="nx">y</span><span class="o">+</span><span class="nx">height</span><span class="p">);</span>
+    <span class="nx">cxt</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="o">+</span><span class="nx">height</span><span class="p">);</span>
+    <span class="nx">cxt</span><span class="p">.</span><span class="nx">closePath</span><span class="p">();</span>
+    
+    <span class="nx">cxt</span><span class="p">.</span><span class="nx">lineWidth</span><span class="o">=</span><span class="nx">BW</span><span class="p">;</span>
+    <span class="nx">cxt</span><span class="p">.</span><span class="nx">fillStyle</span><span class="o">=</span><span class="nx">fillColor</span><span class="p">;</span>
+    <span class="nx">cxt</span><span class="p">.</span><span class="nx">strokeStyle</span><span class="o">=</span><span class="nx">BC</span><span class="p">;</span>
+    
+    <span class="nx">cxt</span><span class="p">.</span><span class="nx">fill</span><span class="p">();</span>
+    <span class="nx">cxt</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span>
+<span class="p">}</span>	
+</code></pre></div></div>
+
+<h1 id="8绘文字">8.绘文字</h1>
+
+<blockquote>
+  <p>方法：drwaText(ctx,x,y,text)</p>
+</blockquote>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">ctx</code> <code class="language-plaintext highlighter-rouge">x</code> <code class="language-plaintext highlighter-rouge">y</code> <code class="language-plaintext highlighter-rouge">text</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ctx</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>canvas 2d绘图环境</td>
+    </tr>
+    <tr>
+      <td>x</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆心x坐标</td>
+    </tr>
+    <tr>
+      <td>y</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>圆心y坐标</td>
+    </tr>
+    <tr>
+      <td>text</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>基本参数</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>参数：<code class="language-plaintext highlighter-rouge">text</code></p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>radius</td>
+      <td>Number</td>
+      <td>是</td>
+      <td>在外圆文字</td>
+    </tr>
+    <tr>
+      <td>font</td>
+      <td>String</td>
+      <td>是</td>
+      <td>字体</td>
+    </tr>
+    <tr>
+      <td>color</td>
+      <td>String</td>
+      <td>是</td>
+      <td>字体颜色</td>
+    </tr>
+    <tr>
+      <td>noColor</td>
+      <td>String</td>
+      <td>是</td>
+      <td>未被选中字体颜色</td>
+    </tr>
+    <tr>
+      <td>offsetPosition</td>
+      <td>Object</td>
+      <td>是</td>
+      <td>x:向’x’轴偏移x,y:向’y’轴偏移y</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">drwaText</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="p">,</span><span class="nx">text</span><span class="p">){</span>	
+    <span class="kd">let</span> <span class="nx">t</span> <span class="o">=</span> <span class="p">{</span>
+    	<span class="na">x</span><span class="p">:</span><span class="nx">x</span><span class="p">,</span>
+    	<span class="na">y</span><span class="p">:</span><span class="nx">y</span><span class="p">,</span>
+    	<span class="na">r</span><span class="p">:</span><span class="nx">text</span><span class="p">.</span><span class="nx">radius</span>
+    <span class="p">}</span>
+    <span class="kd">let</span> <span class="nx">divide</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">allTagValues</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>  <span class="c1">//等分</span>
+    <span class="kd">let</span> <span class="nx">angles</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">bbbb</span><span class="p">(</span><span class="nx">divide</span><span class="p">);</span>
+    
+    <span class="kd">let</span> <span class="nx">points</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getCircle</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span><span class="nx">angles</span><span class="p">);</span>
+    
+    <span class="c1">//this.drawSmallCircle(ctx,2,points)</span>
+    <span class="c1">//this.drawSolidRound(ctx,circle.x,circle.y,circle.r,0,360,{width:1,bgColor:'#000'});</span>
+    
+    <span class="kd">let</span> <span class="nx">tmpArr</span> <span class="o">=</span>  <span class="k">this</span><span class="p">.</span><span class="nx">dealTextData</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="nx">points</span><span class="p">,</span><span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">allTagValues</span><span class="p">,</span><span class="nx">text</span><span class="p">.</span><span class="nx">offsetPosition</span><span class="p">);</span> <span class="c1">//获取处理好的数据</span>
+    
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">font</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">font</span><span class="p">;</span>
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">fillStyle</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">color</span><span class="p">;</span>
+    
+    <span class="nx">tmpArr</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">val</span><span class="p">){</span>
+    	<span class="nx">ctx</span><span class="p">.</span><span class="nx">fillText</span><span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">text</span><span class="p">,</span> <span class="nx">val</span><span class="p">.</span><span class="nx">point</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">val</span><span class="p">.</span><span class="nx">point</span><span class="p">.</span><span class="nx">y</span><span class="p">);</span>	
+    <span class="p">});</span>
+	
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="9工具方法">9.工具方法</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1">//1.角度转弧度</span>
+<span class="nx">getRads</span> <span class="p">(</span><span class="nx">degrees</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="nx">degrees</span><span class="p">)</span> <span class="o">/</span> <span class="mi">180</span><span class="p">;</span> <span class="p">}</span> 
+
+<span class="c1">//2.弧度转角度</span>
+<span class="nx">getDegrees</span> <span class="p">(</span><span class="nx">rads</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span><span class="nx">rads</span> <span class="o">*</span> <span class="mi">180</span><span class="p">)</span> <span class="o">/</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span><span class="p">;</span> <span class="p">}</span>
+
+<span class="c1">//3.获取角度等分</span>
+<span class="nx">getAngles</span><span class="p">(</span><span class="nx">num</span><span class="p">){</span>
+	<span class="kd">let</span> <span class="nx">angle</span> <span class="o">=</span> <span class="mi">360</span> <span class="o">/</span> <span class="nx">num</span><span class="p">;</span>
+	<span class="kd">let</span> <span class="nx">tmpArr</span> <span class="o">=</span> <span class="p">[];</span>
+	<span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="nx">num</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+		<span class="nx">tmpArr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">angle</span> <span class="o">*</span> <span class="nx">i</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">tmpArr</span><span class="p">;</span>
+<span class="p">}</span>	
+<span class="c1">//4.获取圆上任意一点坐标</span>
+<span class="nx">getCircle</span><span class="p">(</span><span class="nx">circle</span><span class="p">,</span><span class="nx">circleArr</span><span class="p">){</span>		
+	<span class="kd">let</span> <span class="nx">tmpArr</span> <span class="o">=</span> <span class="p">[];</span>			
+	<span class="nx">tmpArr</span> <span class="o">=</span> <span class="nx">circleArr</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">val</span><span class="p">){</span>
+		<span class="kd">let</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{};</span>
+		<span class="nx">obj</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="nx">circle</span><span class="p">.</span><span class="nx">x</span> <span class="o">+</span> <span class="nx">circle</span><span class="p">.</span><span class="nx">r</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">cos</span><span class="p">(</span><span class="nx">val</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">/</span> <span class="mi">180</span><span class="p">);</span>
+		<span class="nx">obj</span><span class="p">.</span><span class="nx">y</span> <span class="o">=</span> <span class="nx">circle</span><span class="p">.</span><span class="nx">y</span> <span class="o">+</span> <span class="nx">circle</span><span class="p">.</span><span class="nx">r</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sin</span><span class="p">(</span><span class="nx">val</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">/</span> <span class="mi">180</span><span class="p">);</span>
+		<span class="k">return</span> <span class="nx">obj</span><span class="p">;</span>
+	<span class="p">});</span>
+	<span class="k">return</span> <span class="nx">tmpArr</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">//5.获取等分线角度</span>
+<span class="nx">getsolidPointAngle</span><span class="p">(</span><span class="nx">num</span><span class="p">){</span>
+	<span class="kd">let</span> <span class="nx">angle</span> <span class="o">=</span> <span class="mi">360</span> <span class="o">/</span> <span class="nx">num</span><span class="p">;</span>
+	<span class="kd">let</span> <span class="nx">tmpArr</span> <span class="o">=</span> <span class="p">[];</span>
+	<span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">num</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+		<span class="nx">tmpArr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">i</span> <span class="o">*</span> <span class="nx">angle</span> <span class="o">-</span> <span class="mi">90</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">tmpArr</span><span class="p">;</span>	
+<span class="p">}</span>
+
+<span class="c1">//6.随便起的名字</span>
+<span class="nx">bbbb</span><span class="p">(</span><span class="nx">num</span><span class="p">){</span>
+	<span class="kd">let</span> <span class="nx">angle</span> <span class="o">=</span> <span class="mi">360</span> <span class="o">/</span> <span class="nx">num</span><span class="p">;</span>
+	<span class="kd">let</span> <span class="nx">tmpArr</span> <span class="o">=</span> <span class="p">[];</span>
+	<span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">num</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+		<span class="nx">tmpArr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">angle</span> <span class="o">*</span> <span class="nx">i</span> <span class="o">-</span> <span class="mi">90</span> <span class="o">+</span> <span class="nx">angle</span><span class="o">/</span><span class="mi">2</span> <span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">tmpArr</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">//7.判读数组是否存在某个值</span>
+<span class="nx">isArrayValue</span><span class="p">(</span><span class="nx">val</span><span class="p">,</span><span class="nx">arr</span><span class="p">){</span>
+  <span class="kd">let</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{</span>
+	  <span class="na">flag</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span>
+	  <span class="na">ind</span><span class="p">:</span><span class="kc">null</span>
+  <span class="p">}</span>		
+  <span class="nx">arr</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">v</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span> <span class="o">=&gt;</span><span class="p">{</span>
+	<span class="k">if</span><span class="p">(</span><span class="nx">val</span> <span class="o">==</span> <span class="nx">v</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">obj</span><span class="p">.</span><span class="nx">flag</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+		<span class="nx">obj</span><span class="p">.</span><span class="nx">ind</span> <span class="o">=</span> <span class="nx">i</span><span class="p">;</span>
+	<span class="p">}</span>
+  <span class="p">});</span>
+  <span class="k">return</span> <span class="nx">obj</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">//8.处理文字数据,返回文字起始坐标</span>
+<span class="nx">dealTextData</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="nx">points</span><span class="p">,</span><span class="nx">textArr</span><span class="p">,</span><span class="nx">offsetPosition</span><span class="p">){</span>
+	<span class="kd">let</span> <span class="nx">tmpArr</span> <span class="o">=</span> <span class="p">[];</span>
+	<span class="nx">textArr</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">val</span><span class="p">,</span><span class="nx">ind</span><span class="p">){</span>
+		<span class="kd">let</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{};</span>
+		<span class="kd">let</span> <span class="nx">textWidth</span> <span class="o">=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">measureText</span><span class="p">(</span><span class="nx">val</span><span class="p">).</span><span class="nx">width</span><span class="p">;</span>  <span class="c1">//获取文本长度</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">ind</span> <span class="o">&lt;</span> <span class="nx">textArr</span><span class="p">.</span><span class="nx">length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">){</span>
+			<span class="kd">let</span> <span class="nx">point</span> <span class="o">=</span> <span class="p">{</span>
+					<span class="na">x</span><span class="p">:</span> <span class="nx">points</span><span class="p">[</span><span class="nx">ind</span><span class="p">].</span><span class="nx">x</span> <span class="o">+</span> <span class="nx">offsetPosition</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span>
+					<span class="na">y</span><span class="p">:</span> <span class="nx">points</span><span class="p">[</span><span class="nx">ind</span><span class="p">].</span><span class="nx">y</span> <span class="o">+</span> <span class="nx">offsetPosition</span><span class="p">.</span><span class="nx">y</span>
+				<span class="p">};</span>
+			<span class="nx">obj</span><span class="p">.</span><span class="nx">text</span> <span class="o">=</span> <span class="nx">val</span><span class="p">;</span> 
+			<span class="nx">obj</span><span class="p">.</span><span class="nx">point</span> <span class="o">=</span> <span class="nx">point</span><span class="p">;</span>
+		<span class="p">}</span><span class="k">else</span><span class="p">{</span>
+			<span class="kd">let</span> <span class="nx">point</span> <span class="o">=</span> <span class="p">{</span>
+					<span class="na">x</span><span class="p">:</span> <span class="nx">points</span><span class="p">[</span><span class="nx">ind</span><span class="p">].</span><span class="nx">x</span> <span class="o">+</span> <span class="nx">offsetPosition</span><span class="p">.</span><span class="nx">x</span> <span class="o">-</span> <span class="nx">textWidth</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span>
+					<span class="na">y</span><span class="p">:</span> <span class="nx">points</span><span class="p">[</span><span class="nx">ind</span><span class="p">].</span><span class="nx">y</span> <span class="o">+</span> <span class="nx">offsetPosition</span><span class="p">.</span><span class="nx">y</span>
+				<span class="p">};</span>
+			<span class="nx">obj</span><span class="p">.</span><span class="nx">text</span> <span class="o">=</span> <span class="nx">val</span><span class="p">;</span> 
+			<span class="nx">obj</span><span class="p">.</span><span class="nx">point</span> <span class="o">=</span> <span class="nx">point</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nx">tmpArr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>		
+	<span class="p">});</span>
+	<span class="k">return</span> <span class="nx">tmpArr</span><span class="p">;</span>		
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+:ET

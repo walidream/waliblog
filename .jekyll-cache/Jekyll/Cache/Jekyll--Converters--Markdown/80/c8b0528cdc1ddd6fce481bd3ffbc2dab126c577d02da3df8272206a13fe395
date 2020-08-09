@@ -1,0 +1,63 @@
+I"�	<p>小菜之前的一篇jekyll博客中也提到过添加证书，当时上面还有两篇个帖子的链接。今天去看的时候发现图片不全了。小菜又需要证书，自己回忆配了配。记录一下。</p>
+
+<h1 id="1登录cloudflare">1.登录cloudflare</h1>
+
+<p>登录cloudflare网站，传送门<a href="https://www.cloudflare.com/" title="https://www.cloudflare.com/" target="_blank">https://www.cloudflare.com/</a>。如果没有账号自己去注册个</p>
+
+<p>登录成功后，点击<code class="language-plaintext highlighter-rouge">+Add Site</code>添加一个域名</p>
+
+<p><img src="http://walidream.com:9999/blogImage/https/https_1.jpg" alt="ssl" /></p>
+
+<p>#2.添加域名</p>
+
+<p>输入你购买的域名，点击 add site</p>
+
+<p><img src="http://walidream.com:9999/blogImage/https/https_2.jpg" alt="ssl" /></p>
+
+<h1 id="3选择套餐">3.选择套餐</h1>
+
+<p>这个个人用的话就选择免费的。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/https/https_3.jpg" alt="ssl" /></p>
+
+<h1 id="4添加dns记录">4.添加DNS记录</h1>
+
+<p><img src="http://walidream.com:9999/blogImage/https/https_4.jpg" alt="ssl" /></p>
+
+<p>添加记录需要知道服务器的公网ip，小菜用的是阿里云。这里也就只能阿里云为例了。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/https/https_5.jpg" alt="ssl" /></p>
+
+<p>添加好后，点击下一步</p>
+
+<h1 id="5复制dns">5.复制dns</h1>
+
+<p><img src="http://walidream.com:9999/blogImage/https/https_6.jpg" alt="ssl" /></p>
+
+<p>这里要去修改你购买域名的dns，还是以阿里为例。登录阿里账号，找到你购买的域名，点击管理</p>
+
+<p><img src="http://walidream.com:9999/blogImage/https/https_7.jpg" alt="ssl" /></p>
+
+<p>选择dns修改</p>
+
+<p><img src="http://walidream.com:9999/blogImage/https/https_8.jpg" alt="ssl" /></p>
+
+<p>修改成功后，一般提示48小时。其实时间也没那么长也就十几分钟。</p>
+
+<h1 id="6查看激活">6.查看激活</h1>
+
+<p>回到cloudflare网站，点击确定</p>
+
+<p><img src="http://walidream.com:9999/blogImage/https/https_6.jpg" alt="ssl" /></p>
+
+<p>成功后就是这个样子</p>
+
+<p><img src="http://walidream.com:9999/blogImage/https/https_10.jpg" alt="ssl" /></p>
+
+<h1 id="7验证">7.验证</h1>
+
+<p>在浏览器输入你的域名，看有没有https，有就成功了。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/https/https_9.jpg" alt="ssl" /></p>
+
+:ET

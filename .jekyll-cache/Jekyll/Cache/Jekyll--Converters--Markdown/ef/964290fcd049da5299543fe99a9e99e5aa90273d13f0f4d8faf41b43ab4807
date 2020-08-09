@@ -1,0 +1,528 @@
+I"�[<p>这篇canvas笔记整理，主要是近期写的很多东西都与canvas有关，个人简单搜了搜canvas基本知识以及自己用到的知识点，在此记录整理。在此之前，小菜写了一个图像裁剪，拖拽，缩放的demo，没有放在canvas分类中，放在<code class="language-plaintext highlighter-rouge">javascript/图像、文件上传</code>中。模仿微博的头像裁剪，如果大家感兴趣，可以去看看。</p>
+
+<h1 id="1基本操作">1.基本操作</h1>
+
+<h3 id="1获取绘图环境">1.获取绘图环境</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">canvas</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">canvas</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">ctx</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">getctx</span><span class="p">(</span><span class="dl">'</span><span class="s1">2d</span><span class="dl">'</span><span class="p">);</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">ctx</span><span class="p">)</span> <span class="nx">alert</span><span class="p">(</span><span class="dl">'</span><span class="s1">您的浏览器不支持canvas，请升级</span><span class="dl">'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="2绘线条">2.绘线条</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">ctx</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">);</span>    <span class="c1">//移动点</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">700</span><span class="p">,</span><span class="mi">700</span><span class="p">);</span>    <span class="c1">//线条长度</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">lineWidth</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>     <span class="c1">//粗细</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">strokeStyle</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">#058</span><span class="dl">'</span><span class="p">;</span> <span class="c1">//颜色</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span>    <span class="c1">//绘制</span>
+</code></pre></div></div>
+<h4 id="01线条属性">01.线条属性</h4>
+<blockquote>
+  <p>ctx.lineCap：属性设置或返回线条末端线帽的样式</p>
+</blockquote>
+
+<blockquote>
+  <p>ctx.lineCap = “butt|round|square”;</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>butt</td>
+      <td>String</td>
+      <td>-</td>
+      <td>(默认)向线条的每个末端添加平直的边缘</td>
+    </tr>
+    <tr>
+      <td>round</td>
+      <td>String</td>
+      <td>-</td>
+      <td>向线条的每个末端添加圆形线帽</td>
+    </tr>
+    <tr>
+      <td>square</td>
+      <td>String</td>
+      <td>-</td>
+      <td>向线条的每个末端添加正方形线帽</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>ctx.lineJoin：属性设置或返回所创建边角的类型，当两条线交汇时。</p>
+</blockquote>
+
+<blockquote>
+  <p>ctx.lineJoin = “bevel|round|miter”;</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>bevel</td>
+      <td>String</td>
+      <td>-</td>
+      <td>创建斜角</td>
+    </tr>
+    <tr>
+      <td>round</td>
+      <td>String</td>
+      <td>-</td>
+      <td>创建圆角</td>
+    </tr>
+    <tr>
+      <td>miter</td>
+      <td>String</td>
+      <td>-</td>
+      <td>(默认)创建尖角</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="3绘制矩形">3.绘制矩形</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">ctx</span><span class="p">.</span><span class="nx">rect</span><span class="p">(</span> <span class="nx">x</span> <span class="p">,</span> <span class="nx">y</span> <span class="p">,</span> <span class="nx">width</span> <span class="p">,</span> <span class="nx">height</span> <span class="p">);</span>   <span class="c1">//绘一个矩形</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">fillRect</span><span class="p">(</span> <span class="nx">x</span> <span class="p">,</span> <span class="nx">y</span> <span class="p">,</span> <span class="nx">width</span> <span class="p">,</span> <span class="nx">height</span><span class="p">);</span> <span class="c1">//填充一个矩形</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">strokeRect</span><span class="p">(</span> <span class="nx">x</span> <span class="p">,</span> <span class="nx">y</span> <span class="p">,</span> <span class="nx">width</span> <span class="p">,</span> <span class="nx">height</span> <span class="p">);</span> <span class="c1">//矩形描边</span>
+
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">lineWidth</span>      <span class="c1">//线条宽度</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">strokeStyle</span>    <span class="c1">//线条颜色</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">fillStyle</span>      <span class="c1">//填充颜色</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">stroke</span><span class="p">()</span>       <span class="c1">//绘轮廓</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">fill</span><span class="p">()</span>         <span class="c1">//填充色</span>
+</code></pre></div></div>
+
+<h3 id="4图形变换">4.图形变换</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">ctx</span><span class="p">.</span><span class="nx">translate</span><span class="p">(</span> <span class="nx">x</span> <span class="p">,</span> <span class="nx">y</span> <span class="p">)</span>  <span class="c1">//位移</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">rotate</span><span class="p">(</span> <span class="nx">deg</span> <span class="p">)</span>       <span class="c1">//旋转</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">scale</span><span class="p">(</span> <span class="nx">sx</span> <span class="p">,</span> <span class="nx">sy</span> <span class="p">)</span>    <span class="c1">//缩放</span>
+</code></pre></div></div>
+
+<h3 id="5变换矩阵">5.变换矩阵</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span>                         
+ <span class="nx">a</span> <span class="nx">c</span> <span class="nx">e</span>            <span class="c1">//a 水平缩放 ( 1 )</span>
+ <span class="nx">b</span> <span class="nx">d</span> <span class="nx">f</span>            <span class="c1">//b 水平倾斜 ( 0 )</span>
+ <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span>            <span class="c1">//c 垂直倾斜 ( 0 )</span>
+<span class="p">]</span>                 <span class="c1">//d 垂直缩放 ( 1 )</span>
+                  <span class="c1">//e 水平位移 ( 0 )</span>
+                  <span class="c1">//f  垂直位移 ( 0 ) </span>
+				 
+</code></pre></div></div>
+
+<h4 id="01设置变换矩阵">01.设置变换矩阵</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">ctx</span><span class="p">.</span><span class="nx">transform</span><span class="p">(</span> <span class="nx">a</span> <span class="p">,</span> <span class="nx">b</span> <span class="p">,</span> <span class="nx">c</span> <span class="p">,</span> <span class="nx">d</span> <span class="p">,</span> <span class="nx">e</span> <span class="p">,</span> <span class="nx">f</span> <span class="p">)</span>
+
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">setTransform</span><span class="p">(</span> <span class="nx">a</span> <span class="p">,</span> <span class="nx">b</span> <span class="p">,</span> <span class="nx">c</span> <span class="p">,</span> <span class="nx">d</span> <span class="p">,</span> <span class="nx">e</span> <span class="p">,</span> <span class="nx">f</span> <span class="p">)</span> 
+</code></pre></div></div>
+
+<h3 id="6fillstyle填充样式">6.fillStyle填充样式</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">fillStyle</span> <span class="o">=</span> <span class="nx">color</span><span class="o">|</span><span class="nx">gradient</span><span class="o">|</span><span class="nx">image</span><span class="o">|</span><span class="nx">canvas</span><span class="o">|</span><span class="nx">video</span><span class="p">;</span>
+
+<span class="c1">//线性渐变</span>
+<span class="kd">let</span> <span class="nx">grd</span> <span class="o">=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">createLinearGradient</span><span class="p">(</span><span class="nx">xstart</span><span class="p">,</span><span class="nx">ystart</span><span class="p">,</span><span class="nx">xend</span><span class="p">,</span><span class="nx">yend</span><span class="p">);</span>
+<span class="nx">grd</span><span class="p">.</span><span class="nx">addColorStop</span><span class="p">(</span> <span class="nx">stop</span> <span class="p">,</span> <span class="nx">color</span> <span class="p">);</span>		
+
+<span class="c1">//径性渐变</span>
+<span class="kd">let</span> <span class="nx">grd</span> <span class="o">=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">createRadialGradient</span><span class="p">(</span> <span class="nx">x0</span> <span class="p">,</span> <span class="nx">y0</span><span class="p">,</span> <span class="nx">r0</span> <span class="p">,</span> <span class="nx">x1</span> <span class="p">,</span> <span class="nx">y1</span> <span class="p">,</span> <span class="nx">r1</span> <span class="p">);</span>
+<span class="nx">grd</span><span class="p">.</span><span class="nx">addColorStop</span><span class="p">(</span> <span class="nx">stop</span> <span class="p">,</span> <span class="nx">color</span> <span class="p">);</span>
+
+<span class="c1">//重复图像</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">createPattern</span><span class="p">(</span> <span class="nx">img</span> <span class="p">,</span> <span class="nx">repeat</span><span class="o">-</span><span class="nx">style</span><span class="p">)</span> <span class="nx">方法在指定的方向内重复指定的元素</span>
+<span class="nx">repeat</span><span class="o">-</span><span class="nx">style</span><span class="p">:</span><span class="nx">no</span><span class="o">-</span><span class="nx">repeat</span><span class="o">|</span><span class="nx">repeat</span><span class="o">-</span><span class="nx">x</span><span class="o">|</span><span class="nx">repeat</span><span class="o">-</span><span class="nx">y</span><span class="o">|</span><span class="nx">repeat</span> 
+
+<span class="c1">//重复画布</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">createPattern</span><span class="p">(</span> <span class="nx">canvas</span> <span class="p">,</span> <span class="nx">repeat</span><span class="o">-</span><span class="nx">style</span> <span class="p">);</span>
+
+<span class="c1">//重复视频</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">createPattern</span><span class="p">(</span> <span class="nx">video</span> <span class="p">,</span> <span class="nx">repeat</span><span class="o">-</span><span class="nx">style</span> <span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="7文本渲染">7.文本渲染</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">ctx</span><span class="p">.</span><span class="nx">font</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">bold 40px Arial</span><span class="dl">"</span>  <span class="c1">//设置字体</span>
+
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">fillText</span><span class="p">(</span> <span class="nx">string</span> <span class="p">,</span> <span class="nx">x</span> <span class="p">,</span> <span class="nx">y</span> <span class="p">,</span> <span class="p">[</span><span class="nx">maxlen</span><span class="p">]</span> <span class="p">);</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">strokeText</span><span class="p">(</span> <span class="nx">string</span> <span class="p">,</span> <span class="nx">x</span> <span class="p">,</span> <span class="nx">y</span>  <span class="p">,</span> <span class="p">[</span><span class="nx">maxlen</span><span class="p">]</span> <span class="p">);</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>ctx.font = “font-style font-variant font-weight font-size font-family”;</p>
+</blockquote>
+
+<blockquote>
+  <p>font-style = “normal|italic|oblique”</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>normal</td>
+      <td>String</td>
+      <td>-</td>
+      <td>(默认)</td>
+    </tr>
+    <tr>
+      <td>italic</td>
+      <td>String</td>
+      <td>-</td>
+      <td>斜体字</td>
+    </tr>
+    <tr>
+      <td>oblique</td>
+      <td>String</td>
+      <td>-</td>
+      <td>倾斜字体</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>font-variant = “normal|small-caps”;</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>normal</td>
+      <td>String</td>
+      <td>-</td>
+      <td>(默认)</td>
+    </tr>
+    <tr>
+      <td>small-caps</td>
+      <td>String</td>
+      <td>-</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>font-weight = “lighter|normal|bold|\bolder”;</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>lighter</td>
+      <td>String</td>
+      <td>-</td>
+      <td>细</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>String</td>
+      <td>-</td>
+      <td>(默认)100,200,300,400</td>
+    </tr>
+    <tr>
+      <td>bold</td>
+      <td>String</td>
+      <td>-</td>
+      <td>(粗) 500,600,700</td>
+    </tr>
+    <tr>
+      <td>bolder</td>
+      <td>String</td>
+      <td>-</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>font-size = “20px|2em|150%”;</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>20px</td>
+      <td>String</td>
+      <td>-</td>
+      <td>(默认)单位px</td>
+    </tr>
+    <tr>
+      <td>2em</td>
+      <td>String</td>
+      <td>-</td>
+      <td>单位em</td>
+    </tr>
+    <tr>
+      <td>150%</td>
+      <td>String</td>
+      <td>-</td>
+      <td>单位%</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>font-family = “支持@font-face|Web安全字体”;  设置多种字体备选</p>
+</blockquote>
+
+<blockquote>
+  <p>ctx.textAlign = “left|center|right”;  水平对齐方式</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>left</td>
+      <td>String</td>
+      <td>-</td>
+      <td>左对齐</td>
+    </tr>
+    <tr>
+      <td>center</td>
+      <td>String</td>
+      <td>-</td>
+      <td>居中对齐</td>
+    </tr>
+    <tr>
+      <td>right</td>
+      <td>String</td>
+      <td>-</td>
+      <td>右对齐</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>ctx.textBaseline = “top|middle|bottom|alphabetic|ideographic|hanging”;  基线对齐</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>top</td>
+      <td>String</td>
+      <td>-</td>
+      <td>把当前盒的top与行盒的top对齐(借用css概念)</td>
+    </tr>
+    <tr>
+      <td>middle</td>
+      <td>String</td>
+      <td>-</td>
+      <td>把当前盒的垂直中心和父级盒的基线加上父级的半x-height对齐(借用css概念)</td>
+    </tr>
+    <tr>
+      <td>bottom</td>
+      <td>String</td>
+      <td>-</td>
+      <td>把当前盒的bottom与行盒的bottom对齐(借用css概念)</td>
+    </tr>
+    <tr>
+      <td>alphabetic</td>
+      <td>String</td>
+      <td>-</td>
+      <td>(默认)</td>
+    </tr>
+    <tr>
+      <td>ideographic</td>
+      <td>String</td>
+      <td>-</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>hanging</td>
+      <td>String</td>
+      <td>-</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>ctx.measureText( string ).width  计算字符串在canvas的宽度</p>
+</blockquote>
+
+<h3 id="8阴影">8.阴影</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">ctx</span><span class="p">.</span><span class="nx">shadowColor</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">shadowOffsetX</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">shadowOffsetY</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">shadowBlur</span>
+</code></pre></div></div>
+
+<h3 id="9透明度">9.透明度</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">ctx</span><span class="p">.</span><span class="nx">globalAlpha</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">globleCompositeOperation</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>ctx.globleCompositeOperation = “source-over|source-atop|source-in|source-out|destination-over|destination-atop|destination-in|destination-out|lighter|copy|xor”;</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>必填</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>source-over</td>
+      <td>String</td>
+      <td>-</td>
+      <td>这是默认值，他表示绘制的图形将画在现有画布之上</td>
+    </tr>
+    <tr>
+      <td>source-atop</td>
+      <td>String</td>
+      <td>-</td>
+      <td>这个操作会将源绘制在目标之上，但是在重叠区域上两者都是不透明的。绘制在其他位置的目标是不透明的，但源是透明的</td>
+    </tr>
+    <tr>
+      <td>source-in</td>
+      <td>String</td>
+      <td>-</td>
+      <td>在源于目标重叠的区域只绘制源，而不重叠的部分编程透明的</td>
+    </tr>
+    <tr>
+      <td>source-out</td>
+      <td>String</td>
+      <td>-</td>
+      <td>在与目标不重叠的区域上绘制源，其他部分都变成透明的</td>
+    </tr>
+    <tr>
+      <td>destination-over</td>
+      <td>String</td>
+      <td>-</td>
+      <td>这个操作的值与source-over值相反，所以现在目标绘制在源之上</td>
+    </tr>
+    <tr>
+      <td>destination-atop</td>
+      <td>String</td>
+      <td>-</td>
+      <td>这个操作与source-atop相反，目标绘制在源之上</td>
+    </tr>
+    <tr>
+      <td>destination-in</td>
+      <td>String</td>
+      <td>-</td>
+      <td>这个操作与source-in相反，在源于目标重叠的区域保留目标。而不重叠的部分都变成透明的</td>
+    </tr>
+    <tr>
+      <td>destination-out</td>
+      <td>String</td>
+      <td>-</td>
+      <td>在与源不重叠的区域上保留目标。其他部分都变成透明的</td>
+    </tr>
+    <tr>
+      <td>lighter</td>
+      <td>String</td>
+      <td>-</td>
+      <td>这个值与顺序无关，如果源与目标重叠，就将两者的颜色值叠加。得到的颜色值的最大取值为255，结果就为白色</td>
+    </tr>
+    <tr>
+      <td>copy</td>
+      <td>String</td>
+      <td>-</td>
+      <td>这个值与顺序无关，只绘制源，覆盖掉目标</td>
+    </tr>
+    <tr>
+      <td>xor</td>
+      <td>String</td>
+      <td>-</td>
+      <td>这个值与顺序无关，只绘制出不重叠的源与目标区域。所有重叠的部分都变成透明的</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="10常用">10.常用</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//1.canvas状态保存与恢复</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>    <span class="c1">//保存</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">restore</span><span class="p">()</span> <span class="c1">//恢复</span>
+
+<span class="c1">//2.路径</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">()</span>    <span class="c1">//方法开始一条路径，或重置当前的路径</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">closePath</span><span class="p">()</span>    <span class="c1">//方法创建从当前点到开始点的路径	</span>
+
+<span class="c1">//3.剪辑取区域,一般先保存，然后剪辑路径，最后恢复</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>      <span class="c1">//保存 </span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">clip</span><span class="p">()</span>      <span class="c1">//剪辑</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">restore</span><span class="p">()</span>   <span class="c1">//恢复</span>
+
+<span class="c1">//4.清除画布</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">clearRect</span><span class="p">(</span> <span class="nx">x</span> <span class="p">,</span> <span class="nx">y</span> <span class="p">,</span> <span class="nx">width</span> <span class="p">,</span> <span class="nx">height</span> <span class="p">)</span>
+
+<span class="c1">//5.判断鼠标是否在该路径,只能判断最后一个剪辑路径</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">isPointInPath</span><span class="p">(</span> <span class="nx">x</span> <span class="p">,</span> <span class="nx">y</span> <span class="p">)</span>
+</code></pre></div></div>
+
+:ET

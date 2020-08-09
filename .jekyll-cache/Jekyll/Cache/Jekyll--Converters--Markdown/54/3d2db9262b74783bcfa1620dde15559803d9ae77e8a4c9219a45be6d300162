@@ -1,0 +1,17 @@
+I"�<p>以前写checkbox的样式，用div,加上js才能达到切换效果，今天写个用css写个ckeckbox样式，喜欢的伙伴可以自己写写。用到css3属性，不是很清楚的伙伴就得多查查css文档了。</p>
+
+<h1 id="1checkbox样式">1.checkbox样式</h1>
+
+<script async="" src="//jsfiddle.net/waliblog/orxvab5c/embed/result,html,css/"></script>
+
+<h1 id="1html结构">1.html结构</h1>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+<h1 id="2css样式">2.css样式</h1>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+:ET

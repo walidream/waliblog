@@ -1,0 +1,69 @@
+I"�(<h3 id="1canvas转化base64">1.canvas转化Base64</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">imgBase64</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">toDataURL</span><span class="p">(</span><span class="dl">'</span><span class="s1">image/jpeg</span><span class="dl">'</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="2file对象获取url">2.file对象获取url</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">windowURL</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">URL</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">webkitURL</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">imgsrc</span> <span class="o">=</span> <span class="nx">windowURL</span><span class="p">.</span><span class="nx">createObjectURL</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</code></pre></div></div>
+
+<h3 id="3base64转化blob">3.base64转化Blob</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">convertBase64UrlToBlob</span><span class="p">(</span><span class="nx">base64</span><span class="p">){</span>
+  <span class="kd">let</span> <span class="nx">bytes</span><span class="o">=</span><span class="nb">window</span><span class="p">.</span><span class="nx">atob</span><span class="p">(</span><span class="nx">urlData</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1">,</span><span class="dl">'</span><span class="p">)[</span><span class="mi">1</span><span class="p">]);</span>        <span class="c1">//去掉url的头，并转换为byte; base64编解码(btoa编码,atob解码)</span>
+  <span class="c1">//处理异常,将ascii码小于0的转换为大于0</span>
+  <span class="kd">let</span> <span class="nx">ab</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">ArrayBuffer</span><span class="p">(</span><span class="nx">bytes</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+  <span class="kd">let</span> <span class="nx">ia</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Uint8Array</span><span class="p">(</span><span class="nx">ab</span><span class="p">);</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">bytes</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">ia</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">bytes</span><span class="p">.</span><span class="nx">charCodeAt</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="nx">Blob</span><span class="p">(</span> <span class="p">[</span><span class="nx">ab</span><span class="p">]</span> <span class="p">,</span> <span class="p">{</span><span class="na">type</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">image/png</span><span class="dl">'</span><span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="4获取本地图片base64">4.获取本地图片base64</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">imgInfo</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">files</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>  <span class="c1">//参考javascript/图片上传</span>
+<span class="kd">let</span> <span class="nx">reader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FileReader</span><span class="p">();</span>
+
+<span class="nx">reader</span><span class="p">.</span><span class="nx">onload</span><span class="o">=</span><span class="kd">function</span><span class="p">(){</span>
+   <span class="kd">let</span> <span class="nx">imgBase64</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">result</span><span class="p">;</span>
+   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">imgBase64</span><span class="p">);</span>				
+<span class="p">}</span>
+<span class="nx">reader</span><span class="p">.</span><span class="nx">readAsDataURL</span><span class="p">(</span><span class="nx">imgInfo</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="5canvas传递到后台">5.canvas传递到后台</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">canvas</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">'</span><span class="s1">canvas</span><span class="dl">'</span><span class="p">);</span>
+<span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+<span class="nx">canvas</span><span class="p">.</span><span class="nx">heigth</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+<span class="c1">// ...绘图</span>
+<span class="c1">//1.将canvas转换成base64</span>
+<span class="kd">let</span> <span class="nx">imgBase64</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">toDataURL</span><span class="p">(</span><span class="dl">'</span><span class="s1">image/jpeg</span><span class="dl">'</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">);</span>
+
+<span class="c1">//2.将imgBase64转换Blob</span>
+<span class="kd">let</span> <span class="nx">fileData</span> <span class="o">=</span> <span class="nx">convertBase64UrlToBlob</span><span class="p">(</span><span class="nx">imgBase64</span><span class="p">);</span>
+
+<span class="c1">//3.传到后台</span>
+<span class="kd">let</span> <span class="nx">formData</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FormData</span><span class="p">();</span>
+<span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">file</span><span class="dl">'</span><span class="p">,</span> <span class="nx">fileData</span><span class="p">);</span>
+<span class="nx">$</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span><span class="nx">formData</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+  <span class="c1">//上传成功后做某些事</span>
+<span class="p">});</span>
+	
+<span class="kd">function</span> <span class="nx">convertBase64UrlToBlob</span><span class="p">(</span><span class="nx">base64</span><span class="p">){</span>
+  <span class="kd">let</span> <span class="nx">bytes</span><span class="o">=</span><span class="nb">window</span><span class="p">.</span><span class="nx">atob</span><span class="p">(</span><span class="nx">urlData</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1">,</span><span class="dl">'</span><span class="p">)[</span><span class="mi">1</span><span class="p">]);</span>        <span class="c1">//去掉url的头，并转换为byte; base64编解码(btoa编码,atob解码)</span>
+  <span class="c1">//处理异常,将ascii码小于0的转换为大于0</span>
+  <span class="kd">let</span> <span class="nx">ab</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">ArrayBuffer</span><span class="p">(</span><span class="nx">bytes</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+  <span class="kd">let</span> <span class="nx">ia</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Uint8Array</span><span class="p">(</span><span class="nx">ab</span><span class="p">);</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">bytes</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">ia</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">bytes</span><span class="p">.</span><span class="nx">charCodeAt</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="nx">Blob</span><span class="p">(</span> <span class="p">[</span><span class="nx">ab</span><span class="p">]</span> <span class="p">,</span> <span class="p">{</span><span class="na">type</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">image/png</span><span class="dl">'</span><span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+:ET

@@ -1,0 +1,12 @@
+I"W<h1 id="1java跨域">1.java跨域</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">logger</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="dl">"</span><span class="s2">====================== Enter filter do filter ======================</span><span class="dl">"</span><span class="p">);</span>
+
+<span class="nx">response</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="dl">"</span><span class="s2">Access-Control-Allow-Origin</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">*</span><span class="dl">"</span><span class="p">);</span>
+<span class="nx">response</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="dl">"</span><span class="s2">Access-Control-Allow-Methods</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">POST, GET, OPTIONS, DELETE</span><span class="dl">"</span><span class="p">);</span>
+<span class="nx">response</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="dl">"</span><span class="s2">Access-Control-Max-Age</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">3600</span><span class="dl">"</span><span class="p">);</span>
+<span class="nx">response</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="dl">"</span><span class="s2">Access-Control-Allow-Headers</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">Content-Type, Authorization, X-Requested-With, Origin, Accept, token, openKey</span><span class="dl">"</span><span class="p">);</span>
+<span class="nx">filterChain</span><span class="p">.</span><span class="nx">doFilter</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">);</span>
+</code></pre></div></div>
+
+:ET

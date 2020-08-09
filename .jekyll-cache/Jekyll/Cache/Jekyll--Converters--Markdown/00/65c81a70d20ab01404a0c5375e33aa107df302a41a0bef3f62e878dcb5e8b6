@@ -1,0 +1,46 @@
+I"�<p>小菜今天在配nginx的websocket代理时用到了nodejs，之前小菜学习过nodejs，只不过没有整理出来。从今天这篇博客开始，以后有关nodejs内容都会放到此类标签下。第一篇就简单介绍下安装</p>
+
+<p>进入node官网<a href="https://nodejs.org/zh-cn/download/" title="https://nodejs.org/zh-cn/download/" target="_blank">传送门</a>选择<code class="language-plaintext highlighter-rouge">Linux 二进制文件 (x64)</code>或者直接复制下载链接。</p>
+
+<p>登录服务器,进入到<code class="language-plaintext highlighter-rouge">usr/local</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd /usr/local
+</code></pre></div></div>
+
+<p>输入</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://nodejs.org/dist/v10.14.2/node-v10.14.2-linux-x64.tar.xz
+</code></pre></div></div>
+
+<p>解压</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tar -xvf node-v10.14.2-linux-x64.tar.xz 	
+</code></pre></div></div>
+
+<p>重命名文件夹</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mv node-v10.14.2-linux-x64 node
+</code></pre></div></div>
+
+<p>配置环境变量</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim /etc/profile
+</code></pre></div></div>
+
+<p>在最后面添加</p>
+
+<pre><code class="language-linux">export NODE_HOME=/usr/local/node
+export PATH=$NODE_HOME/bin:$PATH
+</code></pre>
+
+<p>配置生效</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>source /etc/profile
+</code></pre></div></div>
+
+<p>检测是否安装成功</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node -v
+</code></pre></div></div>
+
+:ET

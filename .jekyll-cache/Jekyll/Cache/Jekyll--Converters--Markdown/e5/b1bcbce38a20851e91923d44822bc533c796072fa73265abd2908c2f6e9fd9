@@ -1,0 +1,72 @@
+I"^<p>接下来小菜就要记录nginx在centos上的安装</p>
+
+<h1 id="1nginx的版本">1.Nginx的版本</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Mainline version -开发版
+Stable version - 稳定版
+Legacy version - 历史版本
+</code></pre></div></div>
+
+<h1 id="2安装nginx">2.安装Nginx</h1>
+
+<p>1.访问<a href="http://nginx.org/en/download.html" title="http://nginx.org/en/download.html" target="_blank">nginx官网下载</a>，找到最新的稳定版本。
+选择标题 <code class="language-plaintext highlighter-rouge">pre-Built Packages</code>下面的 Linux packages for stable version 或者点击<a href="http://nginx.org/en/linux_packages.html#stable" title="http://nginx.org/en/linux_packages.html#stable" target="_blank">传送门</a></p>
+
+<p>2.找到<code class="language-plaintext highlighter-rouge">Pre-Built Packages for Stable version</code>下面介绍了在RHEL/CentOS下面怎样安装，拷贝</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="nx">nginx</span><span class="p">]</span>
+<span class="nx">name</span><span class="o">=</span><span class="nx">nginx</span> <span class="nx">repo</span>
+<span class="nx">baseurl</span><span class="o">=</span><span class="nx">http</span><span class="p">:</span><span class="c1">//nginx.org/packages/OS/OSRELEASE/$basearch/</span>
+<span class="nx">gpgcheck</span><span class="o">=</span><span class="mi">0</span>
+<span class="nx">enabled</span><span class="o">=</span><span class="mi">1</span>
+</code></pre></div></div>
+
+<p>在服务上输入</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim /etc/yum.repos.d/nginx.repo
+</code></pre></div></div>
+
+<p>将刚才拷贝的内容粘贴上去，因为小菜用的是centos 7.4版本所以需要将<code class="language-plaintext highlighter-rouge">baseurl=http://nginx.org/packages/OS/OSRELEASE/$basearch</code>修改为<code class="language-plaintext highlighter-rouge">baseurl=http://nginx.org/packages/centos/7/$basearch</code>保存退出</p>
+
+<p>在命令窗口输入查看</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum list | grep nginx
+</code></pre></div></div>
+
+<p>直接安装输入</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum install nginx
+</code></pre></div></div>
+
+<p>检测是否安装完成</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -v
+</code></pre></div></div>
+
+<p>如果和官网的最新稳定版本一致那么就安装成功了</p>
+
+<h1 id="3卸载nginx">3.卸载nginx</h1>
+
+<p>查看nginx安装程序</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rpm -qa nginx 
+</code></pre></div></div>
+
+<p>查看nginx配置项位置</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rpm -ql nginx 
+</code></pre></div></div>
+
+<p>卸载nginx</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum remove nginx
+rpm -ql nginx
+</code></pre></div></div>
+
+<p>输出package nginx is not installed  说明卸载干净了</p>
+
+<h1 id="4升级">4.升级</h1>
+
+<p>当官方升级了最新版本时，我们也需要跟着进行版本升级，nginx升级<a href="/nginx/2019/01/05/nginx-24.html" title="/nginx/2019/01/05/nginx-24.html" target="_blank">传送门</a></p>
+
+:ET

@@ -1,0 +1,134 @@
+I"�6<p>按照小菜的尿性先放一个demo,最近用指令写东西蛮多的，发现指令真的是一个好东西。</p>
+
+<script async="" src="//jsrun.net/xxhKp/embed/all/light/"></script>
+
+<p>@/util/dom.js文件</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 功能：dom绑定事件
+ * 参数：element(dom节点)
+ *      event(事件名称)
+ *      handler(回调)
+ *返回：无
+ * */</span>
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">on</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">element</span> <span class="o">&amp;&amp;</span> <span class="nx">event</span> <span class="o">&amp;&amp;</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">element</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">};</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">element</span> <span class="o">&amp;&amp;</span> <span class="nx">event</span> <span class="o">&amp;&amp;</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">element</span><span class="p">.</span><span class="nx">attachEvent</span><span class="p">(</span><span class="dl">'</span><span class="s1">on</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">};</span>
+    <span class="p">}</span>
+<span class="p">}();</span>
+
+<span class="cm">/**
+ * 功能：移除dom绑定的事件
+ * 参数：element(dom节点)
+ *      event(事件名称)
+ *      handler(回调函数)
+ * 返回：无
+ * */</span>
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">off</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">element</span> <span class="o">&amp;&amp;</span> <span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">element</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">};</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">element</span> <span class="o">&amp;&amp;</span> <span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">element</span><span class="p">.</span><span class="nx">detachEvent</span><span class="p">(</span><span class="dl">'</span><span class="s1">on</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">};</span>
+    <span class="p">}</span>
+<span class="p">}();</span>
+</code></pre></div></div>
+
+<p>在directive文件夹下创建一个<code class="language-plaintext highlighter-rouge">scroll.js</code>文件，将下面代码复制进去</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1">//盒子滚动条拖拽</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">on</span><span class="p">,</span> <span class="nx">off</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@/util/dom</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">let</span> <span class="nx">targetDrag</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1">//托拽</span>
+    <span class="na">isDown</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="na">coord</span><span class="p">:{</span>
+        <span class="na">x</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="na">y</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">//x轴拖动回调 鼠标按下</span>
+<span class="kd">const</span> <span class="nx">scrollMousedown</span> <span class="o">=</span> <span class="nx">event</span><span class="o">=&gt;</span><span class="p">{</span>
+    <span class="nx">targetDrag</span><span class="p">.</span><span class="nx">isDown</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="nx">targetDrag</span><span class="p">.</span><span class="nx">coord</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">pageX</span><span class="p">;</span>
+    <span class="nx">targetDrag</span><span class="p">.</span><span class="nx">coord</span><span class="p">.</span><span class="nx">y</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">pageY</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//x轴拖动回调  鼠标释放</span>
+
+<span class="kd">const</span> <span class="nx">scrollMouseup</span> <span class="o">=</span> <span class="nx">event</span><span class="o">=&gt;</span><span class="p">{</span>
+    <span class="nx">targetDrag</span><span class="p">.</span><span class="nx">isDown</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="nx">targetDrag</span><span class="p">.</span><span class="nx">coord</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="nx">targetDrag</span><span class="p">.</span><span class="nx">coord</span><span class="p">.</span><span class="nx">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//x轴拖动回调  鼠标移动</span>
+
+<span class="kd">const</span> <span class="nx">scrollMousemove</span> <span class="o">=</span> <span class="p">(</span><span class="nx">event</span><span class="p">,</span><span class="nx">el</span><span class="p">)</span><span class="o">=&gt;</span><span class="p">{</span>
+
+<span class="p">}</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">scrollx</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">inserted</span><span class="p">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">){</span>
+        <span class="c1">//鼠标按下</span>
+        <span class="nx">on</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span><span class="dl">'</span><span class="s1">mousedown</span><span class="dl">'</span><span class="p">,</span><span class="nx">scrollMousedown</span><span class="p">);</span>
+        <span class="c1">//鼠标释放</span>
+        <span class="nx">on</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span><span class="dl">'</span><span class="s1">mouseup</span><span class="dl">'</span><span class="p">,</span><span class="nx">scrollMouseup</span><span class="p">);</span>
+        <span class="c1">//鼠标托拽</span>
+        <span class="nx">on</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span><span class="dl">'</span><span class="s1">mousemove</span><span class="dl">'</span><span class="p">,</span><span class="nx">event</span><span class="o">=&gt;</span><span class="p">{</span>
+            <span class="kd">let</span> <span class="nx">movX</span> <span class="o">=</span> <span class="nx">targetDrag</span><span class="p">.</span><span class="nx">coord</span><span class="p">.</span><span class="nx">x</span> <span class="o">-</span> <span class="nx">event</span><span class="p">.</span><span class="nx">pageX</span><span class="p">;</span>
+            <span class="nx">targetDrag</span><span class="p">.</span><span class="nx">coord</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">pageX</span><span class="p">;</span>
+            <span class="k">if</span><span class="p">(</span><span class="nx">targetDrag</span><span class="p">.</span><span class="nx">isDown</span><span class="p">){</span>
+                <span class="nx">el</span><span class="p">.</span><span class="nx">scrollLeft</span> <span class="o">=</span> <span class="nx">el</span><span class="p">.</span><span class="nx">scrollLeft</span> <span class="o">+</span> <span class="nx">movX</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">});</span>
+    <span class="p">},</span>
+    <span class="na">unbind</span><span class="p">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">){</span>
+        <span class="nx">off</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span><span class="dl">'</span><span class="s1">mousedown</span><span class="dl">'</span><span class="p">,</span><span class="nx">scrollMousedown</span><span class="p">);</span>
+        <span class="nx">off</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span><span class="dl">'</span><span class="s1">mouseup</span><span class="dl">'</span><span class="p">,</span><span class="nx">scrollMouseup</span><span class="p">);</span>
+        <span class="nx">off</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span><span class="dl">'</span><span class="s1">mousemove</span><span class="dl">'</span><span class="p">,</span><span class="nx">scrollMousemove</span><span class="p">);</span>
+        <span class="c1">//清空</span>
+        <span class="nx">targetDrag</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1">//托拽</span>
+            <span class="na">isDown</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="na">coord</span><span class="p">:{</span>
+                <span class="na">x</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="na">y</span><span class="p">:</span> <span class="mi">0</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>在需要vue文件中指令引入</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nx">directives</span><span class="p">:{</span>
+    <span class="nx">scroll</span><span class="p">,</span>
+<span class="p">}</span>
+	
+</code></pre></div></div>
+<p>然后在dom</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">div</span> <span class="kd">class</span><span class="o">=</span><span class="dl">"</span><span class="s2">content</span><span class="dl">"</span> <span class="nx">style</span><span class="o">=</span><span class="dl">"</span><span class="s2">overflow-x:auto;</span><span class="dl">"</span><span class="nx">v</span><span class="o">-</span><span class="nx">scrollx</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span></code></pre></div></div>
+
+:ET

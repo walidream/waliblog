@@ -1,0 +1,105 @@
+I"�<p>介绍nginx是如何设置缓存之前，我们还是先聊聊web浏览器的缓存机制。</p>
+
+<h1 id="1浏览器缓存">1.浏览器缓存</h1>
+
+<p>浏览器的缓存机制也就是我们说的HTTP缓存机制，其机制是根据HTTP报文的头信息进行识别的（如：Expires,Cache-control等）。</p>
+
+<h4 id="expires">Expires</h4>
+
+<p>Expires是HTTP/1.0控制网页缓存的字段，其值为服务器返回该请求结果缓存的到期时间，即再次发起该请求时，如果客户端的时间小于Expires的值时，直接使用缓存结果。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Expires是HTTP/1.0的字段，但是现在浏览器默认使用的是HTTP/1.1，那么在HTTP/1.1中网页缓存还是否由Expires控制？
+</code></pre></div></div>
+
+<p>到了HTTP/1.1，Expire已经被Cache-Control替代，原因在于Expires控制缓存的原理是使用客户端的时间与服务端返回的时间做对比，那么如果客户端与服务端的时间因为某些原因（例如时区不同；客户端和服务端有一方的时间不准确）发生误差，那么强制缓存则会直接失效，这样的话强制缓存的存在则毫无意义，那么Cache-Control又是如何控制的呢？</p>
+
+<h4 id="cache-control">Cache-Control</h4>
+
+<p>在HTTP/1.1中，Cache-Control是最重要的规则，主要用于控制网页缓存，主要取值为</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>public</td>
+      <td>所有内容都将被缓存（客户端和代理服务器都可缓存）</td>
+    </tr>
+    <tr>
+      <td>private</td>
+      <td>所有内容只有客户端可以缓存，Cache-Control的默认取值</td>
+    </tr>
+    <tr>
+      <td>no-cache</td>
+      <td>客户端缓存内容，但是是否使用缓存则需要经过协商缓存来验证决定</td>
+    </tr>
+    <tr>
+      <td>no-store</td>
+      <td>所有内容都不会被缓存，即不使用强制缓存，也不使用协商缓存</td>
+    </tr>
+    <tr>
+      <td>max-age=xxx (xxx is numeric)</td>
+      <td>缓存内容将在xxx秒后失效</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="校验过期机制">校验过期机制</h4>
+
+<ul>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>校验是否过期</td>
+          <td>Expires、Cache-Control(max-age)</td>
+        </tr>
+        <tr>
+          <td>协议中Etag头信息校验</td>
+          <td>Etag</td>
+        </tr>
+        <tr>
+          <td>Last-Modified头信息校验</td>
+          <td>Last-Modified</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ul>
+
+<p>首先，校验本地的缓存是否过期，本地缓存校验是否过期依赖http头信息中<code class="language-plaintext highlighter-rouge">Expires</code>和<code class="language-plaintext highlighter-rouge">Cache-Control</code>字段。这两个字段都会起到同一个作用，区别就是协议不同，<code class="language-plaintext highlighter-rouge">Expires</code>是1.0协议，<code class="language-plaintext highlighter-rouge">Cache-Control</code>
+是1.1协议。如果本地文件过期，就会校验<code class="language-plaintext highlighter-rouge">Etag</code>字段和<code class="language-plaintext highlighter-rouge">Last-Modified</code>字段。<code class="language-plaintext highlighter-rouge">Etag</code>和<code class="language-plaintext highlighter-rouge">Last-Modified</code>的共同点就是会向服务器进行校验。</p>
+
+<p>Last-Modified记录的是一个具体时间，当服务器的文件更新后，服务器上的文件时间就会和缓存中Last-Modified记录的时间不一致，这样服务器会将更新后的文件返回给客户端</p>
+
+<p>Etag记录的是一个字符串，因为Last-Modified记录的是一个时间，当服务器更新的时间是秒级别的时候，这个时候靠Last-Modified就不能够检测文件是否更新。所以Etag的出现就是为解决这个问题。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_9.jpg" alt="ssl" /></p>
+
+<h1 id="2expires">2.expires</h1>
+
+<p>expires的原理就是给Response Headers头信息中添加Cache-Control、Expires信息</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span> <span class="s">expires</span> <span class="s">[modified]</span> <span class="s">time</span><span class="p">;</span>
+	<span class="k">expires</span> <span class="s">epoch</span> <span class="s">|</span> <span class="s">max</span> <span class="s">|</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">expires</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,server,location,if</span> <span class="s">in</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h4 id="示例配置">示例配置</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">location</span> <span class="p">~</span> <span class="sr">.*\.(html</span> <span class="s">|</span> <span class="s">htm)</span>$ <span class="p">{</span>
+	<span class="kn">root</span> <span class="n">/opt/app/code</span><span class="p">;</span>
+	<span class="kn">expires</span> <span class="s">24h</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>访问页面，打开调试工具，看到Response Headers头信息中出现<code class="language-plaintext highlighter-rouge">Cache-Control</code>和<code class="language-plaintext highlighter-rouge">Expires</code>字段，记录值都是24小时。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_10.jpg" alt="ssl" /></p>
+
+:ET

@@ -1,0 +1,82 @@
+I"�<p>　　最近太忙了，本来说好要写webpack教程，被公司临时上个项目所以就给耽搁了。花了一周多时间，写个小程序，其中也遇到不少坑，等闲下时间我会把遇到的坑点和项目上传上去。供后面学习的同志参考，好了不多说了，今天就把剩下jekyll教程写写。</p>
+
+<p>　　这篇帖子主要是将如何使用上篇搭建的博客（主要针对没有基础的前端，但又想有自己的博客）。写之前对上篇jekyll(1)博客中添加小绿标的事在说说，国内添加ssl还是比较好添加的，但域名必须要备案，所以比较繁琐。之前是小菜水平不够，所以弄起来就…</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 1. 简单的运行
+ 2. 简单的配置
+ 3. 简单的运行
+</code></pre></div></div>
+
+<h1 id="1简单的运行">1.简单的运行</h1>
+
+<p>在本地打开clone好的<code class="language-plaintext highlighter-rouge">jekyll-blog</code>项目,然后行<code class="language-plaintext highlighter-rouge">$ jekyll server</code> 如果页面什么的都显示正常那就说明可以使用。</p>
+
+<h1 id="2目录结构">2.目录结构</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> /
+ |-- .sass-cache   #缓存文件,不用管
+ |-- _drafts       #草稿箱
+ |-- _includes     #公共部分
+ |-- _layouts      #公共布局
+ |-- _plugins      #插件(jekyll 插件)
+ |-- _posts        #帖子(重点)
+ |-- _sass         #sass(重点)
+ |-- _site         #生成后的项目(可以将这个文件部署到其他服务上)
+ |-- assets        #资源文件(重点)
+ |-- category      #分类文件(重点)
+ |-- script        #脚本
+ |-- .gitignore    
+ |-- .travis.yml   
+ |-- _config.yml   #配置文件(重点)
+ |-- 404.md
+ |-- about.md     
+ |-- CNAME         #配置域名文件
+ |-- CODE_OF_CONDUCT.md 
+ |-- contact.md     
+ |-- CONTRIBUTING.md
+ |-- favicon.ico   #图标
+ |-- Gemfile       #gem脚本
+ |-- Gemfile.lock
+ |-- index.html    #首页
+ |-- jekyll-theme-caman-blog.gemspec
+ |-- LICENSE   
+ |-- README.md     
+ 
+</code></pre></div></div>
+
+<h1 id="3设置域名">3.设置域名</h1>
+
+<p>打开<code class="language-plaintext highlighter-rouge">CNAME</code>文件夹,将设置的域名放进去</p>
+
+<h1 id="4_configyml配置">4._config.yml配置</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 1. title            #默认title
+ 2. description      #默认描述
+ 3. show_downloads   #ture 是否显示下载
+ 4. Encoding:utf-8   #设置编码
+ 5. paginate         #设置显示帖子数量
+ 6. paginate_path    #链接路径 
+ 7. url              #资源加载hostname
+</code></pre></div></div>
+
+<h1 id="5category文件分类">5.category文件(分类)</h1>
+
+<p>在<code class="language-plaintext highlighter-rouge">category</code>中建文件夹要和<code class="language-plaintext highlighter-rouge">_post</code>对应起来,例如：要建一个php分类列表，在_post中建立一个php文件夹,将以后写的php博客帖子放在文件中，然后在category中复制一个其中文件夹，只需要把文件名改成php就可以了。</p>
+
+<h1 id="6_post-帖子变量">6._post 帖子变量</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 2. title        #会覆盖_config.yml中的title
+ 3. tagline      #会覆盖_config.yml中的tagline
+ 4. category     #分类名称
+ 5. author       #作者
+ 6. tag          #标签 
+ 7. ghurl        #github仓库地址
+ 8. ghurl_zip    #github仓库下载地址
+ 9. post_nav     #false和Array;false是不设置导航;Array中的只对应的是标题，如：['6._post 帖子变量','7.添加评论']
+</code></pre></div></div>
+
+<h1 id="7添加评论">7.添加评论</h1>
+
+<p>将assets/js/post.js 中的gitment里面的参数修改成自己git上的参数就可以了,可以参照第一篇jekyll(1)教程。</p>
+
+:ET

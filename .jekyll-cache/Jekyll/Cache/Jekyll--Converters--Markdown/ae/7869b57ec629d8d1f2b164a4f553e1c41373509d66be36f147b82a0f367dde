@@ -1,0 +1,42 @@
+I"�<p>按照惯例，小菜先将写好的demo放上去。这里将内容写在一个文件，方便展示，如果小伙伴们写项目还是需要模块化好点。</p>
+
+<script async="" src="//jsrun.net/exhKp/embed/all/light/"></script>
+
+<p>在directive文件夹下创建一个<code class="language-plaintext highlighter-rouge">highilight.js</code>文件，将下面代码复制进去</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">export</span> <span class="k">default</span><span class="p">{</span>
+    <span class="na">bind</span><span class="p">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span><span class="nx">binding</span><span class="p">){</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">binding</span><span class="p">.</span><span class="nx">value</span> <span class="o">==</span> <span class="dl">''</span><span class="p">)</span> <span class="k">return</span> <span class="p">;</span>
+        <span class="kd">let</span> <span class="nx">word</span> <span class="o">=</span> <span class="nx">el</span><span class="p">.</span><span class="nx">innerText</span><span class="p">;</span>
+        <span class="kd">let</span> <span class="nx">light</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">&lt;code style ="color:#318af3;"&gt;</span><span class="dl">'</span><span class="o">+</span> <span class="nx">binding</span><span class="p">.</span><span class="nx">value</span> <span class="o">+</span><span class="dl">'</span><span class="s1">&lt;/code&gt;</span><span class="dl">'</span>
+        <span class="kd">let</span> <span class="nx">reg</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">binding</span><span class="p">.</span><span class="nx">value</span><span class="p">,</span> <span class="dl">'</span><span class="s1">g</span><span class="dl">'</span><span class="p">);</span>
+        <span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">word</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">reg</span><span class="p">,</span><span class="nx">light</span><span class="p">)</span>
+    <span class="p">},</span>
+    <span class="na">update</span><span class="p">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span><span class="nx">binding</span><span class="p">){</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">binding</span><span class="p">.</span><span class="nx">value</span> <span class="o">==</span> <span class="dl">''</span><span class="p">)</span> <span class="k">return</span> <span class="p">;</span>
+        <span class="kd">let</span> <span class="nx">word</span> <span class="o">=</span> <span class="nx">el</span><span class="p">.</span><span class="nx">innerText</span><span class="p">;</span>
+        <span class="kd">let</span> <span class="nx">light</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">&lt;code style ="color:#318af3;"&gt;</span><span class="dl">'</span><span class="o">+</span> <span class="nx">binding</span><span class="p">.</span><span class="nx">value</span> <span class="o">+</span><span class="dl">'</span><span class="s1">&lt;/code&gt;</span><span class="dl">'</span>
+        <span class="kd">let</span> <span class="nx">reg</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">binding</span><span class="p">.</span><span class="nx">value</span><span class="p">,</span> <span class="dl">'</span><span class="s1">g</span><span class="dl">'</span><span class="p">);</span>
+        <span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">word</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">reg</span><span class="p">,</span><span class="nx">light</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>在需要vue文件中指令引入</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nx">directives</span><span class="p">:{</span>
+    <span class="nx">highlight</span><span class="p">,</span>
+<span class="p">}</span>
+	
+</code></pre></div></div>
+<p>然后在dom</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="o">&lt;</span><span class="nx">span</span> <span class="nx">v</span><span class="o">-</span><span class="nx">highlight</span><span class="p">:</span><span class="nx">key</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">匹配的关键字</span><span class="dl">"</span><span class="o">&gt;</span><span class="mi">11111111111111111</span><span class="o">&lt;</span><span class="sr">/span</span><span class="err">&gt;
+</span>
+</code></pre></div></div>
+
+:ET

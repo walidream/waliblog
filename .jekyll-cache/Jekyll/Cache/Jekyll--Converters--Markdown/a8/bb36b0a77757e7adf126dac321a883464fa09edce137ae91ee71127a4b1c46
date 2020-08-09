@@ -1,0 +1,101 @@
+I"�<p>为nginx主配置文件添加注释，更好的理解nginx</p>
+
+<blockquote>
+  <p>nginx的默认加载 /usr/share/nginx/html/ 文件</p>
+</blockquote>
+
+<h1 id="1nginx主配置文件">1.nginx主配置文件</h1>
+
+<p>打开 vim <code class="language-plaintext highlighter-rouge">/etc/nginx/nginx.conf</code></p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">user</span>  <span class="s">nginx</span><span class="p">;</span>  <span class="c1">#设置nginx服务的系统使用用户</span>
+<span class="k">worker_processes</span>  <span class="mi">1</span><span class="p">;</span>  <span class="c1">#工作进程数 默认设置和cpu相同就好了</span>
+
+<span class="k">error_log</span>  <span class="n">/var/log/nginx/error.log</span> <span class="s">warn</span><span class="p">;</span>   <span class="c1">#错误日志</span>
+<span class="k">pid</span>        <span class="n">/var/run/nginx.pid</span><span class="p">;</span>   <span class="c1">#进程的pid</span>
+
+
+<span class="k">events</span> <span class="p">{</span>
+    <span class="kn">worker_connections</span>  <span class="mi">1024</span><span class="p">;</span>    <span class="c1">#每个进程允许最大连接数</span>
+<span class="p">}</span>
+
+
+<span class="k">http</span> <span class="p">{</span>
+    <span class="kn">include</span>       <span class="n">/etc/nginx/mime.types</span><span class="p">;</span>  <span class="c1">#设置http协议的Content-Type与扩展名对应关系</span>
+    <span class="kn">default_type</span>  <span class="nc">application/octet-stream</span><span class="p">;</span>
+
+    <span class="kn">log_format</span>  <span class="s">main</span>  <span class="s">'</span><span class="nv">$remote_addr</span> <span class="s">-</span> <span class="nv">$remote_user</span> <span class="s">[</span><span class="nv">$time_local</span><span class="s">]</span> <span class="s">"</span><span class="nv">$request</span><span class="s">"</span> <span class="s">'</span> <span class="s">'</span><span class="nv">$status</span> <span class="nv">$body_bytes_sent</span> <span class="s">"</span><span class="nv">$http_referer</span><span class="s">"</span> <span class="s">'</span>
+                      <span class="s">'"</span><span class="nv">$http_user_agent</span><span class="s">"</span> <span class="s">"</span><span class="nv">$http_x_forwarded_for</span><span class="s">"'</span><span class="p">;</span> 
+
+    <span class="kn">access_log</span>  <span class="n">/var/log/nginx/access.log</span>  <span class="s">main</span><span class="p">;</span>  <span class="c1"># 设置日志类型与log_format 对应</span>
+
+    <span class="kn">sendfile</span>        <span class="no">on</span><span class="p">;</span>  <span class="c1">#零拷贝 nginx的一大优势,拷贝文件是不需要经过用户空间，直接在内核空间上拷贝</span>
+    <span class="c1">#tcp_nopush     on; </span>
+
+    <span class="kn">keepalive_timeout</span>  <span class="mi">65</span><span class="p">;</span>  <span class="c1">#连接超时 65s</span>
+
+    <span class="c1">#gzip  on;</span>
+
+    <span class="kn">include</span> <span class="n">/etc/nginx/conf.d/*.conf</span><span class="p">;</span>  <span class="c1">#导入conf.d目录下的配置文件</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>小菜建议配服务的时候在<code class="language-plaintext highlighter-rouge">/etc/nginx/conf.d/</code>目录下新建一个文件后缀为<code class="language-plaintext highlighter-rouge">.conf</code>的文件</p>
+
+<h1 id="2confd文件">2.conf.d文件</h1>
+
+<p>在命令窗口输入</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd /etc/nginx/conf.d
+</code></pre></div></div>
+
+<p>进入到<code class="language-plaintext highlighter-rouge">conf.d</code>目录下面有个默认<code class="language-plaintext highlighter-rouge">default.conf</code>文件</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span>       <span class="mi">80</span><span class="p">;</span>   <span class="c1">#监听的端口号80 也可以这样写 192.168.1.140:80</span>
+    <span class="kn">server_name</span>  <span class="s">localhost</span><span class="p">;</span>  <span class="c1">#主机域名</span>
+
+    <span class="c1">#charset koi8-r;</span>
+    <span class="c1">#access_log  /var/log/nginx/host.access.log  main;</span>
+
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>    <span class="c1">#访问的路径</span>
+        <span class="kn">root</span>   <span class="n">/usr/share/nginx/html</span><span class="p">;</span>
+        <span class="kn">index</span>  <span class="s">index.html</span> <span class="s">index.htm</span><span class="p">;</span>
+    <span class="p">}</span>   
+
+    <span class="c1">#error_page  404              /404.html;   #定义404的错误</span>
+
+    <span class="c1"># redirect server error pages to the static page /50x.html</span>
+    <span class="c1">#   </span>
+    <span class="kn">error_page</span>   <span class="mi">500</span> <span class="mi">502</span> <span class="mi">503</span> <span class="mi">504</span>  <span class="n">/50x.html</span><span class="p">;</span>  <span class="c1">#定义 500 502 503 504错误</span>
+    <span class="kn">location</span> <span class="p">=</span> <span class="n">/50x.html</span> <span class="p">{</span>
+        <span class="kn">root</span>   <span class="n">/usr/share/nginx/html</span><span class="p">;</span>
+    <span class="p">}</span>   
+
+    <span class="c1"># proxy the PHP scripts to Apache listening on 127.0.0.1:80</span>
+    <span class="c1">#   </span>
+    <span class="c1">#location ~ \.php$ {</span>
+    <span class="c1">#    proxy_pass   http://127.0.0.1;</span>
+    <span class="c1">#}  </span>
+
+    <span class="c1"># pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000</span>
+    <span class="c1">#   </span>
+    <span class="c1">#location ~ \.php$ {</span>
+    <span class="c1">#    root           html;</span>
+    <span class="c1">#    fastcgi_pass   127.0.0.1:9000;</span>
+    <span class="c1">#    fastcgi_index  index.php;</span>
+    <span class="c1">#    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;</span>
+    <span class="c1">#    include        fastcgi_params;</span>
+    <span class="c1">#}</span>
+
+    <span class="c1"># deny access to .htaccess files, if Apache's document root</span>
+    <span class="c1"># concurs with nginx's one</span>
+    <span class="c1">#</span>
+    <span class="c1">#location ~ /\.ht {</span>
+    <span class="c1">#    deny  all;</span>
+    <span class="c1">#}</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+:ET

@@ -1,0 +1,608 @@
+I"A�<p>Go语言的入坑之旅就要从这里开始了。入坑之前，推荐先看看这篇博客，Go语言fmt包Printf方法，在调试时是非常用用的。传送门<a href="http://waliblog.com/go/2018/02/28/fmtPrintf.html" title="http://waliblog.com/go/2018/02/28/fmtPrintf.html" target="_blank">http://waliblog.com/go/2018/02/28/fmtPrintf.html</a></p>
+
+<blockquote>
+  <p>Go语言不需要在语句或者声明的末尾添加分号，除非一行上有多条语句</p>
+</blockquote>
+
+<h1 id="1命名">1.命名</h1>
+
+<p>　　●一个名字必须以一个字母（Unicode字母）或下划线开头，后面可以跟任意数量的字母、数字或下划线</p>
+
+<p>　　●区分大小写</p>
+
+<p>　　●Go语言程序员推荐使用 驼峰式 命名</p>
+
+<h1 id="2关键字">2.关键字</h1>
+
+<ul>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>break</td>
+          <td>default</td>
+          <td>func</td>
+          <td>interface</td>
+          <td>select</td>
+        </tr>
+        <tr>
+          <td>case</td>
+          <td>defer</td>
+          <td>go</td>
+          <td>map</td>
+          <td>struct</td>
+        </tr>
+        <tr>
+          <td>chan</td>
+          <td>else</td>
+          <td>goto</td>
+          <td>package</td>
+          <td>switch</td>
+        </tr>
+        <tr>
+          <td>const</td>
+          <td>fallthrough</td>
+          <td>if</td>
+          <td>range</td>
+          <td>type</td>
+        </tr>
+        <tr>
+          <td>continue</td>
+          <td>for</td>
+          <td>import</td>
+          <td>return</td>
+          <td>var</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ul>
+
+<blockquote>
+  <p>预定义的名字，主要对应内建的常量、类型和函数</p>
+</blockquote>
+
+<h3 id="01内建常量">01.内建常量</h3>
+<ul>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>true</td>
+          <td>false</td>
+          <td>iota</td>
+          <td>nil</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ul>
+
+<h3 id="02内建类型">02.内建类型</h3>
+<ul>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>int</td>
+          <td>int8</td>
+          <td>int16</td>
+          <td>int32</td>
+          <td>int64</td>
+          <td> </td>
+        </tr>
+        <tr>
+          <td>uint</td>
+          <td>uint8</td>
+          <td>uint16</td>
+          <td>uint32</td>
+          <td>uint64</td>
+          <td>uintptr</td>
+        </tr>
+        <tr>
+          <td>float32</td>
+          <td>float64</td>
+          <td>complex128</td>
+          <td>complex64</td>
+          <td> </td>
+          <td> </td>
+        </tr>
+        <tr>
+          <td>bool</td>
+          <td>byte</td>
+          <td>rune</td>
+          <td>string</td>
+          <td>error</td>
+          <td> </td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ul>
+
+<h3 id="03内建函数">03.内建函数</h3>
+<ul>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>make</td>
+          <td>len</td>
+          <td>cap</td>
+          <td>new</td>
+          <td>append</td>
+          <td>copy</td>
+          <td>close</td>
+          <td>delete</td>
+        </tr>
+        <tr>
+          <td>complex</td>
+          <td>real</td>
+          <td>imag</td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+        </tr>
+        <tr>
+          <td>panic</td>
+          <td>recover</td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ul>
+
+<h1 id="3声明">3.声明</h1>
+
+<p>Go语言主要有四种类型的声明语句：<code class="language-plaintext highlighter-rouge">var</code>、<code class="language-plaintext highlighter-rouge">const</code>、<code class="language-plaintext highlighter-rouge">type</code>和<code class="language-plaintext highlighter-rouge">func</code>，分别对应<code class="language-plaintext highlighter-rouge">变量</code>、<code class="language-plaintext highlighter-rouge">常量</code>、<code class="language-plaintext highlighter-rouge">类型</code>和<code class="language-plaintext highlighter-rouge">函数实体对象</code>的声明</p>
+
+<h1 id="4常量">4.常量</h1>
+
+<p>常量表达式的值在编译期计算，而不是在运行期。每种常量的潜在类型都是基础类型：boolean、string或数字。</p>
+
+<p>一个常量的声明语句定义了常量的名字，和变量的声明语法类似，常量的值不可修改。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">filename</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">test.txt</span><span class="dl">'</span>
+<span class="kd">const</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span><span class="mi">4</span>
+<span class="c1">//或者</span>
+<span class="kd">const</span> <span class="p">(</span>
+   <span class="nx">filename</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">test.txt</span><span class="dl">'</span>
+   <span class="nx">a</span><span class="p">,</span><span class="nx">b</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span><span class="mi">4</span>
+<span class="p">)</span>
+<span class="c1">//如果是批量声明的常量，除了第一个外其它的常量右边的初始化表达式都可以省略，如果省略初始化表达式则表示使用前面常量的初始化表达式写法，对应的常量类型也一样的</span>
+<span class="kd">const</span> <span class="p">(</span>
+	<span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span>
+	<span class="nx">b</span>
+	<span class="nx">c</span> <span class="o">=</span> <span class="mi">2</span>
+	<span class="nx">d</span>
+<span class="p">)</span>
+
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">,</span><span class="nx">c</span><span class="p">,</span><span class="nx">d</span><span class="p">)</span>  <span class="c1">//1,1,2,2</span>
+</code></pre></div></div>
+<h3 id="01特殊常量枚举">01.特殊常量(枚举)</h3>
+
+<p>Go语言是没有枚举这个类型，不过用<code class="language-plaintext highlighter-rouge">const</code>关键字可以定义一组数据来当枚举使用。常量声明可以使用iota常量生成器初始化。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">type</span> <span class="nx">Weekday</span> <span class="nx">int</span>
+
+<span class="kd">const</span> <span class="p">(</span>
+    <span class="nx">sunday</span>  <span class="nx">Weekday</span> <span class="o">=</span> <span class="nx">iota</span>  <span class="c1">//iota将会被置为0，然后在每一个有常量声明的行加一</span>
+	<span class="nx">monday</span>
+	<span class="nx">tuesday</span>
+	<span class="nx">wednesday</span>
+	<span class="nx">thursday</span>
+	<span class="nx">firday</span>
+	<span class="nx">saturday</span>
+<span class="p">)</span>
+
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">sunday</span><span class="p">,</span><span class="nx">monday</span><span class="p">,</span><span class="nx">tuesday</span><span class="p">,</span><span class="nx">wednesday</span><span class="p">,</span><span class="nx">thursday</span><span class="p">,</span><span class="nx">firday</span><span class="p">,</span><span class="nx">saturday</span><span class="p">)</span>   <span class="c1">//0 1 2 3 4 5 6</span>
+
+<span class="kd">const</span> <span class="p">(</span>
+	<span class="nx">_</span> <span class="o">=</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="nx">iota</span><span class="p">)</span>    <span class="c1">// _</span>
+	<span class="nx">Kib</span>  <span class="c1">//1024</span>
+	<span class="nx">Mib</span>  <span class="c1">//1048576</span>
+	<span class="nx">Gib</span>  <span class="c1">//1073741824</span>
+	<span class="nx">Tib</span>  <span class="c1">//1099511627776   (exceeds 1 &lt;&lt; 32)</span>
+	<span class="nx">Pib</span>  <span class="c1">//1125899906842624</span>
+	<span class="nx">EiB</span>  <span class="c1">// 1152921504606846976</span>
+	<span class="nx">ZiB</span>  <span class="c1">// 1180591620717411303424    (exceeds 1 &lt;&lt; 64)</span>
+	<span class="nx">YiB</span> <span class="c1">// 1208925819614629174706176</span>
+<span class="p">)</span>
+
+</code></pre></div></div>
+
+<h1 id="5变量">5.变量</h1>
+
+<p>变量分为<code class="language-plaintext highlighter-rouge">普通变量</code>和<code class="language-plaintext highlighter-rouge">指针变量</code>。</p>
+
+<blockquote>
+  <p>变量声明后必须使用</p>
+</blockquote>
+
+<blockquote>
+  <p>语法 var 变量名字 类型 = 表达式</p>
+</blockquote>
+
+<p>其中“类型”或“= 表达式”两个部分可以省略其中的一个。如果省略的是类型信息，那么将根据初始化表达式来推导变量的类型信息。如果初始化表达式被省略，那么将用零值初始化该变量。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">num</span> <span class="nx">int</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="kd">var</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span> <span class="nx">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span><span class="mi">3</span>
+</code></pre></div></div>
+
+<h3 id="01省略表达式">01.省略表达式</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>类型对应的零值</th>
+      <th>值</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>数值</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>布尔</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td>字符串</td>
+      <td>空字符串</td>
+    </tr>
+    <tr>
+      <td>接口或引用类型包括(slice、指针、map、chan和函数)</td>
+      <td>nil</td>
+    </tr>
+    <tr>
+      <td>数组或结构体等聚合类型</td>
+      <td>每个元素或字段都是对应该类型的零值</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">a</span> <span class="nx">int</span>   
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">println</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>   <span class="c1">//输出：0</span>
+
+<span class="kd">var</span> <span class="nx">bool</span> <span class="nb">Boolean</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">println</span><span class="p">(</span><span class="nx">bool</span><span class="p">)</span> <span class="c1">//输出: false</span>
+
+<span class="kd">var</span> <span class="nx">str</span> <span class="nb">String</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">println</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span>  <span class="c1">//输出: ""</span>
+
+<span class="c1">//省略类型，类型由初始化表达式推导</span>
+
+<span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="dl">"</span><span class="s2">%T = %d</span><span class="dl">"</span><span class="p">,</span><span class="nx">a</span><span class="p">,</span><span class="nx">a</span><span class="p">)</span>  <span class="c1">//int = 1</span>
+
+<span class="kd">var</span> <span class="nx">str</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">string</span><span class="dl">"</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="dl">"</span><span class="s2">%T = %s</span><span class="dl">"</span><span class="p">,</span><span class="nx">str</span><span class="p">,</span><span class="nx">str</span><span class="p">)</span> <span class="c1">//string = string</span>
+</code></pre></div></div>
+
+<h3 id="02简短变量声明">02.简短变量声明</h3>
+
+<p>简短变量声明被广泛用于大部分的局部变量的声明和初始化。var形式的声明语句往往是用于需要显式指定变量类型地方，或者因为变量稍后会被重新赋值而初始值无关紧要的地方</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">a</span><span class="p">,</span><span class="nx">b</span> <span class="p">:</span><span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="dl">"</span><span class="s2">%d,%d</span><span class="dl">"</span><span class="p">,</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>简短变量声明左边的变量可能并不是全部都是刚刚声明的。如果有一些已经在相同的词法域声明过了，那么简短变量声明语句对这些已经声明过的变量就只有赋值行为了</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">in</span><span class="p">,</span><span class="nx">err</span> <span class="p">:</span><span class="o">=</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Open</span><span class="p">(</span><span class="nx">infile</span><span class="p">)</span>  <span class="c1">//err是声明</span>
+<span class="c1">//...</span>
+<span class="nx">out</span><span class="p">,</span><span class="nx">err</span> <span class="p">:</span><span class="o">=</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">outfile</span><span class="p">)</span>  <span class="c1">//err是赋值，因为之前声明过了</span>
+
+<span class="c1">//简短变量声明语句中必须至少要声明一个新的变量，下面的代码将不能编译通过：</span>
+<span class="nx">f</span><span class="p">,</span> <span class="nx">err</span> <span class="p">:</span><span class="o">=</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Open</span><span class="p">(</span><span class="nx">infile</span><span class="p">)</span>
+<span class="c1">// ...</span>
+<span class="nx">f</span><span class="p">,</span> <span class="nx">err</span> <span class="p">:</span><span class="o">=</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">outfile</span><span class="p">)</span> <span class="c1">// compile error: no new variables</span>
+</code></pre></div></div>
+
+<h1 id="6new函数">6.new函数</h1>
+
+<p>另一个创建变量的方法是调用用内建的new函数。表达式new(T)将创建一个T类型的匿名变量，初始化为T类型的零值，然后返回变量地址，返回的指针类型为*T</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">p</span> <span class="p">:</span><span class="o">=</span> <span class="k">new</span><span class="p">(</span><span class="nx">int</span><span class="p">)</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="o">*</span><span class="nx">p</span><span class="p">)</span>
+
+<span class="o">*</span><span class="nx">p</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="o">*</span><span class="nx">p</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h1 id="7变量声明周期">7.变量声明周期</h1>
+
+<p>　　●变量的生命周期指的是在程序运行期间变量有效存在的时间间隔</p>
+
+<p>　　●对于在包一级声明的变量来说，它们的生命周期和整个程序的运行周期是一致的</p>
+
+<p>　　●局部变量的声明周期则是动态的：每次从创建一个新变量的声明语句开始，直到该变量不再被引用为止，然后变量的存储空间可能被回收</p>
+
+<p>　　●函数的参数变量和返回值变量都是局部变量。它们在函数每次被调用的时候创建,调用完后被销毁</p>
+
+<h1 id="8作用域">8.作用域</h1>
+
+<p>　　●一个声明语句将程序中的实体和一个名字关联，比如一个函数或一个变量。声明语句的作用域<code class="language-plaintext highlighter-rouge">是指源代码中可以有效使用这个名字的范围</code></p>
+
+<p>　　●不要将作用域和生命周期混为一谈。声明语句的作用域<code class="language-plaintext highlighter-rouge">对应的是一个源代码的文本区域</code>；它是一个<code class="language-plaintext highlighter-rouge">编译时的属性</code>。一个变量的生命周期是<code class="language-plaintext highlighter-rouge">指程序运行时变量存在的有效时间段，在此时间区域内它可以被程序的其他部分引用；是一个运行时的概念</code></p>
+
+<p>　　●<code class="language-plaintext highlighter-rouge">句法块</code>是由花括弧所包含的一系列语句，就像函数体或循环体花括弧包裹的内容一样。句法块内部声明的名字是无法被外部块访问的。这个块决定了内部声明的名字的作用域范围</p>
+
+<p>　　●<code class="language-plaintext highlighter-rouge">词法块</code>声明在代码中并未显式地使用花括号包裹起来</p>
+
+<p>　　●<code class="language-plaintext highlighter-rouge">全局词法块</code>对全局的源代码来说，存在一个整体的词法块，称为全局词法块。对于每个包；每个for、if和switch语句，也都对应词法块；每个switch或select的分支也有独立的语法块；当然也包括显式书写的词法块（花括弧包含的语句）</p>
+
+<p>　　●声明语句对应的词法域决定了<code class="language-plaintext highlighter-rouge">作用域范围的大小</code>，对于<code class="language-plaintext highlighter-rouge">内置的类型</code>、<code class="language-plaintext highlighter-rouge">函数和常量</code>，比如int、len和true等是在全局作用域的，因此可以在整个程序中直接使用。任何在在<code class="language-plaintext highlighter-rouge">函数外部</code>（也就是包级语法域）声明的名字可以在同一个包的任何源文件中访问的。对于导入的包，例如tempconv导入的fmt包，则是对应<code class="language-plaintext highlighter-rouge">源文件级</code>的作用域，因此只能在当前的文件中访问导入的fmt包，当前包的其它源文件无法访问在当前源文件导入的包。还有许多声明语句，比如tempconv.CToF函数中的变量c，则是<code class="language-plaintext highlighter-rouge">局部作用域</code>的，它只能在函数内部（甚至只能是局部的某些部分）访问</p>
+
+<p>　　●控制流标号，就是break、continue或goto语句后面跟着的那种标号，则是<code class="language-plaintext highlighter-rouge">函数级的作用域</code></p>
+
+<p>　　●一个程序可能包含多个同名的声明，只要它们在不同的词法域就没有关系。</p>
+
+<p>　　●如果查找失败，则报告“未声明的名字”这样的错误。如果该名字在内部和外部的块分别声明过，则内部块的声明首先被找到。在这种情况下，内部声明屏蔽了外部同名的声明，让外部的声明的名字无法被访问：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">func</span> <span class="nx">f</span><span class="p">()</span> <span class="p">{}</span>
+<span class="kd">var</span> <span class="nx">g</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">g</span><span class="dl">"</span>
+<span class="nx">func</span> <span class="nx">main</span><span class="p">(){</span>
+  <span class="nl">f</span> <span class="p">:</span><span class="o">=</span> <span class="dl">"</span><span class="s2">f</span><span class="dl">"</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span>    <span class="c1">//"f";变量f屏蔽了func f</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">g</span><span class="p">)</span>    <span class="c1">//"g";包级别</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">h</span><span class="p">)</span>    <span class="c1">//未定义，报错</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>示例一</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nl">x</span> <span class="p">:</span><span class="o">=</span> <span class="dl">"</span><span class="s2">hello!</span><span class="dl">"</span>    <span class="c1">//函数级别作用域  </span>
+    <span class="k">for</span> <span class="nx">i</span> <span class="p">:</span><span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">len</span><span class="p">(</span><span class="nx">x</span><span class="p">);</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>   <span class="c1">//for声明了隐式的词法域部分的作用域，相当于for(i := 0; i &lt; len(x); i++) 只不过GO中的for是不需要加花括号的</span>
+       <span class="na">x</span> <span class="p">:</span><span class="o">=</span> <span class="nx">x</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>     <span class="c1">//在for中声明了x，和for外面的x不同，只不过名称相同</span>
+       <span class="k">if</span> <span class="nx">x</span> <span class="o">!=</span> <span class="dl">'</span><span class="s1">!</span><span class="dl">'</span> <span class="p">{</span>  <span class="c1">// 相当于if( x != '!') x是for中x</span>
+          <span class="na">x</span> <span class="p">:</span><span class="o">=</span> <span class="nx">x</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">A</span><span class="dl">'</span> <span class="o">-</span> <span class="dl">'</span><span class="s1">a</span><span class="dl">'</span>   <span class="c1">//在if中声明x，与for外x,for中声明x不同</span>
+          <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="dl">"</span><span class="s2">%c</span><span class="dl">"</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="c1">// "HELLO" (one letter per iteration)</span>
+       <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>示例二</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="nx">x</span> <span class="p">:</span><span class="o">=</span> <span class="mi">3</span><span class="p">;</span> <span class="nx">x</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">{</span> <span class="c1">//if(x :=3; x&gt;5)</span>
+   <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span>
+<span class="p">}</span><span class="k">else</span> <span class="k">if</span> <span class="nx">y</span> <span class="p">:</span><span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="nx">x</span> <span class="o">==</span> <span class="nx">y</span><span class="p">{</span>
+   <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="dl">"</span><span class="s2">y=%d,x=%d</span><span class="dl">"</span><span class="p">,</span><span class="nx">y</span><span class="p">,</span><span class="nx">x</span><span class="p">)</span>
+<span class="p">}</span><span class="k">else</span><span class="p">{</span>
+   <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="p">)</span>  <span class="c1">//3,2</span>
+<span class="p">}</span>
+
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="p">)</span>  <span class="c1">//报错，x,y未定义，不能访问</span>
+</code></pre></div></div>
+<p>第一个if，显示声明了x作用域属于第一个if的。else if中<code class="language-plaintext highlighter-rouge">fmt.Printf("y=%d,x=%d",y,x)</code>是可以访问到x，只不过这里条件不成立。else 中可以访问<code class="language-plaintext highlighter-rouge">x,y</code>，else后面的语句也是属于if作用域的。最后一个<code class="language-plaintext highlighter-rouge">fmt</code>输出不能输出，原因就是x,y声明是在if内，局部作用域，外部是不能访问的。</p>
+
+<p>示例三</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="nx">f</span><span class="p">,</span> <span class="nx">err</span> <span class="p">:</span><span class="o">=</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Open</span><span class="p">(</span><span class="nx">fname</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="nx">nil</span> <span class="p">{</span> <span class="c1">// compile error: unused: f</span>
+   <span class="k">return</span> <span class="nx">err</span>
+<span class="p">}</span>
+
+<span class="nx">f</span><span class="p">.</span><span class="nx">ReadByte</span><span class="p">()</span> <span class="c1">// compile error: undefined f</span>
+<span class="nx">f</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>    <span class="c1">// compile error: undefined f</span>
+
+<span class="c1">//同样f声明的变量的作用域是局部的，只能作用域if，可以这样做修改</span>
+
+<span class="nx">f</span><span class="p">,</span><span class="nx">err</span> <span class="p">:</span><span class="o">=</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Open</span><span class="p">(</span><span class="nx">fname</span><span class="p">)</span>
+<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="nx">nil</span>  <span class="k">return</span> <span class="nx">err</span>
+
+<span class="nx">f</span><span class="p">.</span><span class="nx">ReadByte</span><span class="p">()</span>
+<span class="nx">f</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h1 id="9赋值">9.赋值</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">x</span> <span class="nx">int</span>
+<span class="kd">var</span> <span class="nx">flag</span> <span class="nx">bool</span>
+<span class="kd">var</span> <span class="nx">str</span> <span class="nx">string</span>
+
+<span class="nx">x</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nx">flag</span> <span class="o">=</span> <span class="kc">true</span>
+<span class="nx">str</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">hello world</span><span class="dl">"</span>
+
+<span class="c1">//二元算术运算符和赋值语句的复合操作有一个简洁形式</span>
+<span class="nx">x</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="c1">//数值变量也可以支持++递增和--递减语句（译注：自增和自减是语句，而不是表达式，因此x = i++之类的表达式是错误的）：</span>
+<span class="kd">var</span> <span class="nx">w</span> <span class="nx">int</span>
+<span class="nx">v</span> <span class="p">:</span><span class="o">=</span> <span class="mi">1</span>
+
+<span class="nx">w</span> <span class="o">=</span> <span class="nx">v</span><span class="o">++</span> <span class="c1">//(错误)</span>
+<span class="nx">v</span><span class="o">++</span>
+<span class="nx">w</span> <span class="o">=</span> <span class="nx">v</span>  <span class="c1">//(正确)</span>
+
+<span class="c1">//元组赋值</span>
+<span class="nx">x</span><span class="p">,</span><span class="nx">y</span> <span class="p">:</span><span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span>
+<span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="o">=</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">x</span>
+</code></pre></div></div>
+
+<h1 id="10条件语句">10.条件语句</h1>
+
+<p>条件语句需要开发者通过指定一个或多个条件，并通过测试条件是否为 true 来决定是否执行指定语句，并在条件为 false 的情况在执行另外的语句。</p>
+
+<h3 id="01if语句">01.if语句</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">a</span> <span class="p">:</span><span class="o">=</span> <span class="mi">10</span>
+<span class="k">if</span> <span class="nx">a</span> <span class="o">&gt;</span><span class="mi">5</span><span class="p">{</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="dl">"</span><span class="s2">a大于5</span><span class="dl">"</span><span class="p">)</span>
+<span class="p">}</span><span class="k">else</span><span class="p">{</span>
+    <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="dl">"</span><span class="s2">a小于5</span><span class="dl">"</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">//输出a大于5，也可这样写 </span>
+<span class="k">if</span> <span class="nx">a</span> <span class="p">:</span><span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="nx">a</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="p">{</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="dl">"</span><span class="s2">a大于5</span><span class="dl">"</span><span class="p">)</span>
+<span class="p">}</span><span class="k">else</span><span class="p">{</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="dl">"</span><span class="s2">a小于5</span><span class="dl">"</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>if语句隐式作用域，条件里可以赋值，但作用域就在if语句中包括else，if之外是不能访问变量。</p>
+
+<h3 id="02switch语句">02.switch语句</h3>
+
+<p>switch 语句用于基于不同条件执行不同动作</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">func</span> <span class="nb">eval</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span> <span class="nx">int</span><span class="p">,</span> <span class="nx">op</span> <span class="nx">string</span><span class="p">)</span> <span class="nx">int</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">result</span> <span class="nx">int</span>
+    <span class="k">switch</span> <span class="nx">op</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="dl">"</span><span class="s2">+</span><span class="dl">"</span><span class="p">:</span>
+        <span class="nx">result</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span>
+    <span class="k">case</span> <span class="dl">"</span><span class="s2">-</span><span class="dl">"</span><span class="p">:</span>
+        <span class="nx">result</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span>
+    <span class="k">case</span> <span class="dl">"</span><span class="s2">*</span><span class="dl">"</span><span class="p">:</span>
+        <span class="nx">result</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">*</span> <span class="nx">b</span>
+    <span class="k">case</span> <span class="dl">"</span><span class="s2">/</span><span class="dl">"</span><span class="p">:</span>
+        <span class="nx">result</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">/</span> <span class="nx">b</span>
+    <span class="k">default</span><span class="p">:</span>
+        <span class="nx">panic</span><span class="p">(</span><span class="dl">"</span><span class="s2">没有该操作符</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">op</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">result</span>
+<span class="p">}</span>
+
+<span class="nl">s</span> <span class="p">:</span><span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="dl">"</span><span class="s2">+</span><span class="dl">"</span><span class="p">)</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>  <span class="c1">//9</span>
+
+</code></pre></div></div>
+<p>　　●switch会自动<code class="language-plaintext highlighter-rouge">break</code>，除非使用<code class="language-plaintext highlighter-rouge">fallthrough</code></p>
+
+<p>　　●switch后面可以没有表达式</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">func</span> <span class="nx">grad</span><span class="p">(</span><span class="nx">score</span> <span class="nx">int</span><span class="p">)</span> <span class="nx">string</span>  <span class="p">{</span>
+    <span class="nl">g</span> <span class="p">:</span><span class="o">=</span> <span class="dl">""</span>
+    <span class="k">switch</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="nx">score</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">:</span>
+        <span class="nx">g</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">F</span><span class="dl">"</span>
+    <span class="k">case</span> <span class="nx">score</span> <span class="o">&lt;</span> <span class="mi">70</span><span class="p">:</span>
+        <span class="nx">g</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">E</span><span class="dl">"</span>
+    <span class="k">case</span> <span class="nx">score</span> <span class="o">&lt;</span> <span class="mi">80</span><span class="p">:</span>
+        <span class="nx">g</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">D</span><span class="dl">"</span>
+    <span class="k">case</span> <span class="nx">score</span> <span class="o">&lt;</span> <span class="mi">90</span><span class="p">:</span>
+        <span class="nx">g</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">C</span><span class="dl">"</span>
+    <span class="k">case</span> <span class="nx">score</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="nx">g</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">B</span><span class="dl">"</span>
+    <span class="k">case</span> <span class="nx">score</span> <span class="o">==</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="nx">g</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">A</span><span class="dl">"</span>
+    <span class="na">default</span><span class="p">:</span>
+        <span class="nx">panic</span><span class="p">(</span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Sprintf</span><span class="p">(</span><span class="dl">"</span><span class="s2">出错：%d</span><span class="dl">"</span><span class="p">,</span><span class="nx">score</span><span class="p">))</span>
+    <span class="p">}</span>
+    <span class="k">return</span>  <span class="nx">g</span>
+<span class="p">}</span>
+
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">grad</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>  <span class="c1">//A</span>
+</code></pre></div></div>
+
+<h3 id="03select语句">03.select语句</h3>
+
+<p>select是Go中的一个控制结构，类似于用于通信的switch语句。每个case必须是一个通信操作，要么是发送要么是接收。select随机执行一个可运行的case。如果没有case可运行，它将阻塞，直到有case可运行。一个默认的子句应该总是可运行的。</p>
+
+<p>select语法</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">select</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="nx">communication</span> <span class="nx">clause</span>  <span class="p">:</span>
+       <span class="nx">statement</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>
+    <span class="k">case</span> <span class="nx">communication</span> <span class="nx">clause</span>  <span class="p">:</span>
+       <span class="nx">statement</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> 
+    <span class="c1">//你可以定义任意数量的 case</span>
+    <span class="k">default</span> <span class="p">:</span> <span class="c1">//可选</span>
+       <span class="nx">statement</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>　　●每个case都必须是一个通信</p>
+
+<p>　　●所有channel表达式都会被求值</p>
+
+<p>　　●所有被发送的表达式都会被求值</p>
+
+<p>　　●如果任意某个通信可以进行，它就执行；其他被忽略。</p>
+
+<p>　　●如果有多个case都可以运行，Select会随机公平地选出一个执行。其他不会执行。否则</p>
+
+<p>　　　　1.如果有default子句，则执行该语句。</p>
+
+<p>　　　　2.如果没有default字句，select将阻塞，直到某个通信可以运行；Go不会重新对channel或值进行求值。</p>
+
+<h1 id="11for语句">11.for语句</h1>
+
+<p>　　●for的条件里不需要括号</p>
+
+<p>　　●for的条件里可以省略初始条件，结束条件，递增表达式</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">sum</span> <span class="p">:</span><span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="nx">i</span> <span class="p">:</span><span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">{</span>
+  <span class="nx">sum</span> <span class="o">+=</span> <span class="nx">i</span>
+<span class="p">}</span>
+
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">sum</span><span class="p">)</span>  <span class="c1">//5050</span>
+</code></pre></div></div>
+
+<p>for写十进制转二进制</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">func</span> <span class="nx">convertToBin</span><span class="p">(</span><span class="nx">n</span> <span class="nx">int</span><span class="p">)</span> <span class="nx">string</span><span class="p">{</span>
+  <span class="nl">result</span> <span class="p">:</span><span class="o">=</span> <span class="dl">""</span>
+  <span class="k">for</span> <span class="p">;</span> <span class="nx">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">n</span> <span class="o">/=</span> <span class="mi">2</span><span class="p">{</span>
+    <span class="nl">lsb</span> <span class="p">:</span><span class="o">=</span> <span class="nx">n</span> <span class="o">%</span> <span class="mi">2</span>
+	<span class="nx">result</span> <span class="o">=</span> <span class="nx">strconv</span><span class="p">.</span><span class="nx">Itoa</span><span class="p">(</span><span class="nx">lsb</span><span class="p">)</span> <span class="o">+</span> <span class="nx">result</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">result</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="01无限循环">01.无限循环</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="p">{</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="dl">"</span><span class="s2">1</span><span class="dl">"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="02range变量for">02.range变量for</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//变量字符串</span>
+<span class="nx">str</span> <span class="p">:</span><span class="o">=</span> <span class="dl">"</span><span class="s2">hello world!</span><span class="dl">"</span>
+<span class="k">for</span> <span class="nx">_</span><span class="p">,</span><span class="nx">ch</span> <span class="p">:</span><span class="o">=</span> <span class="nx">range</span> <span class="nx">str</span><span class="p">{</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="dl">"</span><span class="s2">%c</span><span class="dl">"</span><span class="p">,</span><span class="nx">ch</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">//变量数组</span>
+<span class="nl">slice</span> <span class="p">:</span><span class="o">=</span> <span class="p">[]</span><span class="nx">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">}</span>
+<span class="k">for</span> <span class="nx">k</span><span class="p">,</span><span class="nx">v</span> <span class="p">:</span><span class="o">=</span> <span class="nx">range</span> <span class="nx">slice</span><span class="p">{</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="dl">"</span><span class="s2">slice[%d] = %d</span><span class="se">\n</span><span class="dl">"</span><span class="p">,</span><span class="nx">k</span><span class="p">,</span><span class="nx">v</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="12指针变量">12.指针变量</h1>
+
+<p>Go 语言的取地址符是<code class="language-plaintext highlighter-rouge">&amp;</code>，放到一个变量前使用就会返回相应变量的内存地址。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">a</span> <span class="nx">int</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">a</span><span class="p">)</span>  <span class="c1">//0xc042058080是a变量在内存中的一块地址，每台电脑的值可能会不一样</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>指针变量：一个指针变量可以指向任何一个值的内存地址它指向那个值的内存地址</p>
+</blockquote>
+
+<blockquote>
+  <p>访问指针变量的值：在指针类型前面加上 * 号（前缀）来获取指针所指向的内容</p>
+</blockquote>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">a</span> <span class="nx">int</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="kd">var</span> <span class="nx">ptr</span> <span class="o">*</span><span class="nx">int</span>
+<span class="nx">ptr</span> <span class="o">=</span> <span class="o">&amp;</span><span class="nx">a</span>
+<span class="o">*</span><span class="nx">ptr</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>  <span class="c1">//10</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="o">*</span><span class="nx">ptr</span><span class="p">)</span>  <span class="c1">//10</span>
+</code></pre></div></div>
+
+:ET

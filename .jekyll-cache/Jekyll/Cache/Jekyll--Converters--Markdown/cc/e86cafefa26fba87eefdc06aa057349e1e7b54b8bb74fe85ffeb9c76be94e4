@@ -1,0 +1,33 @@
+I"�<p>系统自带安装的 git 无法使用 tab 来补全命令。可以由以下方法，解决此问题。</p>
+
+<h1 id="1下载源码">1.下载源码</h1>
+
+<p>在github的git上找到<code class="language-plaintext highlighter-rouge">git-completion.bash</code>文件，<a href="https://github.com/git/git/blob/master/contrib/completion/git-completion.bash" title="https://github.com/git/git/blob/master/contrib/completion/git-completion.bash" target="_blank">传送门</a>，也可在自己在github中git中查找<code class="language-plaintext highlighter-rouge">git -&gt; contrib -&gt; completion -&gt; git-completion.bash</code>按目录查找下载下来，放在服务器上。</p>
+
+<h1 id="2复制git-completionbash文件">2.复制git-completion.bash文件</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cp ~/git-completion.bash /etc/bash_completion.d/
+</code></pre></div></div>
+
+<p>小菜这里将<code class="language-plaintext highlighter-rouge">git-completion.bash</code>文件上传在<code class="language-plaintext highlighter-rouge">~</code></p>
+
+<h1 id="3加载-bash-脚本">3.加载 bash 脚本</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>. /etc/bash_completion.d/git-completion.bash
+</code></pre></div></div>
+
+<h1 id="4自动加载脚本">4.自动加载脚本</h1>
+
+<p>编辑<code class="language-plaintext highlighter-rouge">/etc/profile</code> 和 <code class="language-plaintext highlighter-rouge">~/.bashrc</code>文件中加入下面代码</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>if [ -f /etc/bash_completion.d/git-completion.bash ]; then
+. /etc/bash_completion.d/git-completion.bash
+fi
+</code></pre></div></div>
+
+<p>在执行下</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>. ~/.bashrc
+</code></pre></div></div>
+
+:ET

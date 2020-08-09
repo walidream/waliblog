@@ -1,0 +1,379 @@
+I"��<p>复合数据类型小菜主要讨论，记录五种类型一一数组、slice、map、结构体、JSON。数组和结构体是聚合类型，他们的值由许多元素或成员字段的值组成。数组是由同构的元素组成-每个数组元素都是完全相同的类型。结构体则是由异构的元素组成的。数组和结构体都是有固定内存大小的数据结构。相比之下，slice和map则是动态的数据结构，它们将根据需要动态增长。</p>
+
+<h1 id="1数组">1.数组</h1>
+
+<blockquote>
+  <p>数组拷贝是值拷贝，不是引用类型拷贝</p>
+</blockquote>
+
+<p>数组是一个由固定长度的特定类型元素组成的序列，一个数组可以由零个或多个元素组成。因为<code class="language-plaintext highlighter-rouge">数组的长度是固定的</code>，因此在Go语言中很少直接使用数组。</p>
+
+<p>数组的每个元素可以通过索引下标来访问，索引下标的范围是从0开始到数组长度减1的位置。内置的len函数将返回数组中元素的个数</p>
+
+<h3 id="01数组声明">01.数组声明</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//声明长度为3，数据类型为int，变量名arr1数组</span>
+<span class="kd">var</span> <span class="nx">arr1</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="nx">int</span>  
+
+<span class="c1">//声明长度为5，数据类型为int并初始化值，变量名为arr2数组</span>
+<span class="nx">arr2</span> <span class="p">:</span><span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="nx">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">}</span>
+
+<span class="c1">//声明并赋值</span>
+<span class="kd">var</span> <span class="nx">arr3</span> <span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="nx">int</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="nx">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">}</span>
+
+<span class="c1">//使用...来声明数组</span>
+<span class="nl">arr4</span> <span class="p">:</span><span class="o">=</span> <span class="p">[...]</span><span class="nx">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">}</span>
+
+<span class="c1">//初始化部分值</span>
+<span class="nl">arr5</span> <span class="p">:</span><span class="o">=</span> <span class="p">[...]</span><span class="nx">int</span><span class="p">{</span><span class="mi">50</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span><span class="mi">99</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">}</span>
+
+<span class="c1">//声明二维数组</span>
+<span class="kd">var</span> <span class="nx">arr6</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span><span class="nx">int</span>
+</code></pre></div></div>
+
+<h3 id="02数组遍历">02.数组遍历</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//第一种遍历</span>
+<span class="nx">arr</span> <span class="p">:</span><span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="nx">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">}</span>
+<span class="k">for</span> <span class="nx">i</span> <span class="p">:</span><span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">len</span><span class="p">(</span><span class="nx">arr</span><span class="p">);</span> <span class="nx">i</span><span class="o">++</span><span class="p">{</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">arr</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span>
+<span class="p">}</span>
+<span class="c1">//第二种遍历</span>
+<span class="nl">arr1</span> <span class="p">:</span><span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="nx">int</span><span class="p">{</span><span class="mi">10</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">6</span><span class="p">}</span>
+<span class="k">for</span> <span class="nx">i</span><span class="p">,</span><span class="nx">v</span> <span class="p">:</span><span class="o">=</span> <span class="nx">range</span> <span class="nx">arr1</span><span class="p">{</span>
+ <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span><span class="nx">v</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="2slice">2.Slice</h1>
+
+<blockquote>
+  <p>slice不是值拷贝</p>
+</blockquote>
+
+<p>Slice（切片）代表<code class="language-plaintext highlighter-rouge">变长的序列</code>，序列中每个元素都有<code class="language-plaintext highlighter-rouge">相同的类型</code>。一个slice类型一般写作<code class="language-plaintext highlighter-rouge">[]T</code>，其中T代表slice中元素的类型；<code class="language-plaintext highlighter-rouge">slice的语法和数组很像，只是没有固定长度而已</code>。</p>
+
+<p>一个slice由三个部分构成：<code class="language-plaintext highlighter-rouge">指针</code>、<code class="language-plaintext highlighter-rouge">长度</code>和<code class="language-plaintext highlighter-rouge">容量</code>。指针指向第一个slice元素对应的<code class="language-plaintext highlighter-rouge">底层数组元素的地址</code>，要注意的是slice的<code class="language-plaintext highlighter-rouge">第一个元素并不一定就是数组的第一个元素</code>。slice的切片操作s[i:j]，其中<code class="language-plaintext highlighter-rouge">0 ≤ i≤ j≤ cap(s)</code></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">arr</span> <span class="p">:</span><span class="o">=</span> <span class="p">[...]</span><span class="nx">int</span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">}</span>
+<span class="nl">s</span> <span class="p">:</span><span class="o">=</span> <span class="nx">arr</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>  <span class="c1">//遵循左闭右开原则，即 x&lt;= val &lt;y</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>  <span class="c1">//2,3,4,5 </span>
+
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">arr</span><span class="p">[:</span><span class="mi">6</span><span class="p">])</span>  <span class="c1">//0,1,2,3,4,5</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">arr</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>  <span class="c1">//2,3,4,5,6,7</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">arr</span><span class="p">[:])</span>   <span class="c1">//0,1,2,3,4,5,6,7</span>
+
+</code></pre></div></div>
+
+<h3 id="01slice扩展">01.slice扩展</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">arr</span> <span class="p">:</span><span class="o">=</span> <span class="p">[...]</span><span class="nx">int</span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">}</span>
+
+<span class="nl">s1</span> <span class="p">:</span><span class="o">=</span> <span class="nx">arr</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>  <span class="c1">//[2,3,4,5](6,7) len长度4,cap容量6</span>
+                <span class="c1">// 0,1,2,3, 4,5</span>
+<span class="nx">s2</span> <span class="p">:</span><span class="o">=</span> <span class="nx">s1</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>   <span class="c1">//[5,6] len长度2,cap容量3</span>
+
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">s1</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="c1">//报错，取不到下标为4，切片是对数组view，数组能取到的值就是小于len下标</span>
+
+</code></pre></div></div>
+<p>slice可以向后扩展，但不能向前扩展。扩展条件 <code class="language-plaintext highlighter-rouge">len &lt; cap</code>。</p>
+
+<p>s[i]不可以超越len(s),向后扩展不可以超越底层数组cap(s)</p>
+
+<h3 id="02make函数">02.make函数</h3>
+
+<p>内置的make函数创建一个指定元素类型、长度和容量的slice。容量部分可以省略，在这种情况下，容量将等于长度。</p>
+
+<blockquote>
+  <p>语法：make([]T,len,cap)</p>
+</blockquote>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">sli</span> <span class="p">:</span><span class="o">=</span> <span class="nx">make</span><span class="p">([]</span><span class="nx">int</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="dl">"</span><span class="s2">sli=%v,len = %d,cap=%d</span><span class="dl">"</span><span class="p">,</span><span class="nx">sli</span><span class="p">,</span><span class="nx">len</span><span class="p">(</span><span class="nx">sli</span><span class="p">),</span><span class="nx">cap</span><span class="p">(</span><span class="nx">sli</span><span class="p">))</span>  <span class="c1">//sli=[0,0,0], len = 3,cap = 10</span>
+</code></pre></div></div>
+
+<h3 id="03slice比较">03.slice比较</h3>
+
+<p>slice唯一合法的比较操作是和<code class="language-plaintext highlighter-rouge">nil</code>比较</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="nx">summer</span> <span class="o">==</span> <span class="nx">nil</span> <span class="p">{</span> <span class="cm">/* ... */</span><span class="p">}</span>
+</code></pre></div></div>
+
+<p>一个零值的slice等于nil。一个nil值的slice并没有底层数组。一个nil值的slice的长度和容量都是0，但是也有非nil值的slice的长度和容量也是0的，例如[]int{}或make([]int, 3)[3:]。与任意类型的nil值一样，我们可以用[]int(nil)类型转换表达式来生成一个对应类型slice的nil值</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">s</span> <span class="p">[]</span><span class="nx">int</span>    <span class="c1">// len(s) == 0, s == nil</span>
+<span class="nx">s</span> <span class="o">=</span> <span class="nx">nil</span>        <span class="c1">// len(s) == 0, s == nil</span>
+<span class="nx">s</span> <span class="o">=</span> <span class="p">[]</span><span class="nx">int</span><span class="p">(</span><span class="nx">nil</span><span class="p">)</span> <span class="c1">// len(s) == 0, s == nil</span>
+<span class="nx">s</span> <span class="o">=</span> <span class="p">[]</span><span class="nx">int</span><span class="p">{}</span>    <span class="c1">// len(s) == 0, s != nil</span>
+</code></pre></div></div>
+
+<p>如果你需要测试一个slice是否是空的，使用len(s) == 0来判断，而不应该用s == nil来判断。除了和nil相等比较外，一个nil值的slice的行为和其它任意0长度的slice一样；例如reverse(nil)也是安全的。除了文档已经明确说明的地方，所有的Go语言函数应该以相同的方式对待nil值的slice和0长度的slice。</p>
+
+<h3 id="04append函数向slice追加元素">04.append函数向slice追加元素</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">sli</span> <span class="p">[]</span><span class="nx">int</span>
+
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="dl">"</span><span class="s2">sli = %v, len = %d, cap = %d</span><span class="dl">"</span><span class="p">,</span><span class="nx">sli</span><span class="p">,</span><span class="nx">len</span><span class="p">(</span><span class="nx">sli</span><span class="p">),</span><span class="nx">cap</span><span class="p">(</span><span class="nx">sli</span><span class="p">))</span>  <span class="c1">//[], len = 0,cap = 0</span>
+<span class="nx">sli</span> <span class="o">=</span> <span class="nx">append</span><span class="p">(</span><span class="nx">sli</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="dl">"</span><span class="s2">sli = %v, len = %d, cap = %d</span><span class="dl">"</span><span class="p">,</span><span class="nx">sli</span><span class="p">,</span><span class="nx">len</span><span class="p">(</span><span class="nx">sli</span><span class="p">),</span><span class="nx">cap</span><span class="p">(</span><span class="nx">sli</span><span class="p">))</span>  <span class="c1">//[1,2,3,4], len = 4,cap = 4</span>
+
+<span class="c1">//append追加多个值，甚至可以是slice</span>
+<span class="nx">sli</span> <span class="o">=</span> <span class="nx">append</span><span class="p">(</span><span class="nx">sli</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<h3 id="05append追加原理">05.append追加原理</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">func</span> <span class="nx">appendInt</span><span class="p">(</span><span class="nx">x</span> <span class="p">[]</span><span class="nx">int</span><span class="p">,</span> <span class="nx">y</span> <span class="nx">int</span><span class="p">)</span> <span class="p">[]</span> <span class="nx">int</span><span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">z</span> <span class="p">[]</span><span class="nx">int</span>
+	<span class="nx">zlen</span> <span class="p">:</span><span class="o">=</span> <span class="nx">len</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+	<span class="k">if</span> <span class="nx">zlen</span> <span class="o">&lt;=</span> <span class="nx">cap</span><span class="p">(</span><span class="nx">x</span><span class="p">){</span> 
+	   <span class="nx">z</span> <span class="o">=</span> <span class="nx">x</span><span class="p">[:</span><span class="nx">zlen</span><span class="p">]</span>
+	<span class="p">}</span><span class="k">else</span><span class="p">{</span>
+	   <span class="na">zcap</span> <span class="p">:</span><span class="o">=</span> <span class="nx">zlen</span>
+	   <span class="k">if</span> <span class="nx">zcap</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">*</span><span class="nx">len</span><span class="p">(</span><span class="nx">x</span><span class="p">){</span>
+	     <span class="nx">zcap</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">len</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span>
+	   <span class="p">}</span>
+	   <span class="nx">z</span> <span class="o">=</span> <span class="nx">make</span><span class="p">([]</span><span class="nx">int</span><span class="p">,</span> <span class="nx">zlen</span><span class="p">,</span> <span class="nx">zcap</span><span class="p">)</span>	   
+	   <span class="nx">copy</span><span class="p">(</span><span class="nx">z</span><span class="p">,</span><span class="nx">x</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="nx">z</span><span class="p">[</span><span class="nx">len</span><span class="p">(</span><span class="nx">x</span><span class="p">)]</span> <span class="o">=</span> <span class="nx">y</span>
+	
+	<span class="k">return</span> <span class="nx">z</span>
+<span class="p">}</span>
+
+<span class="nx">func</span> <span class="nx">main</span><span class="p">(){</span>
+   <span class="kd">var</span> <span class="nx">x</span><span class="p">,</span><span class="nx">y</span> <span class="p">[]</span><span class="nx">int</span>
+   <span class="k">for</span> <span class="nx">i</span> <span class="p">:</span><span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">{</span>
+     <span class="nx">y</span> <span class="o">=</span> <span class="nx">appendInt</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span>
+	 <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="dl">"</span><span class="s2">%d cap=%d</span><span class="se">\t</span><span class="s2">%v</span><span class="se">\n</span><span class="dl">"</span><span class="p">,</span><span class="nx">i</span><span class="p">,</span><span class="nx">cap</span><span class="p">(</span><span class="nx">y</span><span class="p">),</span><span class="nx">y</span><span class="p">)</span>
+	 <span class="nx">x</span> <span class="o">=</span> <span class="nx">y</span>
+   <span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">//输出：</span>
+<span class="c1">//0  cap=1    [0]</span>
+<span class="c1">//1  cap=2    [0 1]</span>
+<span class="c1">//2  cap=4    [0 1 2]</span>
+<span class="c1">//3  cap=4    [0 1 2 3]</span>
+<span class="c1">//4  cap=8    [0 1 2 3 4]</span>
+<span class="c1">//5  cap=8    [0 1 2 3 4 5]</span>
+<span class="c1">//6  cap=8    [0 1 2 3 4 5 6]</span>
+<span class="c1">//7  cap=8    [0 1 2 3 4 5 6 7]</span>
+<span class="c1">//8  cap=16   [0 1 2 3 4 5 6 7 8]</span>
+<span class="c1">//9  cap=16   [0 1 2 3 4 5 6 7 8 9]</span>
+</code></pre></div></div>
+
+<p>优化后，向appendInt中传入可变参数</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">func</span> <span class="nx">appendInt</span><span class="p">(</span><span class="nx">x</span> <span class="p">[]</span><span class="nx">int</span><span class="p">,</span> <span class="nx">y</span> <span class="p">...</span><span class="nx">int</span><span class="p">)</span> <span class="p">[]</span> <span class="nx">int</span><span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">z</span> <span class="p">[]</span><span class="nx">int</span>
+    <span class="nx">zlen</span> <span class="p">:</span><span class="o">=</span> <span class="nx">len</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="o">+</span> <span class="nx">len</span><span class="p">(</span><span class="nx">y</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nx">zlen</span> <span class="o">&lt;=</span> <span class="nx">cap</span><span class="p">(</span><span class="nx">x</span><span class="p">){</span> 
+       <span class="nx">z</span> <span class="o">=</span> <span class="nx">x</span><span class="p">[:</span><span class="nx">zlen</span><span class="p">]</span>
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+       <span class="na">zcap</span> <span class="p">:</span><span class="o">=</span> <span class="nx">zlen</span>
+       <span class="k">if</span> <span class="nx">zcap</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">*</span><span class="nx">len</span><span class="p">(</span><span class="nx">x</span><span class="p">){</span>
+    	 <span class="nx">zcap</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">len</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span>
+       <span class="p">}</span>
+       <span class="nx">z</span> <span class="o">=</span> <span class="nx">make</span><span class="p">([]</span><span class="nx">int</span><span class="p">,</span> <span class="nx">zlen</span><span class="p">,</span> <span class="nx">zcap</span><span class="p">)</span>	   
+       <span class="nx">copy</span><span class="p">(</span><span class="nx">z</span><span class="p">,</span><span class="nx">x</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="nx">copy</span><span class="p">(</span><span class="nx">z</span><span class="p">[</span><span class="nx">len</span><span class="p">(</span><span class="nx">x</span><span class="p">):],</span> <span class="nx">y</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="nx">z</span>
+<span class="p">}</span>
+
+<span class="nx">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+   <span class="kd">var</span> <span class="nx">y</span> <span class="p">[]</span><span class="nx">int</span>
+
+   <span class="nx">y</span> <span class="o">=</span> <span class="nx">appendInt</span><span class="p">(</span><span class="nx">y</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">)</span>	
+   <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="dl">"</span><span class="s2">cap=%d</span><span class="se">\t</span><span class="s2">%v</span><span class="se">\n</span><span class="dl">"</span><span class="p">,</span><span class="nx">cap</span><span class="p">(</span><span class="nx">y</span><span class="p">),</span><span class="nx">y</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">//输出：cap=7   [1 2 3 4 5 6 7]</span>
+</code></pre></div></div>
+
+<h3 id="06slice对数组">06.slice对数组</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">arr</span> <span class="p">:</span><span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="nx">int</span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">}</span>
+
+<span class="nl">s</span> <span class="p">:</span><span class="o">=</span> <span class="nx">arr</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+<span class="nx">s1</span> <span class="p">:</span><span class="o">=</span> <span class="nx">append</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+<span class="nx">s2</span> <span class="p">:</span><span class="o">=</span> <span class="nx">append</span><span class="p">(</span><span class="nx">s1</span><span class="p">,</span><span class="mi">7</span><span class="p">)</span>
+<span class="nx">s3</span> <span class="p">:</span><span class="o">=</span> <span class="nx">append</span><span class="p">(</span><span class="nx">s2</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span>
+<span class="nx">s4</span> <span class="p">:</span><span class="o">=</span> <span class="nx">append</span><span class="p">(</span><span class="nx">s3</span><span class="p">,</span><span class="mi">9</span><span class="p">)</span>
+
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>   <span class="c1">//[2,3,4,5]</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">s1</span><span class="p">)</span>  <span class="c1">//[2,3,4,5,6]</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">s2</span><span class="p">)</span>  <span class="c1">//[2,3,4,5,6,7]</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">s3</span><span class="p">)</span>  <span class="c1">//[2,3,4,5,6,7,8]</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">s4</span><span class="p">)</span>  <span class="c1">//[2,3,4,5,6,7,8,9]</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">arr</span><span class="p">)</span> <span class="c1">//[0,1,2,3,4,5]</span>
+</code></pre></div></div>
+
+<p>slice虽然是对数组操作，但是当超出数组边界时，此刻s1,s2,s3,s4都不在对<code class="language-plaintext highlighter-rouge">arr</code>进行view，而是重新在底层<code class="language-plaintext highlighter-rouge">new Array</code>，这步是GO操作的。添加元素时，如果超越cap，系统会重新分配更大的底层数组。现在只有s是对arr的一种view</p>
+
+<p>由于值传递的关系，必须接收append的返回值。</p>
+
+<h3 id="07slice-pushpopcopy">07.slice push,pop,copy</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//向切片push一个值</span>
+<span class="nx">stack</span> <span class="o">=</span> <span class="nx">append</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span><span class="nx">v</span><span class="p">)</span>  <span class="c1">//push v</span>
+
+<span class="c1">//弹出栈顶元素</span>
+<span class="nx">top</span> <span class="p">:</span><span class="o">=</span> <span class="nx">stack</span><span class="p">[</span><span class="nx">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="c1">//返回弹出后元素slice</span>
+<span class="nx">stack</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">[:</span><span class="nx">len</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="c1">//将s2拷贝到s1</span>
+<span class="nx">copy</span><span class="p">(</span><span class="nx">s1</span><span class="p">,</span><span class="nx">s2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="08slice移除">08.slice移除</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">func</span> <span class="nx">remove</span><span class="p">(</span><span class="nx">slice</span> <span class="p">[]</span><span class="nx">int</span><span class="p">,</span> <span class="nx">i</span> <span class="nx">int</span><span class="p">)</span> <span class="p">[]</span><span class="nx">int</span> <span class="p">{</span>
+   <span class="nx">copy</span><span class="p">(</span><span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">:],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
+   <span class="k">return</span> <span class="nx">slice</span><span class="p">[:</span><span class="nx">len</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="nx">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+   <span class="nl">s</span> <span class="p">:</span><span class="o">=</span> <span class="p">[]</span><span class="nx">int</span><span class="p">{</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">}</span>
+   <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">remove</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="c1">// "[5 6 8 9]"</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="3map">3.Map</h1>
+
+<blockquote>
+  <p>Map中的key值是无序的。map[K]V，复合结构map[k1]map[k2]v</p>
+</blockquote>
+
+<p>哈希表是一种巧妙并且实用的数据结构。它是一个<code class="language-plaintext highlighter-rouge">无序</code>的key/value对的集合，其中所有的key都是不同的，然后通过给定的key可以在常数时间复杂度内检索、更新或删除对应的value。</p>
+
+<p>在Go语言中，一个map就是一个<code class="language-plaintext highlighter-rouge">哈希表</code>的引用，map类型可以写为<code class="language-plaintext highlighter-rouge">map[K]V</code>，其中<code class="language-plaintext highlighter-rouge">K</code>和<code class="language-plaintext highlighter-rouge">V</code>分别对应<code class="language-plaintext highlighter-rouge">key</code>和<code class="language-plaintext highlighter-rouge">value</code>。map中所有的key都有相同的类型，所有的value也有着相同的类型，但是key和value之间可以是不同的数据类型。</p>
+
+<h3 id="01创建map">01.创建map</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//第一种</span>
+<span class="kd">var</span> <span class="nx">ages</span> <span class="nx">map</span><span class="p">[</span><span class="nx">string</span><span class="p">]</span><span class="nx">int</span>
+
+<span class="c1">//第二种</span>
+<span class="nx">ages</span> <span class="p">:</span><span class="o">=</span> <span class="nx">make</span><span class="p">(</span><span class="nx">map</span><span class="p">[</span><span class="nx">string</span><span class="p">]</span><span class="nx">int</span><span class="p">)</span>
+<span class="nx">ages</span><span class="p">[</span><span class="dl">"</span><span class="s2">alice</span><span class="dl">"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">31</span>
+<span class="nx">ages</span><span class="p">[</span><span class="dl">"</span><span class="s2">charlie</span><span class="dl">"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">34</span>
+
+<span class="c1">//第三种</span>
+<span class="nx">ages</span> <span class="p">:</span><span class="o">=</span> <span class="nx">map</span><span class="p">[</span><span class="nx">string</span><span class="p">]</span><span class="nx">int</span><span class="p">{</span>
+    <span class="dl">"</span><span class="s2">alice</span><span class="dl">"</span><span class="p">:</span>   <span class="mi">31</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">charlie</span><span class="dl">"</span><span class="p">:</span> <span class="mi">34</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">ages</span><span class="p">)</span>  <span class="c1">//map[alice:31 charlie:34]</span>
+</code></pre></div></div>
+
+<h3 id="02删除map">02.删除map</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">delete</span><span class="p">(</span><span class="nx">ages</span><span class="p">,</span> <span class="dl">"</span><span class="s2">alice</span><span class="dl">"</span><span class="p">)</span>
+
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">ages</span><span class="p">)</span> <span class="c1">//map[charlie:34]</span>
+</code></pre></div></div>
+
+<p>对map操作中，即使某个元素不存在也没有关系;如果一个查找失败将返回value类型对应的<code class="language-plaintext highlighter-rouge">零值</code></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">ages</span><span class="p">[</span><span class="dl">"</span><span class="s2">kkk</span><span class="dl">"</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ages</span><span class="p">[</span><span class="dl">"</span><span class="s2">kkk</span><span class="dl">"</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">ages</span><span class="p">)</span> <span class="c1">//map[charlie:34 kkk:1]</span>
+
+<span class="k">delete</span><span class="p">(</span><span class="nx">ages</span><span class="p">,</span> <span class="dl">"</span><span class="s2">test</span><span class="dl">"</span><span class="p">)</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">ages</span><span class="p">)</span> <span class="c1">//map[charlie:34 kkk:1]</span>
+</code></pre></div></div>
+
+<p>当map不存在时，会返回value类型对应的<code class="language-plaintext highlighter-rouge">零值</code>，如果value的类型为<code class="language-plaintext highlighter-rouge">int</code>，对应的零值<code class="language-plaintext highlighter-rouge">0</code>，就和真正的零值分不开。可以这样操作</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">ages</span><span class="p">,</span><span class="nx">ok</span> <span class="p">:</span><span class="o">=</span> <span class="nx">ages</span><span class="p">[</span><span class="dl">"</span><span class="s2">kkk</span><span class="dl">"</span><span class="p">]</span>
+<span class="k">if</span> <span class="o">!</span><span class="nx">ok</span> <span class="p">{</span>
+<span class="c1">//...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="03简短赋值">03.简短赋值</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">ages</span><span class="p">[</span><span class="dl">"</span><span class="s2">kkk</span><span class="dl">"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="c1">//或</span>
+<span class="nx">ages</span><span class="p">[</span><span class="dl">"</span><span class="s2">kkk</span><span class="dl">"</span><span class="p">]</span><span class="o">++</span>
+
+<span class="c1">//但是绝对不能这样</span>
+<span class="nx">ages</span><span class="p">[</span><span class="dl">"</span><span class="s2">test</span><span class="dl">"</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ages</span><span class="p">[</span><span class="dl">"</span><span class="s2">kkk</span><span class="dl">"</span><span class="p">]</span><span class="o">++</span>   <span class="c1">//写法错误，go中赋值右侧是表达式，自增是语句不是表达式</span>
+
+<span class="nx">ages</span><span class="p">[</span><span class="dl">"</span><span class="s2">kkk</span><span class="dl">"</span><span class="p">]</span><span class="o">++</span>
+<span class="nx">ages</span><span class="p">[</span><span class="dl">"</span><span class="s2">test</span><span class="dl">"</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ages</span><span class="p">[</span><span class="dl">"</span><span class="s2">kkk</span><span class="dl">"</span><span class="p">]</span>     <span class="c1">//写法正确</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>map中的元素并不是一个变量，不能对map的元素进行取地址操作： _ = &amp;ages[“kkk”]</p>
+</blockquote>
+
+<h3 id="04map遍历">04.map遍历</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">name</span> <span class="p">:</span><span class="o">=</span> <span class="nx">map</span><span class="p">[</span><span class="nx">int</span><span class="p">]</span><span class="nx">string</span><span class="p">{</span>
+    <span class="mi">3</span><span class="p">:</span> <span class="dl">"</span><span class="s2">张三</span><span class="dl">"</span><span class="p">,</span>
+	<span class="mi">1</span><span class="p">:</span> <span class="dl">"</span><span class="s2">李四</span><span class="dl">"</span><span class="p">,</span>
+	<span class="mi">5</span><span class="p">:</span> <span class="dl">"</span><span class="s2">王五</span><span class="dl">"</span><span class="p">,</span>
+	<span class="mi">8</span><span class="p">:</span> <span class="dl">"</span><span class="s2">李二麻子</span><span class="dl">"</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">for</span> <span class="nx">k</span><span class="p">,</span><span class="nx">v</span> <span class="p">:</span><span class="o">=</span> <span class="nx">range</span> <span class="nx">name</span><span class="p">{</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="dl">"</span><span class="s2">%d</span><span class="se">\t</span><span class="s2">%s</span><span class="se">\n</span><span class="dl">"</span><span class="p">,</span><span class="nx">k</span><span class="p">,</span><span class="nx">v</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">//输出：</span>
+<span class="c1">//3       张三</span>
+<span class="c1">//1       李四</span>
+<span class="c1">//5       王五</span>
+<span class="c1">//8       李二麻子</span>
+</code></pre></div></div>
+
+<p>由于map的<code class="language-plaintext highlighter-rouge">key</code>是无序的，所以想要map输出有顺序，就必须手动排序</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">(</span>
+   <span class="dl">"</span><span class="s2">fmt</span><span class="dl">"</span>
+   <span class="dl">"</span><span class="s2">sort</span><span class="dl">"</span>
+<span class="p">)</span>
+
+<span class="nx">name</span> <span class="p">:</span><span class="o">=</span> <span class="nx">map</span><span class="p">[</span><span class="nx">int</span><span class="p">]</span><span class="nx">string</span><span class="p">{</span>
+    <span class="mi">3</span><span class="p">:</span> <span class="dl">"</span><span class="s2">张三</span><span class="dl">"</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="dl">"</span><span class="s2">李四</span><span class="dl">"</span><span class="p">,</span>
+    <span class="mi">5</span><span class="p">:</span> <span class="dl">"</span><span class="s2">王五</span><span class="dl">"</span><span class="p">,</span>
+    <span class="mi">8</span><span class="p">:</span> <span class="dl">"</span><span class="s2">李二麻子</span><span class="dl">"</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">names</span> <span class="o">=</span> <span class="nx">make</span><span class="p">([]</span><span class="nx">int</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="nx">len</span><span class="p">(</span><span class="nx">name</span><span class="p">))</span>
+<span class="k">for</span> <span class="nx">k</span> <span class="p">:</span><span class="o">=</span> <span class="nx">range</span> <span class="nx">name</span><span class="p">{</span>
+   <span class="nx">names</span> <span class="o">=</span> <span class="nx">append</span><span class="p">(</span><span class="nx">names</span><span class="p">,</span><span class="nx">k</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="nx">sort</span><span class="p">.</span><span class="nx">Ints</span><span class="p">(</span><span class="nx">names</span><span class="p">)</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">names</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="nx">k</span><span class="p">,</span><span class="nx">v</span> <span class="p">:</span><span class="o">=</span> <span class="nx">range</span> <span class="nx">name</span><span class="p">{</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="dl">"</span><span class="s2">%d</span><span class="se">\t</span><span class="s2">%s</span><span class="se">\n</span><span class="dl">"</span><span class="p">,</span><span class="nx">k</span><span class="p">,</span><span class="nx">v</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">//输出：</span>
+<span class="c1">//[1 3 6 9]</span>
+<span class="c1">//3       张三</span>
+<span class="c1">//1       李四</span>
+<span class="c1">//6       王五</span>
+<span class="c1">//9       李二麻子</span>
+</code></pre></div></div>
+
+<h1 id="4struct">4.struct</h1>
+
+<h3 id="01定义">01.定义</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nx">type</span> <span class="nx">TreeNode</span> <span class="nx">Struct</span><span class="p">{</span>
+	<span class="nx">left</span><span class="p">,</span> <span class="nx">Right</span> <span class="o">*</span><span class="nx">TreeNode</span>
+	<span class="nx">Value</span> <span class="nx">int</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+:ET

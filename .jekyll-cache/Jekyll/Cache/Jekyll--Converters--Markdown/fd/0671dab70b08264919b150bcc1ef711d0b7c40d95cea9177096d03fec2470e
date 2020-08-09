@@ -1,0 +1,51 @@
+I"i<p>小菜的机器系统windows64，开发编辑器GoLand，下面各位就要入坑了，请做好准备！let’s Go!</p>
+
+<h1 id="1windows64开发go">1.windows64开发GO</h1>
+
+<h4 id="下载golang的运行环境">下载golang的运行环境</h4>
+
+<ul>
+  <li>下载golang安装包<a href="https://golang.org/dl/" title="https://golang.org/dl/" target="_blank">https://golang.org/dl/</a>。国内下载地址<a href="https://studygolang.com/dl" title=" https://studygolang.com/dl" target="_blank"> https://studygolang.com/dl</a> <br /></li>
+  <li>根据自己电脑的操作系统选择Go安装包，windows选择<code class="language-plaintext highlighter-rouge">Microsoft windows</code>、macOS选择<code class="language-plaintext highlighter-rouge">Apple macOS</code>、linux选择<code class="language-plaintext highlighter-rouge">linux</code> <br /></li>
+  <li>安装</li>
+</ul>
+
+<h4 id="goland编辑器">GoLand编辑器</h4>
+
+<ul>
+  <li>Goland下载软件地址 <a href="https://www.jetbrains.com/products.html?fromMenu" title="https://www.jetbrains.com/products.html?fromMenu" target="_blank">https://www.jetbrains.com/products.html?fromMenu</a>，上不去的小伙伴在百度云盘下载<a href="https://pan.baidu.com/s/1qZ33dqG" title="https://pan.baidu.com/s/1qZ33dqG" target="_blank">https://pan.baidu.com/s/1qZ33dqG</a> 密码：<code class="language-plaintext highlighter-rouge">bxew</code> 版本：<code class="language-plaintext highlighter-rouge">goland-2017.3.2.exe</code> <br /></li>
+  <li>windows环境下安装成功，输入idea授权服务器<code class="language-plaintext highlighter-rouge">http://idea.chutianzhinu.com</code> 不会请看这篇帖子<a href="https://www.chutianzhinu.com/post-43.html" title="https://www.chutianzhinu.com/post-43.html" target="_blank">https://www.chutianzhinu.com/post-43.html</a>，顺带感谢下博主的分享。</li>
+</ul>
+
+<h4 id="了解jetbrains那些软件支持些插件仅了解">了解jetbrains那些软件支持些插件(仅了解)</h4>
+
+<ul>
+  <li>开发环境之前的插件：<a href="http://plugins.jetbrains.com/" title="http://plugins.jetbrains.com/" target="_blank">http://plugins.jetbrains.com/</a> Go插件<a href="https://plugins.jetbrains.com/plugin/9568-go" title="https://plugins.jetbrains.com/plugin/9568-go">https://plugins.jetbrains.com/plugin/9568-go</a></li>
+</ul>
+
+<h1 id="2centos7部署go">2.centos7部署GO</h1>
+
+<p>进入<a href="https://golang.org/" title="https://golang.org/" target="_blank">Go 官方网站</a>下载我们需要的<a href="https://golang.org/dl/" title="https://golang.org/dl/" target="_blank">Go 下载包</a>，根据自己的操作系统选择不同的GO包。拷贝下载地址</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd /opt/download
+wget https://dl.google.com/go/go1.11.4.linux-amd64.tar.gz
+tar -xvf go1.11.4.linux-amd64.tar.gz 
+mv go /usr/local/
+cd /usr/local/
+/usr/local/go/bin/go version   #查看go版本
+echo $PATH                     
+vim /etc/profile
+</code></pre></div></div>
+
+<p>在文件末尾添加环境变量</p>
+
+<pre><code class="language-linux">export GOPATH=/opt/go
+export PATH=$PATH:/usr/local/go/bin
+</code></pre>
+
+<p>检查GO环境　　</p>
+<pre><code class="language-linux">source /etc/profile  #使配置文件生效
+go version           #在任何地方输入，输出go版本说明go环境安装好了
+</code></pre>
+
+:ET

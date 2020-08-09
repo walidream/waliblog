@@ -1,0 +1,169 @@
+I"8<p>小菜在这一小节将记录centos 7系统中常用到的操作命令，如果大家有什么常用到的命令，好用的可以联系小菜，小菜将会整理下来。</p>
+
+<h1 id="1添加用户">1.添加用户</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>命令</th>
+      <th>解释</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>adduser[用户名]</td>
+      <td>创建新用户</td>
+    </tr>
+    <tr>
+      <td>passwd[用户名]</td>
+      <td>修改新用户的密码</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="2为用户授权">2.为用户授权</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>命令</th>
+      <th>解释</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>chmod -v u+w /etc/sudoers</td>
+      <td>添加sudoers文件可写权限(新创建的用户并不能使用sudo命令，需要给他添加授权。)</td>
+    </tr>
+    <tr>
+      <td>[用户名] ALL=(ALL) ALL</td>
+      <td>需新用户使用sudo时不用输密码，把最后一个ALL改为NOPASSWD:ALL即可（在文件最后添加即可）</td>
+    </tr>
+    <tr>
+      <td>chmod -v u-w /etc/sudoers</td>
+      <td>收回sudoers文件可写权限</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="3查看用户">3.查看用户</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>命令</th>
+      <th>解释</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>w</td>
+      <td>查看当前登录用户</td>
+    </tr>
+    <tr>
+      <td>who</td>
+      <td>查看当前登录用户</td>
+    </tr>
+    <tr>
+      <td>whoami</td>
+      <td>查看自己的用户名</td>
+    </tr>
+    <tr>
+      <td>last</td>
+      <td>查看用户登录记录</td>
+    </tr>
+    <tr>
+      <td>lastb</td>
+      <td>查看登录不成功的用户记录</td>
+    </tr>
+    <tr>
+      <td>cut -d: -f 1 /etc/passwd</td>
+      <td>查看所有用户</td>
+    </tr>
+    <tr>
+      <td>cat /etc/passwd|awk -F :‘{print$1}’</td>
+      <td>查看所有用户</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="4用户切换">4.用户切换</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>命令</th>
+      <th>解释</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>login -f [用户名]</td>
+      <td>root用户切换为普通用户</td>
+    </tr>
+    <tr>
+      <td>sudo [用户]</td>
+      <td>普通用户切换为root用户</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="5ip和端口查看">5.ip和端口查看</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>命令</th>
+      <th>解释</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ip a</td>
+      <td>查看ip</td>
+    </tr>
+    <tr>
+      <td>ip a add 172.19.139.240/20 dev eth0</td>
+      <td>添加ip到本地地址</td>
+    </tr>
+    <tr>
+      <td>ss -luntp</td>
+      <td>查看端口</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="6nginx">6.nginx</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>命令</th>
+      <th>解释</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>nginx -s stop -c /etc/nginx/nginx.conf</td>
+      <td>nginx服务停止</td>
+    </tr>
+    <tr>
+      <td>nginx -c /etc/nginx/nginx.conf</td>
+      <td>nginx重启服务</td>
+    </tr>
+    <tr>
+      <td>service nginx restart</td>
+      <td>重启nginx</td>
+    </tr>
+    <tr>
+      <td>nginx -t -c /etc/nginx/nginx.conf</td>
+      <td>检测nginx语法</td>
+    </tr>
+    <tr>
+      <td>nginx -s reload -c /etc/nginx/nginx.conf</td>
+      <td>重启配置</td>
+    </tr>
+  </tbody>
+</table>
+
+:ET

@@ -1,0 +1,154 @@
+I"�$<p>nginx中的<code class="language-plaintext highlighter-rouge">ngx_http_proxy_module</code>和<code class="language-plaintext highlighter-rouge">ngx_http_fastcgi_module</code>都可以实现反向代理。ngx_http_proxy_module是通用http协议反向代理，ngx_http_fastcgi_module是按
+fastcgi接口协议的反向代理。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>ngx_http_proxy_module</th>
+      <th>ngx_http_fastcgi_module</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>proxy_pass</td>
+      <td>fastcgi_pass</td>
+    </tr>
+    <tr>
+      <td>proxy_busy_buffers_size</td>
+      <td>fastcgi_busy_buffers_size</td>
+    </tr>
+    <tr>
+      <td>proxy_buffer_size</td>
+      <td>fastcgi_buffer_size</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="1fastcgi缓存图解">1.Fastcgi缓存图解</h1>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_40.jpg" alt="ssl" /></p>
+
+<h1 id="2配置模块">2.配置模块</h1>
+
+<p>fastcgi缓存配置和proxy_cache语法，配置都差不多。</p>
+
+<h3 id="fastcgi_cache_path">fastcgi_cache_path</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">fastcgi_cache_path</span> <span class="s">path</span> <span class="s">[levels=levels]</span> <span class="s">[use_temp_path=on|off]</span> <span class="s">keys_zone=name:size</span> <span class="s">[inactive=time]</span> <span class="s">[max_size=size]</span> <span class="s">[manager_files=number]</span> <span class="s">[manager_sleep=time]</span> <span class="s">[manager_threshold=time]</span> <span class="s">[loader_files=number]</span> <span class="s">[loader_sleep=time]</span> <span class="s">[loader_threshold=time]</span> <span class="s">[purger=on|off]</span> <span class="s">[purger_files=number]</span> <span class="s">[purger_sleep=time]</span> <span class="s">[purger_threshold=time]</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http</span>
+</code></pre></div></div>
+
+<h3 id="fastcgi_cache_key">fastcgi_cache_key</h3>
+
+<p>记录缓存的维度，维度越细，缓存越详细</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">fastcgi_cache_key</span> <span class="s">string</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="fastcgi_cache">fastcgi_cache</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">fastcgi_cache</span> <span class="s">zone</span> <span class="s">|</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">fastcgi_cache</span> <span class="no">off</span><span class="p">;</span>
+<span class="k">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h3 id="fastcgi_cache_valid">fastcgi_cache_valid</h3>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Syntax:</span>	<span class="s">fastcgi_cache_valid</span> <span class="s">[code</span> <span class="s">...]</span> <span class="s">time</span><span class="p">;</span>
+<span class="k">Default:</span> <span class="s">—</span>
+<span class="s">Context:</span> <span class="s">http,</span> <span class="s">server,</span> <span class="s">location</span>
+</code></pre></div></div>
+
+<h1 id="3fastcgi缓存配置">3.fastcgi缓存配置</h1>
+
+<p>服务目录</p>
+
+<pre><code class="language-txt">/opt/app/code6
+|--index.php
+|--time.php
+
+/etc/nginx/conf.d
+|--fastcgi_cache.conf
+</code></pre>
+
+<h4 id="indexphp">index.php</h4>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+	<span class="k">echo</span> <span class="s2">"瓦力博客"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h4 id="timephp">time.php</h4>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+	<span class="k">echo</span> <span class="nb">date</span><span class="p">(</span><span class="s1">'Y-m-d H:m:s'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h4 id="fastcgi_cacheconf">fastcgi_cache.conf</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fastcgi_cache_path</span> <span class="n">/opt/app/fastcache</span> <span class="s">levels=1:2</span> <span class="s">keys_zone=wali:100m</span> <span class="s">max_size=1g</span> <span class="s">inactive=60m</span><span class="p">;</span>
+
+<span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span>       <span class="mi">80</span><span class="p">;</span> 
+    <span class="kn">server_name</span>  <span class="s">localhost</span><span class="p">;</span>
+
+    <span class="c1">#charset koi8-r;</span>
+    <span class="kn">access_log</span>  <span class="n">/var/log/nginx/host.access.log</span>  <span class="s">main</span><span class="p">;</span>
+    
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span> 
+        <span class="kn">root</span> <span class="n">/opt/app/code6</span><span class="p">;</span>
+        <span class="kn">try_files</span> <span class="nv">$uri</span> <span class="nv">$uri</span><span class="n">/</span> <span class="n">/index.php?</span><span class="nv">$args</span><span class="p">;</span>
+        <span class="kn">index</span>  <span class="s">index.php</span><span class="p">;</span>
+    <span class="p">}</span>   
+
+    <span class="kn">location</span> <span class="p">~</span> <span class="sr">\.php$</span> <span class="p">{</span>
+        <span class="kn">root</span> <span class="n">/opt/app/code6</span><span class="p">;</span>
+        <span class="kn">fastcgi_pass</span> <span class="nf">127.0.0.1</span><span class="p">:</span><span class="mi">9000</span><span class="p">;</span>
+        <span class="kn">fastcgi_index</span> <span class="s">index.php</span><span class="p">;</span>
+        <span class="kn">include</span> <span class="s">fastcgi_params</span><span class="p">;</span>
+        <span class="kn">fastcgi_param</span> <span class="s">SCRIPT_FILENAME</span> <span class="nv">$document_root$fastcgi_script_name</span><span class="p">;</span>
+    
+        <span class="kn">fastcgi_cache_key</span> <span class="nv">$scheme$request_method$host$request_uri$is_args$args</span><span class="p">;</span>
+        <span class="kn">fastcgi_cache</span> <span class="s">wali</span><span class="p">;</span>
+        <span class="kn">fastcgi_cache_valid</span> <span class="mi">200</span> <span class="mi">60m</span><span class="p">;</span>
+    
+        <span class="kn">add_header</span> <span class="s">X-Cache-Source</span> <span class="nv">$upstream_cache_status</span><span class="p">;</span>
+    <span class="p">}</span>   
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>检测语法并重启</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -tc /etc/nginx/nginx.conf
+nginx -s reload -c /etc/nginx/nginx.conf
+</code></pre></div></div>
+
+<p>访问你的域名http://walidream.com/time.php，按f5刷新，打开控制台如果看到<code class="language-plaintext highlighter-rouge">X-Cache-Source:HIT</code>就说明配置好了。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_41.jpg" alt="ssl" /></p>
+
+<h1 id="4后端服务添加no-cache头对于nginx代理缓存的影响">4.后端服务添加no-cache头对于Nginx代理缓存的影响</h1>
+
+<p>后端服务添加no-cache头对于Nginx代理缓存的影响</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_42.jpg" alt="ssl" /></p>
+
+<p>如果后台服务器在head头信息添加no-chche，那么nginx就不会缓存。如果这种情况下还需要nginx做缓存</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fastcgi_ignore_headers Cache-Control Expires Set-Cookie; #忽略头信息
+</code></pre></div></div>
+
+<h1 id="5设置缓存维度会带来哪些影响">5.设置缓存维度会带来哪些影响</h1>
+
+<p>fastcgi_cache_key设置不同维度的key会产生哪些不同的状况</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fastcgi_cache_key $scheme$request_method$host$request_uri$is_args$args;
+fastcgi_cache_key  $scheme$host;
+</code></pre></div></div>
+
+<p>第一个key比第二个可以设置的详情，第二个key只设置<code class="language-plaintext highlighter-rouge">协议</code>+<code class="language-plaintext highlighter-rouge">域名</code>。假如访问http://walidream.com/tiem.php 页面被缓存了之后，然后在访问http://walidream.com/index.php的时候
+就会发现页面没有刷新，原因就是第二个key设置的维度只有协议和域名导致上面两个链接被认为是同一个缓存，所以访问第二个链接时页面没有被刷新。</p>
+
+:ET

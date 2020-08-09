@@ -1,0 +1,50 @@
+I"<p>GO语言是一个写工程项目的语言，但学习时或者要想写个简单的demo，没必要创建一个工程项目，小菜很喜欢用Notepadd++这个轻量级编辑软件，在此记录在NotePad++软件上支持GO语法高亮</p>
+
+<h1 id="1安装notepadd">1.安装notepadd++</h1>
+
+<p>(1).下载Notepadd++软件,传送门<a href="http://notepad-plus-plus.org" title="http://notepad-plus-plus.org" target="_blank">http://notepad-plus-plus.org</a></p>
+
+<p>(2).安装</p>
+
+<h1 id="2安装go开发插件">2.安装go开发插件</h1>
+
+<p>(1).运行 Notepad++ 软件</p>
+
+<p>(2).打开菜单，选择：插件 -&gt; Plugin Manager -&gt; Show Plugin Manager</p>
+
+<h1 id="3选择插件gonpp">3.选择插件GOnpp</h1>
+
+<p>找到Gonpp，选中，然后点击install</p>
+
+<p><img src="http://walidream.com:9999/blogImage/go/notepad1.jpg" alt="ssl" /></p>
+
+<h1 id="4测试">4.测试</h1>
+
+<p>写一个简单的Go代码测试</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">package</span> <span class="nx">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="dl">"</span><span class="s2">fmt</span><span class="dl">"</span>
+<span class="p">)</span>
+
+<span class="nx">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="dl">"</span><span class="s2">Hello World!</span><span class="dl">"</span><span class="p">)</span> 
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>查看插件–&gt;Gonpp有没有安装成功，如果没有安装成功，请重新安装一次</p>
+
+<h1 id="5配置语法高亮">5.配置语法高亮</h1>
+
+<p>(1).下载<a href="http://go-lang.cat-v.org/text-editors/notepad-plus-plus/go.xml" title="http://go-lang.cat-v.org/text-editors/notepad-plus-plus/go.xml" target="_blank">go.xml</a> 备用下载地址<a href="http://walidream.com:9999/blogImage/go.xml" title="http://walidream.com:9999/blogImage/go.xml" target="_blank">go.xml</a> 将其拷贝至 Notepad++ 安装目录下的 plugins\APIs 下面（例如：D:\notepad++\plugins\APIs）</p>
+
+<p>(2).下载<a href="http://go-lang.cat-v.org/text-editors/notepad-plus-plus/userDefineLang.xml" title="http://go-lang.cat-v.org/text-editors/notepad-plus-plus/userDefineLang.xml" target="_blank">userDefineLang.xml</a>备用下载地址<a href="http://walidream.com:9999/blogImage/userDefineLang.xml" title="http://walidream.com:9999/blogImage/userDefineLang.xml" target="_blank">userDefineLang.xml</a> 将其内容包含在 <code class="language-plaintext highlighter-rouge">&lt;NotepadPlus&gt;</code> 和 <code class="language-plaintext highlighter-rouge">&lt;/NotepadPlus&gt;</code> 之间，然后保存至 %APPDATA%\Notepad++（例如：C:\Users[Name]\AppData\Roaming\Notepad++）中，在C:\Users\Administrator中可能会找不到<code class="language-plaintext highlighter-rouge">AppData</code>文件夹是因为被隐藏了</p>
+
+<p><img src="http://walidream.com:9999/blogImage/go/notepad2.jpg" alt="ssl" /></p>
+
+<p>(3).重启 Notepad++ 重新打开 Hello.go，选择菜单：语言 -&gt; go，就大功告成了</p>
+
+<p><img src="http://walidream.com:9999/blogImage/go/notepad3.jpg" alt="ssl" /></p>
+
+:ET

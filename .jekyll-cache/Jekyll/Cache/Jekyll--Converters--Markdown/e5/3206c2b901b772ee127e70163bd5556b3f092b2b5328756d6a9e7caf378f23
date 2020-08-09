@@ -1,0 +1,33 @@
+I"�<p>nginx日志类型有两种，第一种是<code class="language-plaintext highlighter-rouge">error.log</code>日志，第二种是<code class="language-plaintext highlighter-rouge">access_log</code>日志。error.log是记录错误，access_log用来指定日志文件的存放路径、格式（把定义的log_format 跟在后面）和缓存大小；如果不想启用日志则access_log off ;</p>
+
+<h1 id="1log_format配置语法">1.log_format配置语法</h1>
+
+<p>作用：用来设置日志格式</p>
+
+<p>语法:</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">syntax:</span> <span class="s">log_format</span> <span class="s">name</span> <span class="s">[escape=default</span> <span class="s">|</span> <span class="s">json]</span> <span class="s">string</span> <span class="s">...</span><span class="p">;</span>
+<span class="k">default:</span> <span class="s">log_format</span> <span class="s">combined</span> <span class="s">"..."</span><span class="p">;</span>
+<span class="k">context:</span> <span class="s">http</span>
+</code></pre></div></div>
+
+<h1 id="2nginx变量">2.nginx变量</h1>
+
+<h3 id="1http请求变量">1.http请求变量</h3>
+
+<p>arg_PAPAMENTER(参数)、http_HEADER(请求头)、send_http_HEADER(响应头信息)</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">log_format</span>  <span class="s">main</span>  <span class="s">'</span><span class="nv">$http_user_agent</span> <span class="nv">$remote_addr</span> <span class="s">-</span> <span class="nv">$remote_user</span> <span class="s">[</span><span class="nv">$time_local</span><span class="s">]</span> <span class="s">"</span><span class="nv">$request</span><span class="s">"</span> <span class="s">'</span>
+                  <span class="s">'</span><span class="nv">$status</span> <span class="nv">$body_bytes_sent</span> <span class="s">"</span><span class="nv">$http_referer</span><span class="s">"</span> <span class="s">'</span>
+                  <span class="s">'"</span><span class="nv">$http_user_agent</span><span class="s">"</span> <span class="s">"</span><span class="nv">$http_x_forwarded_for</span><span class="s">"'</span><span class="p">;</span>
+
+ <span class="k">access_log</span>  <span class="n">/var/log/nginx/access.log</span>  <span class="s">main</span><span class="p">;</span>
+
+</code></pre></div></div>
+<p>在请求头中距离要获取User-Agent信息，则 ‘$http_user_agent’大写转成小写，<code class="language-plaintext highlighter-rouge">-</code>转换成<code class="language-plaintext highlighter-rouge">_</code>记住要用<code class="language-plaintext highlighter-rouge">''引起来</code>，在<code class="language-plaintext highlighter-rouge">''</code>引号内[],-都会被处理成字符串输出</p>
+
+<h3 id="2内置变量">2.内置变量</h3>
+
+<p>在nginx官方网站<code class="language-plaintext highlighter-rouge">Logging to syslog</code>中查找，变量太多不能列举出来。<a href="http://nginx.org/en/docs/http/ngx_http_log_module.html#log_format" title="http://nginx.org/en/docs/http/ngx_http_log_module.html#log_format" target="_blank">传送门</a></p>
+
+:ET

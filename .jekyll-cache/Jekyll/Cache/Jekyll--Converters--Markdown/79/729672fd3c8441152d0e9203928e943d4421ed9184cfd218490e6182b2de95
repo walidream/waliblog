@@ -1,0 +1,98 @@
+I"H<p>最近小菜在写nginx，所以就从windows的桌面环境转移到centos7.4的命令窗口。下面记录在centos7.4安装git</p>
+
+<p>centos7 默认安装的是git 1.8.x版本</p>
+
+<p>将centos7上的git更新到最新的git版本，方法如下</p>
+
+<h1 id="1安装编译git时需要的包">1.安装编译git时需要的包</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># yum install curl-devel expat-devel gettext-devel openssl-devel zlib-devel
+# yum install  gcc perl-ExtUtils-MakeMaker
+</code></pre></div></div>
+
+<h1 id="2删除已有的git">2.删除已有的git</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># yum remove git
+</code></pre></div></div>
+
+<h1 id="3下载git源码">3.下载git源码</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># cd /usr/src
+# wget https://www.kernel.org/pub/software/scm/git/git-2.13.1.tar.gz
+# tar xzf git-2.13.1.tar.gz
+</code></pre></div></div>
+
+<p>在<a href="https://git-scm.com/downloads" title="https://git-scm.com/downloads">git官网</a> 查看最新的稳定版本，将<code class="language-plaintext highlighter-rouge">git-2.13.1.tar.gz</code>修改为官方最新稳定版本号</p>
+
+<h1 id="4-编译安装">4. 编译安装</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># cd git-2.13.1
+# make prefix=/usr/local/git all
+</code></pre></div></div>
+
+<p>如果执行该命令报以下错误信息:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>libgit.a(utf8.o): In function `reencode_string_iconv':
+/usr/local/git/utf8.c:463: undefined reference to `libiconv'
+libgit.a(utf8.o): In function `reencode_string_len':
+/usr/local/git/utf8.c:502: undefined reference to `libiconv_open'
+/usr/local/git/utf8.c:521: undefined reference to `libiconv_close'
+/usr/local/git/utf8.c:515: undefined reference to `libiconv_open'
+collect2: ld returned 1 exit status
+make: *** [git-credential-store] Error 1
+</code></pre></div></div>
+
+<blockquote>
+  <p>编译未出错，继续执行下面命令，如果出错，跳到解决方法</p>
+</blockquote>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># make prefix=/usr/local/git install
+# echo "export PATH=$PATH:/usr/local/git/bin" &gt;&gt; /etc/bashrc
+# source /etc/bashrc
+</code></pre></div></div>
+
+<p>检查版本号</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># git --version
+git version 2.13.1
+</code></pre></div></div>
+
+<blockquote>
+  <p>解决方法如下:</p>
+</blockquote>
+
+<h3 id="1安装libiconv">1.安装libiconv</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># cd /usr/local
+# wget http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz
+# tar -zxvf libiconv-1.15.tar.gz
+# cd libiconv-1.15
+# ./configure –-prefix=/usr/local
+# make
+# make install
+</code></pre></div></div>
+
+<h3 id="2-创建一个软连接到usrlib">2. 创建一个软连接到/usr/lib</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># ln -s /usr/local/lib/libiconv.so /usr/lib
+# ln -s /usr/local/lib/libiconv.so.2 /usr/lib
+</code></pre></div></div>
+
+<h3 id="3然后回到git目录继续编译需要注意这里git-2131版本号要一致">3.然后回到git目录继续编译,需要注意这里<code class="language-plaintext highlighter-rouge">git-2.13.1</code>版本号要一致</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># cd /usr/local/src/git-2.13.1
+# make configure
+# ./configure --prefix=/usr/local --with-iconv=/usr/local/libiconv
+# make
+# make install
+</code></pre></div></div>
+
+<h3 id="4此时git应该编译安装成功了测试如下">4.此时，git应该编译安装成功了，测试如下：</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># git --version
+git version 2.13.1
+</code></pre></div></div>
+
+<p>安装使用完成之后，推荐到<a href="/git/2018/11/11/brabch.html" title="/git/2018/11/11/brabch.html">在Mac、Linux 终端显示 Git 当前所在分支</a></p>
+
+:ET

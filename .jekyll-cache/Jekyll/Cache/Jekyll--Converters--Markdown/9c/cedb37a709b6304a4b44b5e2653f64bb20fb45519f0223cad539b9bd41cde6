@@ -1,0 +1,387 @@
+I"c<h1 id="1常见的恶意行为">1.常见的恶意行为</h1>
+
+<ul>
+  <li>爬虫行为</li>
+  <li>恶意抓取</li>
+  <li>资源盗用</li>
+</ul>
+
+<p>所谓的恶意行为就是不触犯法律的红线，也不是正常的访问，但是带有恶意的目的。爬虫会不断进行网站内容的抓取，有写爬虫是我们要禁止的，有些爬虫要允许的
+如（百度，google）搜索引擎。在之前介绍过<a href="/nginx/2018/12/17/nginx-13.html" title="/nginx/2018/12/17/nginx-13.html" target="_blank">防盗链</a>，目的就是不让恶意用户能轻易的爬取网站对外的数据。
+<a href="/nginx/2019/01/09/nginx-25.html" title="/nginx/2019/01/09/nginx-25.html" target="_blank">secure_link_module模块</a>对数据安全性提高加密验证和失效性，适合重要数据
+感兴趣的小伙伴可以去看看。</p>
+
+<h1 id="2常见的攻击手段">2.常见的攻击手段</h1>
+
+<p>常见的攻击手段已经触犯了法律的红线，小伙伴们千万不要尝试。</p>
+
+<ul>
+  <li>后台密码撞库</li>
+  <li>文件上传</li>
+  <li>sql注入</li>
+</ul>
+
+<h4 id="后台密码撞库">后台密码撞库</h4>
+
+<p>后台密码撞库是非常常见的攻击手段-通过猜测密码自典不断对后台系统登录性尝试，获取后台登录密码。可以通过下面一些方法预防</p>
+
+<ul>
+  <li>提高后台登录密码的复杂度</li>
+  <li>access_module对后台提供ip的访问控制</li>
+  <li>设立预警机制，当一个ip在短时间内尝试多次请求，就启动预警</li>
+</ul>
+
+<h4 id="文件上传">文件上传</h4>
+
+<p>文件上传漏洞是利用这些上传的接口将恶意代码植入到服务器中，在通过url去访问执行代码。在nginx早期版本存在一个漏洞，例如<code class="language-plaintext highlighter-rouge">http://www.waliblog.com/upload/1.jpg/1.php</code>，
+当黑客上传一张1.jpg图片放在文件upload目录下，图片内容实际上是php代码（假设恶意的），只是修改了文件名称，于是就可以通过http://www.waliblog.com/upload/1.jpg来访问到1.jpg文件。nginx此时是将1.jpg文件作为静态资源来处理。
+当我们通过http://www.waliblog.com/upload/1.jpg/1.php访问时，后面加上<code class="language-plaintext highlighter-rouge">1.php</code>。nginx就会将1.jpg交给php解析器，作为php代码执行。在服务器端就可以做想做的事情了，这个漏洞被修复掉了。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">location</span> <span class="s">^~</span> <span class="n">/upload</span><span class="p">{</span>
+	<span class="kn">root</span> <span class="n">/opt/app/images</span><span class="p">;</span>
+	<span class="kn">if</span><span class="s">(</span><span class="nv">$request_filename</span> <span class="p">~</span><span class="sr">*</span> <span class="s">(.*)</span><span class="err">\</span><span class="s">.php)</span><span class="p">{</span>
+		<span class="kn">return</span> <span class="mi">403</span><span class="p">;</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="sql注入">SQL注入</h4>
+
+<p>SQL注入-利用未过滤/未审核用户输入的攻击方法，让应用运行本不应该运行SQL代码。</p>
+
+<p>我们来模拟一个用户登录场景，假设前后端都是不负责任的，对提交的内容不做任何校验。事实上，小菜在写项目时，也发现后台有时候不会对前端输入的内容做任何校验，
+这时候前端懒一点也不做校验，就会在某些情况写发生严重的后果。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_63.jpg" alt="ssl" /></p>
+
+<p>在正常登陆下，一般都是这样的用户名密码，用户名：wali122 密码：123456。如果在用户名中输入<code class="language-plaintext highlighter-rouge">' or 1=1'#</code>，密码随便输入一个。在后台查询的sql语句如下</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$sql</span> <span class="o">=</span> <span class="s2">"select * from users where username='</span><span class="nv">$name</span><span class="s2">' and password='</span><span class="nv">$pwd</span><span class="s2">'"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>那么在数据库中sql语句</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">users</span> <span class="k">where</span> <span class="n">username</span> <span class="o">=</span><span class="s1">' or 1=1'</span><span class="o">#</span> <span class="k">and</span> <span class="n">password</span><span class="o">=</span><span class="s1">'233423'</span><span class="nv">";
+</span></code></pre></div></div>
+<p>解读sql，就会发现是一个ture的语句。并且密码后半段校验就会被注释掉，这样随便一个账号就能够登录。</p>
+
+<p>虽然上面为举这个例子有大量的假设，而且我相信这样的错误几乎是不会在出现。但作为程序员还是要有自己的责任。</p>
+
+<h1 id="3模拟sql注入场景">3.模拟SQL注入场景</h1>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_64.jpg" alt="ssl" /></p>
+
+<p>####搭建安装环境</p>
+
+<p>安装数据库</p>
+
+<pre><code class="language-linux">yum install mariadb-server mariadb
+</code></pre>
+
+<p>安装php</p>
+
+<pre><code class="language-linux">yum install php php-fpm php-mysql
+</code></pre>
+
+<p>启动mql</p>
+
+<pre><code class="language-linux">systemctl start mariadb
+
+mysql -uroot -p 
+</code></pre>
+<p>默认数据库的密码是回车</p>
+
+<pre><code class="language-mysql">show databases; #查看数据库
+create database info; #创建info数据库
+use info; #使用info数据库
+show tables; #查看表
+create table users(id int(11),username varchar(64),password varchar(64),email varchar(64)); #创建表结构
+desc users;  #查看表结构
+insert into users (id,username,password,email) values(1,'wali','1234','walidream@163.com'); #向表中插入数据
+</code></pre>
+
+<p>####PHP环境</p>
+
+<pre><code class="language-linux">ps -aux|grep php #查看php-fpm起来没
+php-fpm -D #守护进程
+</code></pre>
+
+<h4 id="配置目录">配置目录</h4>
+
+<pre><code class="language-txt">/etc/nginx/cond.f
+|-php.conf
+
+/opt/app/code
+|-index.php
+|-validate.php
+|-login.html
+</code></pre>
+
+<h4 id="phpconf">php.conf</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span>       <span class="mi">80</span><span class="p">;</span>
+    <span class="kn">server_name</span>  <span class="s">localhost</span><span class="p">;</span>
+
+    <span class="c1">#charset koi8-r;</span>
+    <span class="kn">access_log</span>  <span class="n">/var/log/nginx/yagm.log</span>  <span class="s">main</span><span class="p">;</span>
+
+    <span class="kn">root</span> <span class="n">/opt/app/code</span><span class="p">;</span>
+
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+        <span class="kn">index</span>  <span class="s">index.php</span> <span class="s">index.html</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kn">location</span> <span class="p">~</span> <span class="sr">\.php$</span> <span class="p">{</span>
+        <span class="kn">fastcgi_pass</span> <span class="nf">127.0.0.1</span><span class="p">:</span><span class="mi">9000</span><span class="p">;</span>
+        <span class="kn">fastcgi_index</span> <span class="s">index.php</span><span class="p">;</span>
+        <span class="c1">#fastcgi_param SCRIPT_FILENAME /scripts$fastcgi_script_name;</span>
+        <span class="kn">fastcgi_param</span> <span class="s">SCRIPT_FILENAME</span> <span class="n">/opt/app/code/</span><span class="nv">$fastcgi_script_name</span><span class="p">;</span>
+        <span class="kn">include</span> <span class="s">fastcgi_params</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="indexphp">index.php</h4>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+	<span class="nb">phpinfo</span><span class="p">();</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>重启nginx,在页面上输入域名，出现php输出信息就好了</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_65.jpg" alt="ssl" /></p>
+
+<h4 id="loginhtml">login.html</h4>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+<span class="nt">&lt;title&gt;</span>sql注入演示<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;meta</span> <span class="na">http-equiv=</span><span class="s">"content-type"</span><span class="na">content=</span><span class="s">"text/html;charset=utf-8"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+	<span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">"validate.php"</span> <span class="na">method=</span><span class="s">"post"</span><span class="nt">&gt;</span>
+		<span class="nt">&lt;table&gt;</span>
+			<span class="nt">&lt;tr&gt;</span>
+				<span class="nt">&lt;td&gt;</span>用户名：<span class="nt">&lt;/td&gt;</span>
+				<span class="nt">&lt;td&gt;&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"username"</span><span class="nt">/&gt;&lt;/td&gt;</span>
+			<span class="nt">&lt;/tr&gt;</span>
+			<span class="nt">&lt;tr&gt;</span>
+				<span class="nt">&lt;td&gt;</span>密码：<span class="nt">&lt;/td&gt;</span>
+				<span class="nt">&lt;td&gt;&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"password"</span><span class="nt">/&gt;&lt;/td&gt;</span>
+			<span class="nt">&lt;/tr&gt;</span>
+			<span class="nt">&lt;tr&gt;</span> <span class="nt">&lt;td&gt;</span> <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">value=</span><span class="s">"提交"</span><span class="nt">&gt;&lt;/td&gt;</span>
+			 	<span class="nt">&lt;td&gt;&lt;input</span> <span class="na">type=</span><span class="s">"reset"</span> <span class="na">value=</span><span class="s">"重置"</span><span class="nt">&gt;&lt;/td&gt;</span>
+			<span class="nt">&lt;/tr&gt;</span>
+		<span class="nt">&lt;/table&gt;</span>	
+	<span class="nt">&lt;/form&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<h4 id="validatephp">validate.php</h4>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+	<span class="nv">$conn</span> <span class="o">=</span> <span class="nb">mysql_connect</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s1">'root'</span><span class="p">,</span><span class="s1">''</span><span class="p">)</span> <span class="k">or</span> <span class="k">die</span><span class="p">(</span><span class="s2">"数据库连接失败！"</span><span class="p">);</span>
+	<span class="nb">mysql_select_db</span><span class="p">(</span><span class="s2">"info"</span><span class="p">,</span><span class="nv">$conn</span><span class="p">)</span> <span class="k">or</span> <span class="k">die</span><span class="p">(</span><span class="s2">"您要选择的数据库不存在"</span><span class="p">);</span>
+	<span class="nv">$name</span><span class="o">=</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'username'</span><span class="p">];</span>
+	<span class="nv">$pwd</span><span class="o">=</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'password'</span><span class="p">];</span>
+	<span class="nv">$sql</span><span class="o">=</span><span class="s2">"select * from users where username=’</span><span class="nv">$name</span><span class="s2">' and password='</span><span class="nv">$pwd</span><span class="s2">'"</span><span class="p">;</span>
+	<span class="k">echo</span> <span class="nv">$sql</span><span class="o">.</span><span class="s2">"&lt;br/&gt;&lt;br/&gt;"</span><span class="p">;</span>
+	<span class="nv">$query</span><span class="o">=</span><span class="nb">mysql_query</span><span class="p">(</span><span class="nv">$sql</span><span class="p">);</span>
+	<span class="nv">$arr</span><span class="o">=</span><span class="nb">mysql_fetch_array</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+	<span class="k">if</span><span class="p">(</span><span class="nv">$arr</span><span class="p">){</span>
+		<span class="k">echo</span> <span class="s2">"login success!</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+		<span class="k">echo</span> <span class="nv">$arr</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+		<span class="k">echo</span> <span class="nv">$arr</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="s2">"&lt;br/&gt;"</span><span class="p">;</span>
+	<span class="p">}</span><span class="k">else</span><span class="p">{</span>
+		<span class="k">echo</span> <span class="s2">"login failed"</span><span class="p">;</span>
+	<span class="p">}</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>访问http://yagm.xin/login.html就会出现登录页面</p>
+
+<p>正常情况：</p>
+
+<p>用户名：eve 密码：1234</p>
+
+<p>sql注入：</p>
+
+<p>用户名：’ or 1=1# 密码：1adfa</p>
+
+<p>输出sql语句</p>
+
+<p>select * from users where username=’ ‘ or 1=1# and password=’1234’</p>
+
+<p>虽然上面的例子实在有些勉强，但是小菜想说在前后端逻辑不严谨的情况下是很容易给黑客留下漏洞的。</p>
+
+<h1 id="4搭建nginxlua防火墙">4.搭建Nginx+lua防火墙</h1>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_66.jpg" alt="ssl" /></p>
+
+<p>为了简单方便，网上有现成的。</p>
+
+<ul>
+  <li><a href="https://github.com/loveshell/ngx_lua_waf" title="https://github.com/loveshell/ngx_lua_waf" target="_blank">https://github.com/loveshell/ngx_lua_waf</a></li>
+</ul>
+
+<p>复制<code class="language-plaintext highlighter-rouge">https://github.com/loveshell/ngx_lua_waf.git</code>命令</p>
+
+<pre><code class="language-linux">cd /opt/download
+git clone https://github.com/loveshell/ngx_lua_waf.git
+cd /etc/nginx/
+mv /opt/download/ngx_lua_waf ./waf/
+cd waf
+</code></pre>
+<p>修改config.lua文件配置路径</p>
+
+<p>原文件</p>
+
+<div class="language-lua highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">RulePath</span> <span class="o">=</span> <span class="s2">"/usr/local/nginx/conf/waf/wafconf/"</span>
+<span class="n">attacklog</span> <span class="o">=</span> <span class="s2">"on"</span>
+<span class="n">logdir</span> <span class="o">=</span> <span class="s2">"/usr/local/nginx/logs/hack/"</span>
+<span class="n">UrlDeny</span><span class="o">=</span><span class="s2">"on"</span>
+<span class="n">Redirect</span><span class="o">=</span><span class="s2">"on"</span>
+<span class="n">CookieMatch</span><span class="o">=</span><span class="s2">"on"</span>
+<span class="n">postMatch</span><span class="o">=</span><span class="s2">"on"</span>
+<span class="n">whiteModule</span><span class="o">=</span><span class="s2">"on"</span>
+<span class="n">black_fileExt</span><span class="o">=</span><span class="p">{</span><span class="s2">"php"</span><span class="p">,</span><span class="s2">"jsp"</span><span class="p">}</span>
+<span class="n">ipWhitelist</span><span class="o">=</span><span class="p">{</span><span class="s2">"127.0.0.1"</span><span class="p">}</span>
+<span class="n">ipBlocklist</span><span class="o">=</span><span class="p">{</span><span class="s2">"1.0.0.1"</span><span class="p">}</span>
+<span class="n">CCDeny</span><span class="o">=</span><span class="s2">"off"</span>
+<span class="n">CCrate</span><span class="o">=</span><span class="s2">"100/60"</span>
+<span class="n">html</span><span class="o">=</span><span class="p">[[</span> <span class="o">...</span>
+</code></pre></div></div>
+
+<p>修改后的文件</p>
+
+<div class="language-lua highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">RulePath</span> <span class="o">=</span> <span class="s2">"/etc/nginx/waf/wafconf/"</span>  <span class="o">#</span><span class="err">匹配的规则</span>
+<span class="n">attacklog</span> <span class="o">=</span> <span class="s2">"on"</span> <span class="o">#</span><span class="err">如果有攻击，会记录日志</span>
+<span class="n">logdir</span> <span class="o">=</span> <span class="s2">"/var/log/nginx/log/hack"</span>  <span class="o">#</span><span class="err">日志的保存路径</span>
+<span class="n">UrlDeny</span><span class="o">=</span><span class="s2">"on"</span>  
+<span class="n">Redirect</span><span class="o">=</span><span class="s2">"on"</span> 
+<span class="n">CookieMatch</span><span class="o">=</span><span class="s2">"on"</span> 
+<span class="n">postMatch</span><span class="o">=</span><span class="s2">"on"</span>
+<span class="n">whiteModule</span><span class="o">=</span><span class="s2">"on"</span>
+<span class="n">black_fileExt</span><span class="o">=</span><span class="p">{</span><span class="s2">"php"</span><span class="p">,</span><span class="s2">"jsp"</span><span class="p">}</span>
+<span class="n">ipWhitelist</span><span class="o">=</span><span class="p">{</span><span class="s2">"127.0.0.1"</span><span class="p">}</span>  <span class="o">#</span><span class="err">白名单</span>
+<span class="n">ipBlocklist</span><span class="o">=</span><span class="p">{</span><span class="s2">"1.0.0.1"</span><span class="p">}</span>    <span class="o">#</span><span class="err">黑名单</span>
+<span class="n">CCDeny</span><span class="o">=</span><span class="s2">"off"</span>
+<span class="n">CCrate</span><span class="o">=</span><span class="s2">"100/60"</span>
+<span class="n">html</span><span class="o">=</span><span class="p">[[</span> <span class="o">...</span>
+</code></pre></div></div>
+
+<h4 id="将lua加入nginxconf配置文件">将lua加入nginx.conf配置文件</h4>
+
+<pre><code class="language-linux">vim /etc/nginx/nginx.conf
+</code></pre>
+
+<p>原nginx.conf文件</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">http</span> <span class="p">{</span>
+    <span class="kn">include</span>       <span class="n">/etc/nginx/mime.types</span><span class="p">;</span>
+    <span class="kn">default_type</span>  <span class="nc">application/octet-stream</span><span class="p">;</span>
+
+    <span class="kn">log_format</span>  <span class="s">main</span>  <span class="s">'</span><span class="nv">$remote_addr</span> <span class="s">-</span> <span class="nv">$remote_user</span> <span class="s">[</span><span class="nv">$time_local</span><span class="s">]</span> <span class="s">"</span><span class="nv">$request</span><span class="s">"</span> <span class="s">'</span>
+                      <span class="s">'</span><span class="nv">$status</span> <span class="nv">$body_bytes_sent</span> <span class="s">"</span><span class="nv">$http_referer</span><span class="s">"</span> <span class="s">'</span>
+                      <span class="s">'"</span><span class="nv">$http_user_agent</span><span class="s">"</span> <span class="s">"</span><span class="nv">$http_x_forwarded_for</span><span class="s">"'</span><span class="p">;</span>
+
+    <span class="kn">access_log</span>  <span class="n">/var/log/nginx/access.log</span>  <span class="s">main</span><span class="p">;</span>
+
+    <span class="kn">sendfile</span>        <span class="no">on</span><span class="p">;</span>
+    <span class="c1">#tcp_nopush     on;</span>
+
+    <span class="kn">keepalive_timeout</span>  <span class="mi">65</span><span class="p">;</span>
+
+    <span class="c1">#gzip  on;</span>
+
+    <span class="kn">include</span> <span class="n">/etc/nginx/conf.d/*.conf</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>修改后nginx.conf文件</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">http</span> <span class="p">{</span>
+    <span class="kn">include</span>       <span class="n">/etc/nginx/mime.types</span><span class="p">;</span>
+    <span class="kn">default_type</span>  <span class="nc">application/octet-stream</span><span class="p">;</span>
+	
+	<span class="kn">lua_package_path</span> <span class="s">"/etc/nginx/waf/?.lua"</span><span class="p">;</span>
+	<span class="kn">lua_shared_dict</span> <span class="s">limit</span> <span class="mi">10m</span><span class="p">;</span>
+	<span class="kn">init_by_lua_file</span> <span class="n">/etc/nginx/waf/init.lua</span><span class="p">;</span>
+	<span class="kn">access_by_lua_file</span> <span class="n">/etc/nginx/waf/waf.lua</span><span class="p">;</span>
+
+    <span class="kn">log_format</span>  <span class="s">main</span>  <span class="s">'</span><span class="nv">$remote_addr</span> <span class="s">-</span> <span class="nv">$remote_user</span> <span class="s">[</span><span class="nv">$time_local</span><span class="s">]</span> <span class="s">"</span><span class="nv">$request</span><span class="s">"</span> <span class="s">'</span>
+                      <span class="s">'</span><span class="nv">$status</span> <span class="nv">$body_bytes_sent</span> <span class="s">"</span><span class="nv">$http_referer</span><span class="s">"</span> <span class="s">'</span>
+                      <span class="s">'"</span><span class="nv">$http_user_agent</span><span class="s">"</span> <span class="s">"</span><span class="nv">$http_x_forwarded_for</span><span class="s">"'</span><span class="p">;</span>
+
+    <span class="kn">access_log</span>  <span class="n">/var/log/nginx/access.log</span>  <span class="s">main</span><span class="p">;</span>
+
+    <span class="kn">sendfile</span>        <span class="no">on</span><span class="p">;</span>
+    <span class="c1">#tcp_nopush     on;</span>
+
+    <span class="kn">keepalive_timeout</span>  <span class="mi">65</span><span class="p">;</span>
+
+    <span class="c1">#gzip  on;</span>
+
+    <span class="kn">include</span> <span class="n">/etc/nginx/conf.d/*.conf</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>检测nginx语法并重启</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -tc /etc/nginx/nginx.conf
+nginx -s reload -c /etc/nginx/nginx.conf
+</code></pre></div></div>
+
+<p>重启完成后，在输入域名到测试页面去。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_67.jpg" alt="ssl" /></p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_68.jpg" alt="ssl" /></p>
+
+<p>然后我们修改lua配置</p>
+
+<pre><code class="language-linux">cd /etc/nginx/waf/wafconf/
+vim post 
+</code></pre>
+
+<p>在第一行加入</p>
+
+<div class="language-lua highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">\</span><span class="n">sor</span><span class="err">\</span><span class="n">s</span><span class="o">+</span>
+</code></pre></div></div>
+
+<p>保存后重启nginx，在输入之前的用户名会发现被拦截了</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_69.jpg" alt="ssl" /></p>
+
+<h1 id="5nginx对cc攻击限制">5.nginx对cc攻击限制</h1>
+
+<p>接上面lua配置继续配置对cc攻击的限制</p>
+
+<pre><code class="language-linux">vim /etc/nginx/waf/config.lua
+</code></pre>
+
+<p>将config.lua文件中</p>
+
+<div class="language-lua highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">CCDeny</span><span class="o">=</span><span class="s2">"off"</span>
+<span class="n">CCrate</span><span class="o">=</span><span class="s2">"100/60"</span>
+</code></pre></div></div>
+
+<p>修改为</p>
+
+<div class="language-lua highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">CCDeny</span><span class="o">=</span><span class="s2">"on"</span>
+<span class="n">CCrate</span><span class="o">=</span><span class="s2">"10/60"</span> <span class="o">#</span><span class="err">每</span><span class="mi">60</span><span class="err">秒访问</span><span class="mi">1</span><span class="err">次</span>
+</code></pre></div></div>
+
+<p>修改完成检查nginx语法并重启</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -tc /etc/nginx/nginx.conf
+nginx -s reload -c /etc/nginx/nginx.conf
+</code></pre></div></div>
+
+<p>然后在测试页面输入域名http://yagm.xin/login.html,不停的按F5键，就会出现503。</p>
+
+:ET

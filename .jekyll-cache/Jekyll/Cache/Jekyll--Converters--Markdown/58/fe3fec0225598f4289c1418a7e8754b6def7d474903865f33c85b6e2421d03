@@ -1,0 +1,185 @@
+I"�`<blockquote>
+  <p>小程序获取页面的当前实例方法<code class="language-plaintext highlighter-rouge">getCurrentPages()</code></p>
+</blockquote>
+
+<blockquote>
+  <p>小程中this.setData({},callback)方法是异步方法</p>
+</blockquote>
+
+<h1 id="1小程序中的请求">1.小程序中的请求</h1>
+
+<p>习惯了jQ中的ajax，方式简洁，在微信中的请求过于繁琐，自己动手简单的写下</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">#</span><span class="nx">创建ajax</span><span class="p">.</span><span class="nx">js</span>
+<span class="kd">function</span> <span class="nx">ajaxFactory</span><span class="p">(){</span>
+    <span class="kd">let</span> <span class="nx">configData</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="na">taoke_id</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>  <span class="c1">//ext.taoke_id,</span>
+        <span class="na">client_id</span><span class="p">:</span><span class="dl">'</span><span class="s1">pcselection</span><span class="dl">'</span><span class="p">,</span>
+        <span class="na">page_size</span><span class="p">:</span><span class="mi">10</span>
+    <span class="p">}</span>
+    <span class="c1">//get方法</span>
+    <span class="kd">function</span> <span class="kd">get</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span><span class="nx">data</span><span class="p">,</span><span class="nx">callback</span><span class="p">){</span>
+        <span class="nx">data</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span><span class="nx">configData</span><span class="p">,</span><span class="nx">data</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="dl">''</span> <span class="o">==</span> <span class="nx">url</span><span class="p">){</span>
+            <span class="kd">let</span> <span class="nx">err</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">请输入请求url</span><span class="dl">'</span><span class="p">);</span>
+            <span class="k">throw</span> <span class="nx">err</span><span class="p">;</span>
+            <span class="k">return</span> <span class="p">;</span>
+        <span class="p">}</span>
+        <span class="nx">wx</span><span class="p">.</span><span class="nx">request</span><span class="p">({</span>
+            <span class="na">url</span><span class="p">:</span> <span class="nx">url</span><span class="p">,</span>
+            <span class="na">data</span><span class="p">:</span> <span class="nx">data</span><span class="p">,</span>
+            <span class="na">header</span><span class="p">:</span> <span class="p">{</span>
+                <span class="dl">'</span><span class="s1">content-type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/x-www-form-urlencoded</span><span class="dl">'</span>  <span class="c1">//序列化</span>
+            <span class="p">},</span>
+            <span class="na">method</span><span class="p">:</span><span class="dl">'</span><span class="s1">GET</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">dataType</span><span class="p">:</span><span class="dl">'</span><span class="s1">json</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span><span class="p">(</span><span class="nx">callback</span><span class="p">){</span>
+                    <span class="nx">callback</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="na">fail</span><span class="p">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">log</span><span class="p">){</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">log</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+    <span class="c1">//post方法</span>
+    <span class="kd">function</span> <span class="nx">post</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span><span class="nx">data</span><span class="p">,</span><span class="nx">callback</span><span class="p">){</span>
+        <span class="nx">data</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span><span class="nx">configData</span><span class="p">,</span><span class="nx">data</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="dl">''</span> <span class="o">==</span> <span class="nx">url</span><span class="p">){</span>
+            <span class="kd">let</span> <span class="nx">err</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">请输入请求url</span><span class="dl">'</span><span class="p">);</span>
+            <span class="k">throw</span> <span class="nx">err</span><span class="p">;</span>
+            <span class="k">return</span> <span class="p">;</span>
+        <span class="p">}</span>
+        <span class="nx">wx</span><span class="p">.</span><span class="nx">request</span><span class="p">({</span>
+            <span class="na">url</span><span class="p">:</span> <span class="nx">url</span><span class="p">,</span>
+            <span class="na">data</span><span class="p">:</span> <span class="nx">data</span><span class="p">,</span>
+            <span class="na">header</span><span class="p">:</span> <span class="p">{</span>
+                <span class="dl">'</span><span class="s1">content-type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/x-www-form-urlencoded</span><span class="dl">'</span> <span class="c1">//序列化</span>
+            <span class="p">},</span>
+            <span class="na">method</span><span class="p">:</span><span class="dl">'</span><span class="s1">POST</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">dataType</span><span class="p">:</span><span class="dl">'</span><span class="s1">json</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span><span class="p">(</span><span class="nx">callback</span><span class="p">){</span>
+                    <span class="nx">callback</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="na">fail</span><span class="p">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">log</span><span class="p">){</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">log</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="na">get</span><span class="p">:</span><span class="kd">get</span><span class="p">,</span>
+        <span class="na">post</span><span class="p">:</span><span class="nx">post</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">ajax</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">get</span><span class="p">:</span><span class="nx">ajaxFactory</span><span class="p">().</span><span class="kd">get</span><span class="p">,</span>
+    <span class="na">post</span><span class="p">:</span><span class="nx">ajaxFactory</span><span class="p">().</span><span class="nx">post</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>在如a.js中使用</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">ajax</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">path/ajax.js</span><span class="dl">"</span><span class="p">;</span>  <span class="c1">//path就是路径</span>
+
+<span class="c1">//post请求</span>
+<span class="nx">ajax</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="dl">'</span><span class="s1">http:www.baidu.com</span><span class="dl">'</span><span class="p">,{</span>
+	<span class="na">key1</span><span class="p">:</span><span class="nx">value1</span><span class="p">,</span>
+	<span class="na">key2</span><span class="p">:</span><span class="nx">value2</span>
+<span class="p">},</span><span class="nx">data</span> <span class="o">=&gt;</span> <span class="p">{</span>
+	<span class="c1">//返回成功后处理的回调</span>
+<span class="p">});</span>
+
+<span class="c1">//get请求</span>
+<span class="nx">ajax</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">http:www.baidu.com</span><span class="dl">'</span><span class="p">,{</span>
+	<span class="na">key1</span><span class="p">:</span><span class="nx">value1</span><span class="p">,</span>
+	<span class="na">key2</span><span class="p">:</span><span class="nx">value2</span>
+<span class="p">},</span><span class="nx">data</span> <span class="o">=&gt;</span><span class="p">{</span>
+    <span class="c1">//返回成功后处理的回调</span>
+<span class="p">});</span>
+
+</code></pre></div></div>
+
+<p>有没有回到jQ的用法，现在可以大喊一声，我 胡汉三又回来了！</p>
+
+<h1 id="2获得当前页面url">2.获得当前页面url</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">#</span><span class="mi">01</span><span class="p">.</span><span class="nx">获取当前页面的url</span>
+<span class="k">export</span> <span class="kd">function</span> <span class="nx">getCurrentPageUrl</span><span class="p">(){</span>
+    <span class="kd">let</span> <span class="nx">pages</span> <span class="o">=</span> <span class="nx">getCurrentPages</span><span class="p">();</span>    <span class="c1">//获取加载的页面</span>
+    <span class="kd">let</span> <span class="nx">currentPage</span> <span class="o">=</span> <span class="nx">pages</span><span class="p">[</span><span class="nx">pages</span><span class="p">.</span><span class="nx">length</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span>    <span class="c1">//获取当前页面的对象</span>
+    <span class="kd">let</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">currentPage</span><span class="p">.</span><span class="nx">route</span><span class="p">;</span>    <span class="c1">//当前页面url</span>
+    <span class="k">return</span> <span class="nx">url</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="err">#</span><span class="mi">02</span><span class="p">.</span><span class="nx">获取当前页带参数的url</span>
+<span class="k">export</span> <span class="kd">function</span> <span class="nx">getCurrentPageUrlWithArgs</span><span class="p">(){</span>
+    <span class="kd">let</span> <span class="nx">pages</span> <span class="o">=</span> <span class="nx">getCurrentPages</span><span class="p">();</span>    <span class="c1">//获取加载的页面</span>
+    <span class="kd">let</span> <span class="nx">currentPage</span> <span class="o">=</span> <span class="nx">pages</span><span class="p">[</span><span class="nx">pages</span><span class="p">.</span><span class="nx">length</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span>    <span class="c1">//获取当前页面的对象</span>
+    <span class="kd">let</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">currentPage</span><span class="p">.</span><span class="nx">route</span><span class="p">;</span>    <span class="c1">//当前页面url</span>
+    <span class="kd">let</span> <span class="nx">options</span> <span class="o">=</span> <span class="nx">currentPage</span><span class="p">.</span><span class="nx">options</span><span class="p">;</span>    <span class="c1">//如果要获取url中所带的参数可以查看options</span>
+
+    <span class="c1">//拼接url的参数</span>
+    <span class="kd">var</span> <span class="nx">urlWithArgs</span> <span class="o">=</span> <span class="nx">url</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">?</span><span class="dl">'</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">options</span><span class="p">){</span>
+        <span class="kd">let</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+        <span class="nx">urlWithArgs</span> <span class="o">+=</span> <span class="nx">key</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">=</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">value</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&amp;</span><span class="dl">'</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">urlWithArgs</span> <span class="o">=</span> <span class="nx">urlWithArgs</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">urlWithArgs</span><span class="p">.</span><span class="nx">length</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nx">urlWithArgs</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="err">#</span><span class="mi">03</span><span class="p">.</span><span class="nx">获取当前页面参数</span>
+<span class="k">export</span> <span class="kd">function</span> <span class="nx">getCurrentPageParam</span><span class="p">(){</span>
+    <span class="kd">let</span> <span class="nx">pages</span> <span class="o">=</span> <span class="nx">getCurrentPages</span><span class="p">();</span>    <span class="c1">//获取加载的页面</span>
+    <span class="kd">let</span> <span class="nx">currentPage</span> <span class="o">=</span> <span class="nx">pages</span><span class="p">[</span><span class="nx">pages</span><span class="p">.</span><span class="nx">length</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span>    <span class="c1">//获取当前页面的对象</span>
+    <span class="kd">let</span> <span class="nx">options</span> <span class="o">=</span> <span class="nx">currentPage</span><span class="p">.</span><span class="nx">options</span><span class="p">;</span>    <span class="c1">//如果要获取url中所带的参数可以查看options</span>
+    <span class="k">return</span> <span class="nx">options</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<h1 id="3小程序倒计时">3.小程序倒计时</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">countDown</span> <span class="o">=</span> <span class="p">(</span><span class="nb">self</span><span class="p">,</span><span class="nx">endData</span><span class="p">)</span> <span class="o">=&gt;</span><span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">endTime</span> <span class="o">=</span> <span class="nx">endData</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">nowTime</span> <span class="o">=</span>  <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">();</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="nx">endTime</span> <span class="o">-</span> <span class="nx">nowTime</span> <span class="p">){</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nx">setData</span><span class="p">({</span><span class="na">endData</span><span class="p">:</span><span class="dl">'</span><span class="s1">已结束</span><span class="dl">'</span><span class="p">});</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">changeTime</span> <span class="o">=</span> <span class="p">(</span><span class="nx">endTime</span> <span class="o">-</span> <span class="nx">nowTime</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="nx">tmp</span> <span class="o">=</span> <span class="nx">msTransformDate</span><span class="p">(</span><span class="nx">changeTime</span><span class="p">),</span>
+        <span class="nx">day</span> <span class="o">=</span> <span class="nx">tmp</span><span class="p">.</span><span class="nx">day</span><span class="p">,</span>
+        <span class="nx">h</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">&gt;</span><span class="nx">tmp</span><span class="p">.</span><span class="nx">h</span><span class="p">?</span><span class="dl">'</span><span class="s1">0</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">tmp</span><span class="p">.</span><span class="nx">h</span><span class="p">:</span><span class="nx">tmp</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span>
+        <span class="nx">m</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">&gt;</span><span class="nx">tmp</span><span class="p">.</span><span class="nx">m</span><span class="p">?</span><span class="dl">'</span><span class="s1">0</span><span class="dl">'</span><span class="o">+</span> <span class="nx">tmp</span><span class="p">.</span><span class="nx">m</span><span class="p">:</span><span class="nx">tmp</span><span class="p">.</span><span class="nx">m</span><span class="p">,</span>
+        <span class="nx">s</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">&gt;</span> <span class="nx">tmp</span><span class="p">.</span><span class="nx">s</span><span class="p">?</span><span class="dl">'</span><span class="s1">0</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">tmp</span><span class="p">.</span><span class="nx">s</span><span class="p">:</span><span class="nx">tmp</span><span class="p">.</span><span class="nx">s</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">day</span> <span class="o">+</span><span class="dl">'</span><span class="s1">天 </span><span class="dl">'</span><span class="o">+</span><span class="nx">h</span><span class="o">+</span><span class="dl">'</span><span class="s1">小时 </span><span class="dl">'</span><span class="o">+</span><span class="nx">m</span><span class="o">+</span><span class="dl">'</span><span class="s1">分钟 </span><span class="dl">'</span><span class="o">+</span><span class="nx">s</span><span class="o">+</span><span class="dl">'</span><span class="s1">秒</span><span class="dl">'</span><span class="p">;</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nx">setData</span><span class="p">({</span><span class="na">endData</span><span class="p">:</span><span class="nx">text</span><span class="p">});</span>
+  <span class="p">}</span>
+  <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+    <span class="nx">countDown</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span><span class="nx">endData</span><span class="p">);</span>
+  <span class="p">},</span><span class="mi">1000</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="kd">const</span> <span class="nx">msTransformDate</span> <span class="o">=</span> <span class="nx">ms</span> <span class="o">=&gt;</span><span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">day</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">ms</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">24</span><span class="p">),</span>
+      <span class="nx">h</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">((</span><span class="nx">ms</span><span class="o">-</span><span class="p">(</span><span class="nx">day</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">1000</span><span class="p">))</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">60</span><span class="p">),</span>
+      <span class="nx">m</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">((</span><span class="nx">ms</span> <span class="o">-</span> <span class="p">(</span><span class="nx">day</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="nx">h</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">1000</span><span class="p">))</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="mi">60</span><span class="p">),</span>
+      <span class="nx">s</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">((</span><span class="nx">ms</span> <span class="o">-</span> <span class="p">(</span><span class="nx">day</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="nx">h</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="nx">m</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">1000</span><span class="p">))</span><span class="o">/</span><span class="mi">1000</span><span class="p">);</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">day</span><span class="p">:</span><span class="nx">day</span><span class="p">,</span>
+    <span class="na">h</span><span class="p">:</span><span class="nx">h</span><span class="p">,</span>
+    <span class="na">m</span><span class="p">:</span><span class="nx">m</span><span class="p">,</span>
+    <span class="na">s</span><span class="p">:</span><span class="nx">s</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+:ET

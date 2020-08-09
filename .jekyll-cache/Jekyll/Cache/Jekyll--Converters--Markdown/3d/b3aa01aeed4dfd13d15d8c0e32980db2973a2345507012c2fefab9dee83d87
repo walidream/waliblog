@@ -1,0 +1,207 @@
+I"v)<p>uWSGI是一个Web服务器，它实现了WSGI协议、uwsgi、http等协议。Nginx中HttpUwsgiModule的作用是与uWSGI服务器进行交换。fastcgi应用于php语言，
+uwsgi应用于Python语言。</p>
+
+<h4 id="wsgi">WSGI</h4>
+
+<p>WSGI是一种WEB服务器==网关接口==。 是一个Web服务器（如nginx）与应用服务器（如uWSGI）通信的一种规范（协议）。</p>
+
+<p>在生产环境中使用WSGI作为python web的服务器。Python Web服务器网关接口，是Python应用程序或框架和Web服务器之间的一种接口，被广泛接受。WSGI没有官方的实现, 因为WSGI更像一个协议，只要遵照这些协议，WSGI应用(Application)都可以在任何服务器(Server)上运行。</p>
+
+<h4 id="uwsgi">uWSGI</h4>
+
+<p>uWSGI实现了WSGI的所有接口，是一个快速、自我修复、开发人员和系统管理员友好的服务器。uWSGI代码完全用C编写，效率高、性能稳定。</p>
+
+<p>uwsgi是一种线路协议而不是通信协议，在此常用于在uWSGI服务器与其他网络服务器的数据通信。uwsgi协议是一个uWSGI服务器自有的协议，它用于定义传输信息的类型。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_43.jpg" alt="ssl" /></p>
+
+<h1 id="1安装基础环境">1.安装基础环境</h1>
+
+<h4 id="安装系统基础包">安装系统基础包</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum install openssl-devel bzip2-devel expat-devel gdbm-devel readline-devel sqlite-devel gcc gcc-c++  openssl-devel -y
+</code></pre></div></div>
+
+<h4 id="安装mysql支持">安装mysql支持</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum install mysqld mysql-devel
+</code></pre></div></div>
+
+<h4 id="获取phthon源码包">获取phthon源码包</h4>
+
+<p>到官方网站，下载最新python源码包</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tgz
+</code></pre></div></div>
+
+<h4 id="解压安装">解压安装</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tar -xvf Python-3.6.2.tgz
+cd Python-3.6.2/
+./configure --prefix=/opt/python3.6
+make
+make install
+echo "export PATH=/opt/python3.6/bin:\$PATH" &gt; /etc/profile.d/python.sh
+
+
+echo $PATH
+which python
+mkdir ~/.python-eggs
+chmod +w ~/.python-eggs
+echo "export PATH=/opt/python3.6/bin:\$PATH" &gt; /etc/profile.d/python.sh
+
+export PATH=/opt/python3.6/bin:$PATH
+
+python3 -V
+</code></pre></div></div>
+
+<h4 id="安装django">安装django</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/opt/python3.6/bin/pip3 install django
+</code></pre></div></div>
+
+<p>查看是否安装成功</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd /opt/python3.6/bin/  
+</code></pre></div></div>
+
+<p>是否存在<code class="language-plaintext highlighter-rouge">django-admin.py</code>这个文件，存在说明安装成功</p>
+
+<h4 id="安装uwsgi">安装uwsgi</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/opt/python3.6/bin/pip3  install uwsgi
+cd /opt/python3.6/bin/  
+</code></pre></div></div>
+
+<p>是否存在<code class="language-plaintext highlighter-rouge">uwsgi</code>这个文件，存在说明安装成功</p>
+
+<h1 id="2启动uwsgi">2.启动uwsgi</h1>
+
+<p>服务目录</p>
+
+<pre><code class="language-txt">/opt/app/
+|-code7/
+   |-demo  #这些不需要手动创建，由/opt/python3.6/bin/django-admin.py  startproject demo自动生成
+      |-demo
+         |-__init__.py
+         |-settings.py
+         |-urls.py
+         |-wsgi.py	
+   |-manage.py	
+|-conf/
+   |-uwsig.ini
+</code></pre>
+
+<p>在<code class="language-plaintext highlighter-rouge">/opt/app</code>创建<code class="language-plaintext highlighter-rouge">code7</code>和<code class="language-plaintext highlighter-rouge">conf</code>文件夹。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd code7
+/opt/python3.6/bin/django-admin.py  startproject demo  #用django-admin.py创建一个demo项目
+</code></pre></div></div>
+
+<p>由于启动时需要普通用户启动</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>useradd uwsgi #创建一个普通用户
+</code></pre></div></div>
+
+<h4 id="uwsigini">uwsig.ini</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">uwsgi</span><span class="p">]</span>
+<span class="n">socket</span> <span class="o">=</span> <span class="mf">127.0</span><span class="p">.</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">9005</span>
+<span class="c1">#chdir = /opt/app/code7/demo
+</span><span class="n">workers</span> <span class="o">=</span> <span class="mi">2</span> 
+<span class="nb">max</span><span class="o">-</span><span class="n">requests</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="nb">buffer</span><span class="o">-</span><span class="n">size</span> <span class="o">=</span> <span class="mi">30000</span>
+<span class="n">pidfile</span> <span class="o">=</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">uwsgi</span><span class="o">/</span><span class="n">uwsgi</span><span class="p">.</span><span class="n">pid</span>
+<span class="n">daemonize</span> <span class="o">=</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">uwsgi</span><span class="p">.</span><span class="n">log</span>
+</code></pre></div></div>
+
+<p>由于需要对/var/run/uwsgi/目录进行写入操作</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>chown -R uwsgi /var/run/uwsgi/
+</code></pre></div></div>
+
+<h4 id="切换普通用户">切换普通用户</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>su - uwsgi
+cd /opt/app/conf
+</code></pre></div></div>
+
+<p>启动uwsgi之前需要确保uwsgi没有被启动</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ps -ef | grep uwsgi
+kill -9 'pid'  #如果检查有启动，需要杀死进程
+/opt/python3.6/bin/uwsgi --ini /opt/app/conf/uwsgi.init  #启动uwsgi
+</code></pre></div></div>
+
+<p>如果有错误，请查看日/var/log/uwsgi.log。小菜第一次也没有启动起来，报的是uwsgi用户没有权限，还有就是不存在<code class="language-plaintext highlighter-rouge">/var/run/uwsgi/uwsgi.pid</code>文件，如果不存在<code class="language-plaintext highlighter-rouge">/var/run/uwsgi/uwsgi.pid</code>
+文件就先切到root用户创建，然后在做后面的步骤。</p>
+
+<p>如果成功了，检查一下9005端口是否被监听</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ss -luntp | grep 9005
+</code></pre></div></div>
+
+<h1 id="3nginx配置">3.nginx配置</h1>
+
+<p>服务目录</p>
+
+<pre><code class="language-txt">/etc/nginx/conf.d
+|-uwsgi.conf
+</code></pre>
+
+<h4 id="uwsgiconf">uwsgi.conf</h4>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span>       <span class="mi">80</span><span class="p">;</span> 
+    <span class="kn">server_name</span>  <span class="s">localhost</span><span class="p">;</span>
+
+    <span class="c1">#charset koi8-r;</span>
+    <span class="kn">access_log</span>  <span class="n">/var/log/nginx/host.access.log</span>  <span class="s">main</span><span class="p">;</span>
+
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span> 
+        <span class="kn">include</span> <span class="s">uwsgi_params</span><span class="p">;</span>
+        <span class="kn">uwsgi_pass</span> <span class="nf">127.0.0.1</span><span class="p">:</span><span class="mi">9005</span><span class="p">;</span>
+        <span class="kn">uwsgi_param</span> <span class="s">UWSGI_SCRIPT</span> <span class="s">demo.wsgi</span><span class="p">;</span>
+        <span class="kn">uwsgi_param</span> <span class="s">UWSGI_CHDIR</span> <span class="n">/opt/app/code7/demo</span><span class="p">;</span>
+        <span class="kn">index</span>  <span class="s">index.html</span> <span class="s">index.htm</span><span class="p">;</span>
+        <span class="kn">client_max_body_size</span> <span class="mi">35m</span><span class="p">;</span>
+    <span class="p">}</span> 
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>检查语法并重启</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nginx -tc /etc/nginx/nginx.conf
+nginx -s reload -c /etc/nginx/nginx.conf
+</code></pre></div></div>
+
+<p>重启nginx后输入域名http://walidream.com</p>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_44.jpg" alt="ssl" /></p>
+
+<p>会发现django报了一个错误，需要将我们的域名添加进白名单</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim /opt/app/code7/demo/demo/settings.py
+/ALLOWED_HOSTS = #查找到ALLOWED_HOSTS，将我们的域名添加进白名单
+</code></pre></div></div>
+
+<p>将之前的django进程关闭</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ps -ef |grep uwsgi
+</code></pre></div></div>
+
+<p>将<code class="language-plaintext highlighter-rouge">/opt/python3.6/bin/uwsgi --ini /opt/app/conf/uwsgi.init</code>进程杀死掉</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kill -9 'pid'
+</code></pre></div></div>
+
+<p>之后再重启django</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/opt/python3.6/bin/uwsgi --ini /opt/app/conf/uwsgi.init	
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/nginx/nginx_45.jpg" alt="ssl" /></p>
+
+<p>出现欢迎界面就说明我们配置好了。</p>
+
+:ET

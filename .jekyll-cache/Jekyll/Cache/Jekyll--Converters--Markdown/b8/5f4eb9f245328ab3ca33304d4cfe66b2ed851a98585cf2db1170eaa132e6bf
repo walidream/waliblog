@@ -1,0 +1,35 @@
+I"�<p>最近小菜用element UI的框架发现el-input 的自动聚焦只有在第一次会自动聚焦，后面的不会自动聚焦，就用指令写一个input自动聚焦</p>
+
+<script async="" src="//jsrun.net/dxhKp/embed/all/light/"></script>
+
+<p>在directive文件夹下创建一个<code class="language-plaintext highlighter-rouge">focus.js</code>文件，将下面代码复制进去</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="kd">const</span> <span class="nx">focus</span> <span class="o">=</span><span class="p">{</span>
+    <span class="na">inserted</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">let</span> <span class="nx">dom</span> <span class="o">=</span> <span class="nx">el</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="dl">'</span><span class="s1">el-input__inner</span><span class="dl">'</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="nx">dom</span><span class="p">.</span><span class="nx">focus</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>在需要vue文件中指令引入</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nx">directives</span><span class="p">:{</span>
+    <span class="nx">focus</span><span class="p">,</span>
+<span class="p">}</span>
+	
+</code></pre></div></div>
+<p>然后在dom</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="o">&lt;</span><span class="nx">el</span><span class="o">-</span><span class="nx">input</span> <span class="nx">placeholder</span><span class="o">=</span><span class="dl">"</span><span class="s2">请输入单号、人力资源姓名</span><span class="dl">"</span>
+		  <span class="nx">v</span><span class="o">-</span><span class="nx">model</span><span class="o">=</span><span class="dl">"</span><span class="s2">searchTxt</span><span class="dl">"</span>
+		  <span class="nx">v</span><span class="o">-</span><span class="nx">focus</span>
+		  <span class="nx">clearable</span><span class="o">&gt;</span>
+	<span class="o">&lt;</span><span class="nx">i</span> <span class="nx">slot</span><span class="o">=</span><span class="dl">"</span><span class="s2">prefix</span><span class="dl">"</span> <span class="kd">class</span><span class="o">=</span><span class="dl">"</span><span class="s2">el-input__icon el-icon-search</span><span class="dl">"</span><span class="o">&gt;&lt;</span><span class="sr">/i</span><span class="err">&gt;
+</span><span class="o">&lt;</span><span class="sr">/el-input</span><span class="err">&gt;
+</span></code></pre></div></div>
+
+:ET
