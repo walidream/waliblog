@@ -1,0 +1,139 @@
+I"�A<p>这小节小菜将记录一些常用的开发技巧,想练习的小伙伴们下载<a href="http://walidream.com/waliData/school.sql" download="school.sql">练习表查询sql表</a></p>
+
+<h1 id="1join更新表">1.join更新表</h1>
+
+<p>更新表中多条数据</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">--将课程成中php老师都替换成'小白'</span>
+<span class="k">UPDATE</span> <span class="n">teacher</span> <span class="n">t</span>
+<span class="k">JOIN</span> <span class="p">(</span> <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">course</span> <span class="k">c</span> <span class="k">WHERE</span> <span class="k">c</span><span class="p">.</span><span class="n">c_name</span> <span class="o">=</span> <span class="s1">'php'</span> <span class="p">)</span> <span class="n">b</span> <span class="k">ON</span> <span class="n">t</span><span class="p">.</span><span class="n">t_id</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">t_id</span> 
+<span class="k">SET</span> <span class="n">t</span><span class="p">.</span><span class="n">t_name</span> <span class="o">=</span> <span class="s1">'小白'</span>
+<span class="c1">--这样子写在sql会报错</span>
+<span class="k">UPDATE</span> <span class="n">teacher</span> <span class="n">t</span> 
+<span class="k">SET</span> <span class="n">t</span><span class="p">.</span><span class="n">t_name</span> <span class="o">=</span> <span class="s1">'催永元'</span> 
+<span class="k">WHERE</span>
+	<span class="n">t</span><span class="p">.</span><span class="n">t_id</span> <span class="k">IN</span> <span class="p">(</span> <span class="k">SELECT</span> <span class="k">c</span><span class="p">.</span><span class="n">t_id</span> <span class="k">FROM</span> <span class="n">course</span> <span class="k">c</span> <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">teacher</span> <span class="n">t</span> <span class="k">ON</span> <span class="n">t</span><span class="p">.</span><span class="n">t_id</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">t_id</span> <span class="k">WHERE</span> <span class="k">c</span><span class="p">.</span><span class="n">c_name</span> <span class="o">=</span> <span class="s1">'php'</span> <span class="p">)</span>
+</code></pre></div></div>
+<p><img src="http://walidream.com:9999/blogImage/server/server_44.png" alt="ssl" /></p>
+
+<h1 id="2join优化子查询">2.join优化子查询</h1>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">--未优化</span>
+<span class="k">SELECT</span> <span class="k">C</span><span class="p">.</span><span class="n">c_name</span><span class="p">,</span> <span class="p">(</span>
+	<span class="k">SELECT</span> <span class="n">T</span><span class="p">.</span><span class="n">t_name</span>
+	<span class="k">FROM</span> <span class="n">teacher</span> <span class="n">T</span>
+	<span class="k">WHERE</span> <span class="n">T</span><span class="p">.</span><span class="n">t_id</span> <span class="o">=</span> <span class="k">C</span><span class="p">.</span><span class="n">t_id</span>
+<span class="p">)</span> <span class="k">AS</span> <span class="n">t_name</span>
+<span class="k">FROM</span> <span class="n">course</span> <span class="k">C</span><span class="p">;</span>
+
+<span class="c1">--优化后</span>
+<span class="k">SELECT</span> <span class="k">C</span><span class="p">.</span><span class="n">c_name</span><span class="p">,</span> <span class="n">T</span><span class="p">.</span><span class="n">t_name</span> 
+<span class="k">FROM</span> <span class="n">course</span> <span class="k">C</span>
+<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">teacher</span> <span class="n">T</span> <span class="k">on</span> <span class="k">C</span><span class="p">.</span><span class="n">t_id</span> <span class="o">=</span> <span class="n">T</span><span class="p">.</span><span class="n">t_id</span><span class="p">;</span>
+</code></pre></div></div>
+<p><img src="http://walidream.com:9999/blogImage/server/server_45.png" alt="ssl" /></p>
+
+<h1 id="3join优化聚合查询">3.join优化聚合查询</h1>
+
+<p>查询每门课最高分数是多少</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span>
+	<span class="k">c</span><span class="p">.</span><span class="n">c_name</span><span class="p">,</span>
+	<span class="n">sc</span><span class="p">.</span><span class="n">s_score</span> 
+<span class="k">FROM</span>
+	<span class="n">score</span> <span class="n">sc</span>
+	<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">course</span> <span class="k">c</span> <span class="k">ON</span> <span class="n">sc</span><span class="p">.</span><span class="n">c_id</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">c_id</span> 
+<span class="k">WHERE</span>
+	<span class="n">sc</span><span class="p">.</span><span class="n">s_score</span> <span class="o">=</span> <span class="p">(</span> <span class="k">SELECT</span> <span class="k">MAX</span><span class="p">(</span> <span class="n">t</span><span class="p">.</span><span class="n">s_score</span> <span class="p">)</span> <span class="k">FROM</span> <span class="n">score</span> <span class="n">t</span> <span class="k">WHERE</span> <span class="n">t</span><span class="p">.</span><span class="n">c_id</span> <span class="o">=</span> <span class="n">sc</span><span class="p">.</span><span class="n">c_id</span> <span class="p">)</span>
+</code></pre></div></div>
+<p><img src="http://walidream.com:9999/blogImage/server/server_46.png" alt="ssl" /></p>
+
+<h1 id="4如何实现分组选择">4.如何实现分组选择</h1>
+
+<p>查询每门课程的前3名学科的同学姓名</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span>
+	<span class="n">st</span><span class="p">.</span><span class="n">s_name</span><span class="p">,</span>
+	<span class="n">tmp</span><span class="p">.</span><span class="n">c_id</span><span class="p">,</span>
+	<span class="n">tmp</span><span class="p">.</span><span class="n">s_score</span> 
+<span class="k">FROM</span>
+	<span class="n">student</span> <span class="n">st</span>
+	<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="p">(</span>
+	<span class="k">SELECT</span>
+		<span class="n">sc</span><span class="p">.</span><span class="n">s_id</span><span class="p">,</span>
+		<span class="n">sc</span><span class="p">.</span><span class="n">c_id</span><span class="p">,</span>
+		<span class="n">sc</span><span class="p">.</span><span class="n">s_score</span> 
+	<span class="k">FROM</span>
+		<span class="n">score</span> <span class="n">sc</span>
+		<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">score</span> <span class="n">s</span> <span class="k">ON</span> <span class="n">sc</span><span class="p">.</span><span class="n">c_id</span> <span class="o">=</span> <span class="n">s</span><span class="p">.</span><span class="n">c_id</span> 
+		<span class="k">AND</span> <span class="n">sc</span><span class="p">.</span><span class="n">s_score</span> <span class="o">&lt;=</span> <span class="n">s</span><span class="p">.</span><span class="n">s_score</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">sc</span><span class="p">.</span><span class="n">c_id</span><span class="p">,</span> <span class="n">sc</span><span class="p">.</span><span class="n">s_id</span><span class="p">,</span> <span class="n">sc</span><span class="p">.</span><span class="n">s_score</span> <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span> <span class="n">sc</span><span class="p">.</span><span class="n">c_id</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span> 
+	<span class="k">ORDER</span> <span class="k">BY</span>
+		<span class="n">sc</span><span class="p">.</span><span class="n">c_id</span><span class="p">,</span>
+		<span class="n">sc</span><span class="p">.</span><span class="n">s_score</span> <span class="k">DESC</span> 
+	<span class="p">)</span> <span class="n">tmp</span> <span class="k">ON</span> <span class="n">tmp</span><span class="p">.</span><span class="n">s_id</span> <span class="o">=</span> <span class="n">st</span><span class="p">.</span><span class="n">s_id</span> 
+<span class="k">ORDER</span> <span class="k">BY</span>
+	<span class="n">c_id</span><span class="p">,</span>
+	<span class="n">s_score</span> <span class="k">DESC</span>
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_47.png" alt="ssl" /></p>
+
+<h1 id="5行转列">5.行转列</h1>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">st</span><span class="p">.</span><span class="n">s_name</span><span class="p">,</span> <span class="k">c</span><span class="p">.</span><span class="n">c_name</span><span class="p">,</span> <span class="n">sc</span><span class="p">.</span><span class="n">s_score</span>
+<span class="k">FROM</span> <span class="n">student</span> <span class="n">st</span><span class="p">,</span> <span class="n">course</span> <span class="k">c</span><span class="p">,</span> <span class="n">score</span> <span class="n">sc</span>
+<span class="k">WHERE</span> <span class="n">sc</span><span class="p">.</span><span class="n">s_id</span> <span class="o">=</span> <span class="n">st</span><span class="p">.</span><span class="n">s_id</span> 
+<span class="k">AND</span> <span class="n">sc</span><span class="p">.</span><span class="n">c_id</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">c_id</span>
+</code></pre></div></div>
+<p><img src="http://walidream.com:9999/blogImage/server/server_48.png" alt="ssl" /></p>
+
+<p>转换成下面的效果</p>
+
+<h4 id="静态行转列">静态行转列</h4>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">--</span>
+<span class="c1">-- 静态行转列</span>
+<span class="c1">--</span>
+<span class="k">SELECT</span>
+	<span class="n">sc</span><span class="p">.</span><span class="n">s_id</span><span class="p">,</span>
+	<span class="n">st</span><span class="p">.</span><span class="n">s_name</span><span class="p">,</span>
+	<span class="k">MAX</span><span class="p">(</span> <span class="k">CASE</span> <span class="k">c</span><span class="p">.</span><span class="n">c_name</span> <span class="k">WHEN</span> <span class="s1">'java'</span> <span class="k">THEN</span> <span class="n">sc</span><span class="p">.</span><span class="n">s_score</span> <span class="k">ELSE</span> <span class="mi">0</span> <span class="k">END</span> <span class="p">)</span> <span class="s1">'java'</span><span class="p">,</span>
+	<span class="k">MAX</span><span class="p">(</span> <span class="k">CASE</span> <span class="k">c</span><span class="p">.</span><span class="n">c_name</span> <span class="k">WHEN</span> <span class="s1">'net'</span> <span class="k">THEN</span> <span class="n">sc</span><span class="p">.</span><span class="n">s_score</span> <span class="k">ELSE</span> <span class="mi">0</span> <span class="k">END</span> <span class="p">)</span> <span class="s1">'net'</span><span class="p">,</span>
+	<span class="k">MAX</span><span class="p">(</span> <span class="k">CASE</span> <span class="k">c</span><span class="p">.</span><span class="n">c_name</span> <span class="k">WHEN</span> <span class="s1">'php'</span> <span class="k">THEN</span> <span class="n">sc</span><span class="p">.</span><span class="n">s_score</span> <span class="k">ELSE</span> <span class="mi">0</span> <span class="k">END</span> <span class="p">)</span> <span class="s1">'php'</span><span class="p">,</span>
+	<span class="k">MAX</span><span class="p">(</span> <span class="k">CASE</span> <span class="k">c</span><span class="p">.</span><span class="n">c_name</span> <span class="k">WHEN</span> <span class="s1">'hadoop'</span> <span class="k">THEN</span> <span class="n">sc</span><span class="p">.</span><span class="n">s_score</span> <span class="k">ELSE</span> <span class="mi">0</span> <span class="k">END</span> <span class="p">)</span> <span class="s1">'hadoop'</span><span class="p">,</span>
+	<span class="k">MAX</span><span class="p">(</span> <span class="k">CASE</span> <span class="k">c</span><span class="p">.</span><span class="n">c_name</span> <span class="k">WHEN</span> <span class="s1">'test'</span> <span class="k">THEN</span> <span class="n">sc</span><span class="p">.</span><span class="n">s_score</span> <span class="k">ELSE</span> <span class="mi">0</span> <span class="k">END</span> <span class="p">)</span> <span class="s1">'test'</span><span class="p">,</span>
+	<span class="k">MAX</span><span class="p">(</span> <span class="k">CASE</span> <span class="k">c</span><span class="p">.</span><span class="n">c_name</span> <span class="k">WHEN</span> <span class="s1">'google'</span> <span class="k">THEN</span> <span class="n">sc</span><span class="p">.</span><span class="n">s_score</span> <span class="k">ELSE</span> <span class="mi">0</span> <span class="k">END</span> <span class="p">)</span> <span class="s1">'google'</span> 
+<span class="k">FROM</span>
+	<span class="n">score</span> <span class="n">sc</span>
+	<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">course</span> <span class="k">c</span> <span class="k">ON</span> <span class="n">sc</span><span class="p">.</span><span class="n">c_id</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">c_id</span>
+	<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">student</span> <span class="n">st</span> <span class="k">ON</span> <span class="n">sc</span><span class="p">.</span><span class="n">s_id</span> <span class="o">=</span> <span class="n">st</span><span class="p">.</span><span class="n">s_id</span> 
+<span class="k">GROUP</span> <span class="k">BY</span>
+	<span class="n">sc</span><span class="p">.</span><span class="n">s_id</span>
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_49.png" alt="ssl" /></p>
+
+<h4 id="动态行转列">动态行转列</h4>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">--</span>
+<span class="c1">-- 动态行转列</span>
+<span class="c1">--</span>
+<span class="k">SET</span> <span class="o">@</span><span class="k">SQL</span> <span class="o">=</span> <span class="k">NULL</span><span class="p">;</span>
+<span class="k">SELECT</span>
+	<span class="n">GROUP_CONCAT</span><span class="p">(</span> <span class="k">DISTINCT</span> <span class="n">CONCAT</span><span class="p">(</span> <span class="s1">'MAX(IF(c.c_name = </span><span class="se">''</span><span class="s1">'</span><span class="p">,</span> <span class="k">c</span><span class="p">.</span><span class="n">c_name</span><span class="p">,</span> <span class="s1">'</span><span class="se">''</span><span class="s1">,sc.s_score,0)) AS </span><span class="se">''</span><span class="s1">'</span><span class="p">,</span> <span class="k">c</span><span class="p">.</span><span class="n">c_name</span><span class="p">,</span> <span class="s1">'</span><span class="se">''</span><span class="s1">'</span> <span class="p">)</span> <span class="p">)</span> <span class="k">INTO</span> <span class="o">@</span><span class="k">SQL</span> 
+<span class="k">FROM</span>
+	<span class="n">course</span> <span class="k">c</span><span class="p">;</span>
+
+<span class="k">SET</span> <span class="o">@</span><span class="k">SQL</span> <span class="o">=</span> <span class="n">CONCAT</span><span class="p">(</span> <span class="s1">'SELECT st.s_id,st.s_name,'</span><span class="p">,</span> <span class="o">@</span><span class="k">SQL</span><span class="p">,</span> <span class="s1">'FROM score sc
+	LEFT JOIN course c ON sc.c_id = c.c_id
+	LEFT JOIN student st ON sc.s_id = st.s_id 
+	GROUP BY
+sc.s_id'</span> <span class="p">);</span>
+<span class="k">PREPARE</span> <span class="n">stmt</span> 
+<span class="k">FROM</span>
+	<span class="o">@</span><span class="k">SQL</span><span class="p">;</span>
+<span class="k">EXECUTE</span> <span class="n">stmt</span><span class="p">;</span>
+<span class="k">DEALLOCATE</span> <span class="k">PREPARE</span> <span class="n">stmt</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_50.png" alt="ssl" /></p>
+:ET

@@ -1,0 +1,244 @@
+I"�;<p>Vim支持各种插件，也正是因为插件太多导致各个插件的管理比较麻烦，于是Vim插件管理器诞生了，用于安装、管理、卸装Vim插件。本文主要介绍Vim插件管理器Pathogen和Vundle的安装、配置和使用方法。</p>
+
+<h1 id="1vim插件管理器pathogen">1.Vim插件管理器Pathogen</h1>
+
+<h4 id="安装pathogen">安装Pathogen</h4>
+
+<p>pathogen只有一个单独的脚本pathogen.vim，其github下载地址为:<a href="https://github.com/tpope/vim-pathogen" title="https://github.com/tpope/vim-pathogen" target="_blank">https://github.com/tpope/vim-pathogen
+</a></p>
+
+<p>Pathogen下载后直接解压并保存到当前用户的 <code class="language-plaintext highlighter-rouge">~/.vim/autoload</code>目录即可完成安装</p>
+
+<h4 id="启用pathogen">启用Pathogen</h4>
+
+<p>在Vim配置文件vimrc <code class="language-plaintext highlighter-rouge">vim ~/.vimrc</code>里面增加以下三条命令即可启用Pathogen插件。</p>
+
+<div class="language-vim highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">execute</span> pathogen#infect<span class="p">()</span>
+<span class="nb">syntax</span> <span class="k">on</span>
+<span class="k">filetype</span> plugin <span class="nb">indent</span> <span class="k">on</span>
+</code></pre></div></div>
+
+<h4 id="使用pathogen安装卸装vim插件">使用Pathogen安装、卸装Vim插件</h4>
+
+<p>在当前用户目录<code class="language-plaintext highlighter-rouge">~/.vim/</code>下新建<code class="language-plaintext highlighter-rouge">bundle</code>目录，将新安装插件放到该目录下后，Pathogen会自动在bundle目录下生成对应插件子目录并使该插件生效。</p>
+
+<p>而如果需要卸载插件，只需把<code class="language-plaintext highlighter-rouge">~/.vim/bundle</code>目录下对应的插件目录删除即可</p>
+
+<h1 id="2vim插件管理器vundle">2.Vim插件管理器Vundle</h1>
+
+<h4 id="安装vundle">安装Vundle</h4>
+
+<p>Vundle插件也是提供一个Vundle.vim文件，其下载地址为：<a href="https://github.com/VundleVim/Vundle.vim.git" title="https://github.com/VundleVim/Vundle.vim.git" target="_blank">https://github.com/VundleVim/Vundle.vim.git</a></p>
+
+<p>将下载的Vundle.vim文件保存到<code class="language-plaintext highlighter-rouge">~/.vim/bundle</code>即可完成Vundle的安装</p>
+
+<p>也可以使用以下的命令直接从github拉取<code class="language-plaintext highlighter-rouge">Vundle.vim</code>文件到<code class="language-plaintext highlighter-rouge">bundle</code>文件夹下 <code class="language-plaintext highlighter-rouge">git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim</code></p>
+
+<h4 id="配置vundle">配置Vundle</h4>
+
+<p>修改Vim配置文件vimrc，增加必要的配置，以下是<code class="language-plaintext highlighter-rouge">.vimrc</code>配置模板</p>
+
+<div class="language-vim highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">set</span> <span class="nb">nocompatible</span>               <span class="s2">"去除VIM一致性，必须"</span>
+<span class="k">filetype</span> off                   <span class="s2">"必须"</span>
+
+<span class="c">"设置包括vundle和初始化相关的运行时路径"</span>
+<span class="k">set</span> <span class="nb">rtp</span><span class="p">+=~</span><span class="sr">/.vim/</span>bundle/Vundle<span class="p">.</span><span class="k">vim</span>
+<span class="k">call</span> vundle#begin<span class="p">()</span>
+
+<span class="c">"启用vundle管理插件，必须"</span>
+Plugin <span class="s1">'VundleVim/Vundle.vim'</span>
+
+<span class="c">"在此增加其他插件，安装的插件需要放在vundle#begin和vundle#end之间"</span>
+<span class="c">"安装github上的插件格式为 Plugin '用户名/插件仓库名'"</span>
+
+<span class="k">call</span> vundle#end<span class="p">()</span>              
+<span class="k">filetype</span> plugin <span class="nb">indent</span> <span class="k">on</span>      <span class="s2">"加载vim自带和插件相应的语法和文件类型相关脚本，必须"</span>
+</code></pre></div></div>
+
+<h4 id="使用vundle安装插件">使用Vundle安装插件</h4>
+
+<p>首先需要将要安装的插件，按照上述配置格式将插件地址填写在vundle#begin和vundle#end之间并保存</p>
+
+<p>设置好配置文件后，可通过下述两种方法安装插件:</p>
+<ul>
+  <li>在Vim尾行模式下运行命令<code class="language-plaintext highlighter-rouge">:PluginInstall</code></li>
+  <li>在终端命令行下通过命令<code class="language-plaintext highlighter-rouge">vim +PluginInstall +qall</code>直接安装</li>
+</ul>
+
+<p>至此，需要安装的插件已经安装完毕，可以正常使用了</p>
+
+<h4 id="使用vundle删除插件">使用Vundle删除插件</h4>
+
+<p>使用Vundle删除插件:</p>
+<ul>
+  <li>需要删除Vim插件时，只需编辑Vim配置文件<code class="language-plaintext highlighter-rouge">.vimrc文件</code>，删除要移除插件所对应的Plugin一行</li>
+  <li>打开Vim，在Vim尾行模式执行命令<code class="language-plaintext highlighter-rouge">:BundleClean</code>即可删除对应Vim插件</li>
+</ul>
+
+<h1 id="3vim插件管理器vim-plug">3.Vim插件管理器vim-plug</h1>
+
+<p>Vundle是一款非常出名且历史悠久的Vim插件管理工具。但随着安装的vim插件越来越多，使用Vundle来管理这些插件时效率变得越来越低，vim启动耗时也越来越大。</p>
+
+<p>而vim-plug是一款非常轻量又高效的vim插件管理工具。它支持全异步、多线程并行安装插件，支持git分支、标签等，可以对插件进行回滚更新、还支持按需加载插件(On-demand loading)，可以指定对特定文件类型加载对应vim插件，大大加快了vim启动时间。</p>
+
+<h4 id="安装vim-plug插件管理器">安装vim-plug插件管理器</h4>
+
+<p>vim-plug使用github进行托管和维护，只需要下载对应的<a href="https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim" title="https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim" target="_blank">plug.vim</a> 文件并保存到 autoload 目录即可完成安装。</p>
+
+<p>ubuntu系统下可使用以下命令快速安装vim-plug。</p>
+
+<div class="language-vim highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> <span class="p">~</span><span class="sr">/.vim/</span>autoload/
+<span class="k">cd</span> <span class="p">~</span><span class="sr">/.vim/</span>autoload/
+wget https<span class="p">:</span><span class="sr">//</span>raw<span class="p">.</span>githubusercontent<span class="p">.</span><span class="k">com</span><span class="sr">/junegunn/</span><span class="k">vim</span><span class="p">-</span>plug<span class="sr">/master/</span>plug<span class="p">.</span><span class="k">vim</span>
+</code></pre></div></div>
+
+<p>或使用curl工具来简化下载过程。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+</code></pre></div></div>
+
+<h4 id="vim-plug配置介绍">vim-plug配置介绍</h4>
+
+<p>使用vim-plug安装vim插件的方法与另外一个著名的vim插件管理器Vundle非常相似，只需要在vim配置文件 <code class="language-plaintext highlighter-rouge">~/.vimrc</code> 增加以 <code class="language-plaintext highlighter-rouge">call plug#begin(PLUGIN_DIRECTORY)</code> 开始，并以 <code class="language-plaintext highlighter-rouge">plug#end()</code> 结束的配置段即可。</p>
+
+<p>下面是一个典型的vim-plug的配置实例，使用了多种vim-plug相关的配置形式。</p>
+
+<div class="language-vim highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">call</span> plug#begin<span class="p">(</span><span class="s1">'~/.vim/plugged'</span><span class="p">)</span>
+Plug <span class="s1">'junegunn/vim-easy-align'</span>
+Plug <span class="s1">'https://github.com/junegunn/vim-github-dashboard.git'</span>
+Plug <span class="s1">'SirVer/ultisnips'</span> <span class="p">|</span> Plug <span class="s1">'honza/vim-snippets'</span>
+Plug <span class="s1">'scrooloose/nerdtree'</span><span class="p">,</span> <span class="p">{</span> <span class="s1">'on'</span><span class="p">:</span>  <span class="s1">'NERDTreeToggle'</span> <span class="p">}</span>
+Plug <span class="s1">'tpope/vim-fireplace'</span><span class="p">,</span> <span class="p">{</span> <span class="s1">'for'</span><span class="p">:</span> <span class="s1">'clojure'</span> <span class="p">}</span>
+Plug <span class="s1">'rdnetto/YCM-Generator'</span><span class="p">,</span> <span class="p">{</span> <span class="s1">'branch'</span><span class="p">:</span> <span class="s1">'stable'</span> <span class="p">}</span>
+Plug <span class="s1">'nsf/gocode'</span><span class="p">,</span> <span class="p">{</span> <span class="s1">'tag'</span><span class="p">:</span> <span class="s1">'v.20150303'</span><span class="p">,</span> <span class="s1">'rtp'</span><span class="p">:</span> <span class="s1">'vim'</span> <span class="p">}</span>
+Plug <span class="s1">'junegunn/fzf'</span><span class="p">,</span> <span class="p">{</span> <span class="s1">'dir'</span><span class="p">:</span> <span class="s1">'~/.fzf'</span><span class="p">,</span> <span class="s1">'do'</span><span class="p">:</span> <span class="s1">'./install --all'</span> <span class="p">}</span>
+Plug <span class="s1">'~/my-prototype-plugin'</span>
+<span class="k">call</span> plug#end<span class="p">()</span>
+</code></pre></div></div>
+
+<p>在上面的vim-plug配置中，以 <code class="language-plaintext highlighter-rouge">call plug#begin('~/.vim/plugged')</code> 标识vim-plug配置的开始并显式指定vim插件的存放路径为 ~/.vim/plugged；</p>
+
+<p><code class="language-plaintext highlighter-rouge">Plug 'junegunn/vim-easy-align'</code> 使用缩写形式指定了插件在github的地址 <a href="https://github.com/junegunn/vim-easy-align" title="https://github.com/junegunn/vim-easy-align" target="_blank">https://github.com/junegunn/vim-easy-align</a></p>
+
+<p><code class="language-plaintext highlighter-rouge">Plug 'https://github.com/junegunn/vim-github-dashboard.git'</code> 则用完整的URL指定插件在github的位置；</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'</code> 用</td>
+      <td>将两个vim插件写在同一行配置中；</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code class="language-plaintext highlighter-rouge">Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }</code> 使用 按需加载，表明只有在 NERDTreeToggle 命令被调用时, 对应的插件才会被加载；</p>
+
+<p><code class="language-plaintext highlighter-rouge">Plug 'tpope/vim-fireplace', { 'for': 'clojure' }</code> 使用 按需加载，表明只有编辑 clojure 类型的文件时该插件才会被打开；</p>
+
+<p><code class="language-plaintext highlighter-rouge">Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }</code> 显式指定使用YCM-Generator插件的 stable 分支</p>
+
+<p><code class="language-plaintext highlighter-rouge">Plug 'nsf/gocode', { 'tag': 'v.20150303', 'rtp': 'vim' }</code> 指定插件所用git标签，rtp描述了包含vim插件的子目录；</p>
+
+<p><code class="language-plaintext highlighter-rouge">Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }</code> 用 dir 选项单独指定了该插件存放的目录，do选项用于 Post-update hook，指定在安装或者更新完插件后所需要执行的额外操作</p>
+
+<p><code class="language-plaintext highlighter-rouge">Plug '~/my-prototype-plugin'</code>表示不用github托管的本地vim插件；</p>
+
+<p><code class="language-plaintext highlighter-rouge">call plug#end()</code> 用于标识vim-plug配置的结束</p>
+
+<p>总结上面的vim-plug配置，可以发现vim-plug支持以下配置项：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>选项</th>
+      <th>功能描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>branch/tag/commitbranch/tag/co</td>
+      <td>所用插件git仓库的Branch/tag/commit</td>
+    </tr>
+    <tr>
+      <td>rtp</td>
+      <td>包含vim插件的子目录</td>
+    </tr>
+    <tr>
+      <td>dir</td>
+      <td>该vim插件的定制化目录 (Custom directory)</td>
+    </tr>
+    <tr>
+      <td>as</td>
+      <td>给vim插件取别名</td>
+    </tr>
+    <tr>
+      <td>do</td>
+      <td>Post-update hook，某些vim插件在完成安装或更新后，需要执行额外的操作，可以使用 do 选项指定具体的操作或函数</td>
+    </tr>
+    <tr>
+      <td>on</td>
+      <td>按需加载: vim命令或<Plug>-mappings</Plug></td>
+    </tr>
+    <tr>
+      <td>for</td>
+      <td>按需加载: 文件类型</td>
+    </tr>
+    <tr>
+      <td>frozen</td>
+      <td>Do not update unless explicitly specified</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code class="language-plaintext highlighter-rouge">注</code>：do 选项的操作如果是以 <code class="language-plaintext highlighter-rouge">:</code> 开头，则表示其为vim命令，例如: <code class="language-plaintext highlighter-rouge">Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }</code></p>
+
+<h4 id="使用vim-plug安装vim插件">使用vim-plug安装vim插件</h4>
+
+<p>在Vim命令行模式下，使用命令 <code class="language-plaintext highlighter-rouge">:PlugInstall</code> 可安装vim配置文件中所有配置的vim插件；也可以使用 <code class="language-plaintext highlighter-rouge">PlugInstall [name ...]</code> 来指定安装某一个或某几个vim插件。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_35.gif" alt="ssl" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">:PlugStatus</code> 可查看vim插件的当前状态，<code class="language-plaintext highlighter-rouge">:PlugUpdate [name ...] </code>用于安装或更新对应vim插件，而vim-plug本身的更新则使用命令 :PlugUpgrade。</p>
+
+<p>vim-plug的命令列表如下所示。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>命令</th>
+      <th>功能描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>PlugInstall [name …] [#threads]</td>
+      <td>安装插件</td>
+    </tr>
+    <tr>
+      <td>PlugUpdate [name …] [#threads]</td>
+      <td>安装或更新vim插件</td>
+    </tr>
+    <tr>
+      <td>PlugClean[!]</td>
+      <td>卸装未使用的目录 (bang version will clean without prompt)</td>
+    </tr>
+    <tr>
+      <td>PlugUpgrade</td>
+      <td>更新vim-plug自身</td>
+    </tr>
+    <tr>
+      <td>PlugStatus</td>
+      <td>查看vim插件的状态</td>
+    </tr>
+    <tr>
+      <td>PlugDiff</td>
+      <td>对比上次PlugUpdate的更改 (Examine changes from the previous update and the pending changes)</td>
+    </tr>
+    <tr>
+      <td>PlugSnapshot[!] [output path]</td>
+      <td>保存当前插件的镜像副本到指定目录 (Generate script for restoring the current snapshot of the plugins)</td>
+    </tr>
+  </tbody>
+</table>
+
+:ET

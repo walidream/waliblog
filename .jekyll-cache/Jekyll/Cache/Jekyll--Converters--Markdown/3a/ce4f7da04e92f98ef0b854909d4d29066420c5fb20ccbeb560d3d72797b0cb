@@ -1,0 +1,2 @@
+I"m<p>上小节从无到有写了一个完整的小爬虫，本小节我们继续练习爬虫。相信小伙伴已经知道我们这次爬取的目标是谁了，爬取<code class="language-plaintext highlighter-rouge">知乎</code>比爬取<code class="language-plaintext highlighter-rouge">下厨房</code>困难一些，原因就是<code class="language-plaintext highlighter-rouge">知乎</code>的反爬机制比<code class="language-plaintext highlighter-rouge">下厨房</code>的反爬机制更完善。知乎查看问答，必须要登录。我们要想爬取知乎的数据，首先得让程序自动登录。</p>
+:ET

@@ -1,0 +1,21 @@
+I"r<p>最近我们老大问我想学习<code class="language-plaintext highlighter-rouge">Python</code>吗？我这个小员工又不能拒绝，看到之前好多身边的人都开始学习Python，对Python处理大数据的能力是非常感兴趣，所以也没多想就答应了。后面就在自己博客上开了python这节教程，主要是记录小菜从零开始学习python的过程。后面我就开始入坑了。</p>
+
+<p>去<a href="https://www.python.org/" title="https://www.python.org/" target="_blank">python官网</a>转了转，发现python的官方资料真的是很详细，官方居然还有中农版本，对我这种英语水平差的同学简直就是友好的不行。</p>
+
+<h1 id="1windows下安装python">1.windows下安装python</h1>
+
+<p>在<a href="https://www.python.org/" title="https://www.python.org/" target="_blank">python官网上</a>找到<code class="language-plaintext highlighter-rouge">downloads</code>按钮，选择自己PC的操作系统，点击下载。windows下面安装很简单，基本就是下一步，下一步。</p>
+
+<h1 id="2idle命令窗口编写代码">2.IDLE命令窗口编写代码</h1>
+
+<p><a href="https://www.python.org/dev/peps/pep-0008/" title="https://www.python.org/dev/peps/pep-0008/" target="_blank">python官方代码风格宝典</a></p>
+
+<p>我们将python安装好后，windows开始菜单下就会有一个IDLE，打开IDLE就能在上面编写python代码了</p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_1.png" alt="ssl" /></p>
+
+<p>小菜在python之旅开始之前，赠与小伙伴们一本<a href="https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/python_style_rules/" title="https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/python_style_rules/" target="_blank">Python风格规范宝典</a></p>
+
+<p>接下来就进入python学习之旅吧！</p>
+
+:ET

@@ -1,0 +1,361 @@
+I"\{<p>本小节介绍了鸭子模型、抽象基类、类变量和实例变量、python中类的继承顺序、对象的私有属性、对象的自省机制、super函数。</p>
+
+<h1 id="1鸭子类型和多态">1.鸭子类型和多态</h1>
+
+<h4 id="鸭子类型">鸭子类型</h4>
+
+<p>在维基百科中这样描述鸭子类型,<code class="language-plaintext highlighter-rouge">当看到一只鸟走起来像鸭子、游泳起来像鸭子、叫起来也像鸭子，那么这只鸟就可以被称为鸭子</code>。</p>
+
+<p>在鸭子类型中，关注点在于对象的行为，能做什么，而不是关注对象所属的类型。例如，在不使用鸭子类型的语言中，我们可以编写一个函数，它接受一个类型为”鸭子”的对象，并调用它的”走”和”叫”方法。在使用鸭子类型的语言中，这样的一个函数可以接受一个任意类型的对象，并调用它的”走”和”叫”方法。如果这些需要被调用的方法不存在，那么将引发一个运行时错误。任何拥有这样的正确的”走”和”叫”方法的对象都可被函数接受的这种行为引出了以上表述，这种决定类型的方式因此得名。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Duck</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">quack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"这鸭子正在嘎嘎叫"</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">feathers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"这鸭子拥有白色和灰色的羽毛"</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Person</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">quack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">"这人正在模仿鸭子"</span>
+
+    <span class="k">def</span> <span class="nf">feathers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">"这人在地上拿起1根羽毛然后给其他人看"</span>
+
+
+<span class="k">def</span> <span class="nf">in_the_forest</span><span class="p">(</span><span class="n">duck</span><span class="p">):</span>
+    <span class="n">duck</span><span class="p">.</span><span class="n">quack</span><span class="p">()</span>
+    <span class="n">duck</span><span class="p">.</span><span class="n">feathers</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">game</span><span class="p">():</span>
+    <span class="n">donald</span> <span class="o">=</span> <span class="n">Duck</span><span class="p">()</span>
+    <span class="n">john</span> <span class="o">=</span> <span class="n">Person</span><span class="p">()</span>
+    <span class="n">in_the_forest</span><span class="p">(</span><span class="n">donald</span><span class="p">)</span>
+    <span class="n">in_the_forest</span><span class="p">(</span><span class="n">john</span><span class="p">)</span>
+
+<span class="n">game</span><span class="p">()</span>
+</code></pre></div></div>
+<p>对in_the_forest函数而言，对象是一个鸭子。john对象中也拥有<code class="language-plaintext highlighter-rouge">quack</code>和<code class="language-plaintext highlighter-rouge">feathers</code>方法。鸭子类型关注的是对象的行为而不是对象所属的类型。</p>
+
+<h4 id="多态">多态</h4>
+
+<p><strong>多态</strong>是同一个行为具有多个不同表现形式或形态的能力。</p>
+
+<p>主人家有一只狗和一只猫，主人向他们发出叫指令时，如果是一只狗，就<code class="language-plaintext highlighter-rouge">汪汪叫</code>，如果是一只猫就<code class="language-plaintext highlighter-rouge">喵喵叫</code>。</p>
+
+<p>非多态演示</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Dog</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">Cat</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+
+<span class="k">def</span> <span class="nf">sound</span><span class="p">(</span><span class="n">animal</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">animal</span><span class="p">,</span> <span class="n">Dog</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"汪汪"</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">animal</span><span class="p">,</span> <span class="n">Cat</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"喵喵"</span><span class="p">)</span>
+
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">Dog</span><span class="p">()</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">Cat</span><span class="p">()</span>
+
+<span class="n">sound</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="n">sound</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+<span class="c1">#输出
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">汪汪</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">喵喵</span>
+</code></pre></div></div>
+
+<p>多态代码</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Dog</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">sound</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"汪汪"</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Cat</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">soundself</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"喵喵"</span><span class="p">)</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">Dog</span><span class="p">()</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">Cat</span><span class="p">()</span>
+
+<span class="n">d</span><span class="p">.</span><span class="n">sound</span><span class="p">()</span>
+<span class="n">c</span><span class="p">.</span><span class="n">sound</span><span class="p">()</span>
+
+<span class="c1">#输出
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">汪汪</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">喵喵</span>
+</code></pre></div></div>
+<p>无论创建狗的对象或者猫的对象，调用sound方法时，都能够正确的打印。</p>
+
+<h1 id="2抽象基类">2.抽象基类</h1>
+
+<p>ABC，Abstract Base Class（抽象基类），主要定义了基本类和最基本的抽象方法，可以为子类定义共有的API，不需要具体实现。相当于是Java中的接口或者是抽象类。所有继承抽象基类都必须覆盖其父类的方法,抽象基类无法实例化。</p>
+
+<p><a href="https://docs.python.org/zh-cn/3/library/abc.html" title="https://docs.python.org/zh-cn/3/library/abc.html">抽象基类</a>
+<a href="https://zhuanlan.zhihu.com/p/26417576" title="https://zhuanlan.zhihu.com/p/26417576">StoneBegin博主 python-抽象基类</a></p>
+
+<p>抽象基类应用：</p>
+<ul>
+  <li>在某些情况下判定某个对象的类型 <a href="https://docs.python.org/zh-cn/3/library/collections.abc.html#module-collections.abc" title="https://docs.python.org/zh-cn/3/library/collections.abc.html#module-collections.abc">collections.abc</a></li>
+  <li>强制某个子类必须实现某些方法</li>
+</ul>
+
+<h4 id="1判断某个对象的类型">1.判断某个对象的类型</h4>
+
+<p>假设我们需要判断com对象中是否含有<code class="language-plaintext highlighter-rouge">__len__方法</code>。一种方式用<code class="language-plaintext highlighter-rouge">hasattr</code>，另一种可以用抽象基类</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sized</span>
+
+
+<span class="k">class</span> <span class="nc">Company</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">employee</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">employee</span> <span class="o">=</span> <span class="n">employee</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">employee</span><span class="p">)</span>
+
+
+<span class="n">com</span> <span class="o">=</span> <span class="n">Company</span><span class="p">([</span><span class="s">'wali'</span><span class="p">,</span> <span class="s">'eve'</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">com</span><span class="p">,</span> <span class="s">"__len__"</span><span class="p">))</span>
+
+<span class="c1">#抽象基类，建议使用这种
+</span><span class="k">print</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">com</span><span class="p">,</span> <span class="n">Sized</span><span class="p">))</span>  
+
+</code></pre></div></div>
+<h4 id="2强制某个子类实现某些方法">2.强制某个子类实现某些方法</h4>
+
+<p>假设需要实现一个缓存，在定义缓存基类时，要求继承<code class="language-plaintext highlighter-rouge">CacheBase</code>基类的子类必须实现其基类<code class="language-plaintext highlighter-rouge">get</code>、<code class="language-plaintext highlighter-rouge">set</code>方法。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">abc</span>
+
+
+<span class="k">class</span> <span class="nc">CacheBase</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span> <span class="n">abc</span><span class="p">.</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="o">@</span><span class="n">abc</span><span class="p">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="o">@</span><span class="n">abc</span><span class="p">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">RedisCache</span><span class="p">(</span><span class="n">CacheBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+<span class="n">rc</span> <span class="o">=</span> <span class="n">RedisCache</span><span class="p">()</span>
+
+</code></pre></div></div>
+<p>执行上面代码，是不会抛异常的，因为子类<code class="language-plaintext highlighter-rouge">RedisCache</code>实现其基类的get、set方法。如果<code class="language-plaintext highlighter-rouge">RedisCache</code>类中未实现get、set方法，则在初始化时就会抛异常。</p>
+
+<h1 id="3类变量和实例变量">3.类变量和实例变量</h1>
+
+<p><strong>类变量</strong>就是定义在类中，但是在函数体之外的变量。通常不使用<code class="language-plaintext highlighter-rouge">self.变量名</code>赋值的变量。类变量通常不作为类的实例变量，类变量对所有实例化的对象是公用的。</p>
+
+<p><strong>实例变量</strong>定义在方法中的变量，使用<code class="language-plaintext highlighter-rouge">self</code>绑定到实例上的变量，只对实例起作用</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Circle</span><span class="p">:</span>
+    <span class="c1">#类变量
+</span>    <span class="n">radius</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="c1">#实例变量
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+
+</code></pre></div></div>
+
+<h4 id="访问">访问</h4>
+
+<p><strong>访问类变量：</strong>在类内部访问可以使用<code class="language-plaintext highlighter-rouge">className.类变量</code>，也可以使用<code class="language-plaintext highlighter-rouge">self.类变量</code>访问，但不建议这么访问。在类方法中可以使用<code class="language-plaintext highlighter-rouge">cls.类变量</code>建议使用这种。</p>
+
+<p><strong>访问实例变量：</strong>在类的内部实例方法使用<code class="language-plaintext highlighter-rouge">self.实例变量</code>，在类的外部使用<code class="language-plaintext highlighter-rouge">对象.实例变量</code>的形式访问。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Circle</span><span class="p">:</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"类名访问类变量：{}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">Circle</span><span class="p">.</span><span class="n">radius</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"self访问类变量:{}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">radius</span><span class="p">))</span>
+
+
+<span class="n">cir</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+
+<span class="c1"># 访问类变量
+</span><span class="k">print</span><span class="p">(</span><span class="s">"类外部访问类变量：{}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">Circle</span><span class="p">.</span><span class="n">radius</span><span class="p">))</span>
+
+<span class="c1"># 访问实例变量
+</span><span class="k">print</span><span class="p">(</span><span class="s">"访问x：{}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">cir</span><span class="p">.</span><span class="n">x</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h1 id="4python继承顺序">4.python继承顺序</h1>
+
+<p>在 Python 3中多继承模式是使用<code class="language-plaintext highlighter-rouge">C3</code>算法来确定 MRO(Method Resolution Order) 的。关于MRO小伙伴们请自行google。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_63.png" alt="ssl" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">D</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">C</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">__mro__</span><span class="p">)</span>
+
+<span class="c1"># 输出
+</span><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="o">&lt;</span><span class="k">class</span> <span class="err">'</span><span class="nc">__main__</span><span class="p">.</span><span class="n">A</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="s">B'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">C</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">D</span><span class="s">'&gt;, &lt;class '</span><span class="nb">object</span><span class="s">'&gt;)
+</span></code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_64.png" alt="ssl" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">D</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">E</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">C</span><span class="p">(</span><span class="n">E</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">__mro__</span><span class="p">)</span>
+
+<span class="c1"># 输出
+</span><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="o">&lt;</span><span class="k">class</span> <span class="err">'</span><span class="nc">__main__</span><span class="p">.</span><span class="n">A</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="s">B'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">D</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">C</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">E</span><span class="s">'&gt;, &lt;class '</span><span class="nb">object</span><span class="s">'&gt;)
+</span></code></pre></div></div>
+
+<h1 id="5私有属性">5.私有属性</h1>
+
+<p>python中的<a href="https://waliblog.com/python/2019/06/29/python-15.html#11%E7%A7%81%E6%9C%89%E6%80%A7" title="https://waliblog.com/python/2019/06/29/python-15.html#11%E7%A7%81%E6%9C%89%E6%80%A7">私有属性</a>，小菜这篇文章介绍的比较清楚，这里简单的做个补充</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">name</span>
+    
+<span class="k">class</span> <span class="nc">Student</span><span class="p">(</span><span class="n">Person</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">name</span>
+
+<span class="n">tom</span> <span class="o">=</span> <span class="n">Person</span><span class="p">(</span><span class="s">"Tom"</span><span class="p">)</span>
+<span class="n">jerry</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">"Jerry"</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">tom</span><span class="p">.</span><span class="n">__dict__</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">{</span><span class="s">'_Person__name'</span><span class="p">:</span> <span class="s">'Tom'</span><span class="p">}</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">jerry</span><span class="p">.</span><span class="n">__dict__</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">{</span><span class="s">'_Student__name'</span><span class="p">:</span> <span class="s">'Jerry'</span><span class="p">}</span>
+</code></pre></div></div>
+
+<p>当定义一个私有变量时，python中会将私有变量变形为<code class="language-plaintext highlighter-rouge">_类名__变量名</code>。上面看到<code class="language-plaintext highlighter-rouge">_Person__name</code>。这种变形后的形式也解决了类中的继承后变量的命名问题。</p>
+
+<h1 id="6对象的自省机制">6.对象的自省机制</h1>
+
+<p>自省是通过一定的机制查询到对象的内部结构</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span><span class="p">:</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">"user"</span>
+
+<span class="k">class</span> <span class="nc">Student</span><span class="p">(</span><span class="n">Person</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">school_name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">school_name</span> <span class="o">=</span> <span class="n">school_name</span>
+
+<span class="n">user</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">"大学"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">__dict__</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">{</span><span class="s">'school_name'</span><span class="p">:</span><span class="s">'大学'</span><span class="p">}</span>
+    
+<span class="k">print</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">大学</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">Person</span><span class="p">.</span><span class="n">__dict__</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">{</span><span class="s">'__module__'</span><span class="p">:</span> <span class="s">'__main__'</span><span class="p">,</span> <span class="s">'name'</span><span class="p">:</span> <span class="s">'user'</span><span class="p">,</span> <span class="s">'__dict__'</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">attribute</span> <span class="s">'__dict__'</span> <span class="n">of</span> <span class="s">'Person'</span> <span class="n">objects</span><span class="o">&gt;</span><span class="p">,</span> <span class="s">'__weakref__'</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">attribute</span> <span class="s">'__weakref__'</span> <span class="n">of</span> <span class="s">'Person'</span> <span class="n">objects</span><span class="o">&gt;</span><span class="p">,</span> <span class="s">'__doc__'</span><span class="p">:</span> <span class="bp">None</span><span class="p">}</span>
+
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">user.__dict__</code>只打印school_name属性，可以访问到name属性。Person中的name不属于user对象。当访问user.name属性时，user中name不存在时，会根据MRO算法会上查找，然后在Person中查找name属性。</p>
+
+<p>python中<code class="language-plaintext highlighter-rouge">dir()</code>函数比<code class="language-plaintext highlighter-rouge">__dict__</code>功能更为强大，它能例举出所有的属性。</p>
+
+<h1 id="7super函数">7.super函数</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"父类"</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"子类"</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">().</span><span class="n">__init</span><span class="p">()</span>
+
+<span class="n">b</span> <span class="o">=</span> <span class="n">B</span><span class="p">()</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">父类</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">子类</span>
+</code></pre></div></div>
+
+<p>我们知道super是调用父类的，这种说法有点不严谨。为什么说这种说法不够严谨呢？上面这个例子super就是调用的了A。对于单继承来说没什么毛病，但是对于多继承就不一定了。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_64.png" alt="ssl" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">D</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"D"</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">().</span><span class="n">__init__</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">C</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"C"</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">().</span><span class="n">__init__</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"B"</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">().</span><span class="n">__init__</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"A"</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">().</span><span class="n">__init__</span><span class="p">()</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">()</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">A</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">B</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">C</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">D</span>
+</code></pre></div></div>
+
+<p>上面这个例子就说明，如果B调用父类应该打印的D,而不是C。最后的顺序应该是A-&gt;B-D-C。但是真实情况打印的是A-&gt;B-&gt;C-D。这也说明了super是调用MRO顺序的下一个类的函数。</p>
+
+:ET

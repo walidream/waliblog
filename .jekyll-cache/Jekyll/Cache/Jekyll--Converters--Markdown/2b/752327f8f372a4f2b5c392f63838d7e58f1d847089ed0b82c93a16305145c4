@@ -1,0 +1,486 @@
+I"ֶ<p>面向对象最重要的概念就是<code class="language-plaintext highlighter-rouge">类</code>（Class）和<code class="language-plaintext highlighter-rouge">实例</code>（Instance）有些人也将<code class="language-plaintext highlighter-rouge">实例</code>称之为<code class="language-plaintext highlighter-rouge">对象</code>。<code class="language-plaintext highlighter-rouge">对象</code>和<code class="language-plaintext highlighter-rouge">实例</code>个人认为是同一个意思。</p>
+
+<p>对象：个人理解<code class="language-plaintext highlighter-rouge">对象</code>就是一个具体的事物，比如，一名学生、一张桌子、一张凳子、一个笔记本都可以看成是一个对象。</p>
+
+<p>类：个人理解<code class="language-plaintext highlighter-rouge">类</code>是对<code class="language-plaintext highlighter-rouge">对象</code>的一个抽象化，如，定义一个<code class="language-plaintext highlighter-rouge">Students</code>类，类里面有<code class="language-plaintext highlighter-rouge">name</code> 、<code class="language-plaintext highlighter-rouge">age</code>、<code class="language-plaintext highlighter-rouge">sex</code>等，那么通过这个类可以创建出许多个不同的实例</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="s">'name'</span><span class="p">:</span><span class="s">'小米'</span><span class="p">,</span><span class="s">'age'</span><span class="p">:</span><span class="mi">20</span><span class="p">,</span><span class="s">'sex'</span><span class="p">:</span><span class="s">'男'</span><span class="p">}</span>
+<span class="p">{</span><span class="s">'name'</span><span class="p">:</span><span class="s">'小王'</span><span class="p">,</span><span class="s">'age'</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span><span class="s">'sex'</span><span class="p">:</span><span class="s">'女'</span><span class="p">}</span>
+<span class="p">{</span><span class="s">'name'</span><span class="p">:</span><span class="s">'小黑'</span><span class="p">,</span><span class="s">'age'</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span><span class="s">'sex'</span><span class="p">:</span><span class="s">'女'</span><span class="p">}</span>
+</code></pre></div></div>
+<p>这三个对象都有不同的<code class="language-plaintext highlighter-rouge">名称</code>、<code class="language-plaintext highlighter-rouge">年龄</code>、<code class="language-plaintext highlighter-rouge">性别</code>。但是他们有相同的属性<code class="language-plaintext highlighter-rouge">name</code>、<code class="language-plaintext highlighter-rouge">age</code>、<code class="language-plaintext highlighter-rouge">sex</code>。</p>
+
+<h1 id="1类的定义">1.类的定义</h1>
+
+<p>python中类定义是用关键字<code class="language-plaintext highlighter-rouge">class</code>定义,类名的首字母要<code class="language-plaintext highlighter-rouge">大写</code>。类最基本的功能就是封装。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Students</span><span class="p">():</span>
+  <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">StudentHomework</span><span class="p">():</span>
+  <span class="k">pass</span>
+</code></pre></div></div>
+
+<h4 id="最简单的类">最简单的类</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">():</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="s">'小米'</span>
+  <span class="n">age</span> <span class="o">=</span> <span class="mi">0</span>
+  
+  <span class="k">def</span> <span class="nf">do_homework</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'正在做家庭作业'</span><span class="p">)</span>
+
+<span class="c1">#实例化类
+</span><span class="n">student1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">()</span> 
+
+<span class="c1">#调用类的方法
+</span><span class="n">student1</span><span class="p">.</span><span class="n">do_homework</span><span class="p">()</span>
+</code></pre></div></div>
+<p>以上大概就是创建一个类并实例化</p>
+
+<h1 id="2函数与方法的区别">2.函数与方法的区别</h1>
+
+<p>python中定义<code class="language-plaintext highlighter-rouge">函数</code>和<code class="language-plaintext highlighter-rouge">方法</code>都是通过关键字<code class="language-plaintext highlighter-rouge">def</code>来定义的，在类中定义的函数习惯性的称之为<code class="language-plaintext highlighter-rouge">方法</code>。方法是倾向于<code class="language-plaintext highlighter-rouge">设计层面</code>而函数是倾向于<code class="language-plaintext highlighter-rouge">面向过程</code>。两者更多是概念上的区分。</p>
+
+<p>函数：函数是可重复使用的，用来实现单一或相关联功能的代码段，函数是一个面向过程的编程。</p>
+
+<p>方法：在类中定义的函数习惯性称之为方法，方法是设计层面的一个概念。</p>
+
+<h1 id="3类和对象的关系">3.类和对象的关系</h1>
+
+<p>类是现实世界或思维世界中的实体在计算机中的反映，它将数据以及这些数据上的操作封装在一起。个人理解：类是对象的一个抽象，对象就是实例化类。</p>
+
+<p>设计一个类是否优美，取决于设计者能否抓住类的<code class="language-plaintext highlighter-rouge">特征</code>(类变量) 与 <code class="language-plaintext highlighter-rouge">行为</code>(方法)</p>
+
+<p>类和对象的关系就是<code class="language-plaintext highlighter-rouge">实例化</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#实例化
+</span><span class="n">student1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h1 id="4构造函数">4.构造函数</h1>
+
+<p><code class="language-plaintext highlighter-rouge">__init__()</code>方法是类的一种特殊的方法，被称为类的<code class="language-plaintext highlighter-rouge">构造函数</code>或<code class="language-plaintext highlighter-rouge">初始化方法</code>，当创建类的实例时就会<code class="language-plaintext highlighter-rouge">自动</code>调用该方法。构造方法一般用于初始化。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">():</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="s">'小米'</span>
+  <span class="n">age</span> <span class="o">=</span> <span class="mi">0</span>
+
+  <span class="c1">#构造函数
+</span>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">age</span><span class="p">):</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="n">slef</span><span class="p">.</span><span class="n">age</span> <span class="o">=</span> <span class="n">age</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'创建一个名为：'</span> <span class="o">+</span> <span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">+</span> <span class="s">'的同学，年龄是：'</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">age</span><span class="p">))</span>
+  <span class="c1">#方法
+</span>  <span class="k">def</span> <span class="nf">do_homework</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'正在做家庭作业'</span><span class="p">)</span>
+
+ <span class="c1">#实例化
+</span><span class="n">student1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">'小名'</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>  
+
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">注意：类中的方法需要传self，self名称是官方建议的，但不是绝对的</code></p>
+
+<p>构造函数和方法区别：</p>
+<ul>
+  <li>构造函数是不能<code class="language-plaintext highlighter-rouge">return None</code>值之外的值</li>
+  <li>构造函数用于初始化，方法用于定义类的<code class="language-plaintext highlighter-rouge">行为</code></li>
+</ul>
+
+<h1 id="5区别类变量和实例变量">5.区别类变量和实例变量</h1>
+
+<p>实例变量用于每个实例的唯一数据，而类变量用于类的所有实例共享的属性和方法:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Dog</span><span class="p">:</span>
+  <span class="c1">#类变量
+</span>  <span class="n">kind</span> <span class="o">=</span> <span class="s">'canine'</span> 
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+    <span class="c1">#实例变量
+</span>    <span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">Dog</span><span class="p">(</span><span class="s">'fido'</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">Dog</span><span class="p">(</span><span class="s">'buddy'</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d</span><span class="p">.</span><span class="n">kind</span>
+<span class="s">'canine'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">e</span><span class="p">.</span><span class="n">kind</span>
+<span class="s">'canine'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d</span><span class="p">.</span><span class="n">name</span>
+<span class="s">'fido'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">e</span><span class="p">.</span><span class="n">name</span>
+<span class="s">'buddy'</span>
+
+</code></pre></div></div>
+<p>类变量:类变量是和类关联在一起的变量，类变量放在类下面，如上面<code class="language-plaintext highlighter-rouge">kind</code>就是一个类变量</p>
+
+<p>实例变量:实例变量是和实例关联在一起的变量，通过<code class="language-plaintext highlighter-rouge">self</code>将实例和变量关联起来。如上面<code class="language-plaintext highlighter-rouge">name</code>就是一个实例变量</p>
+
+<h1 id="6类与对象的变量查找顺序">6.类与对象的变量查找顺序</h1>
+
+<p>在Python程序中创建、改变、查找变量名时，都是在一个保存变量名的空间中进行，我们称之为命名空间，也被称之为作用域。python的作用域是静态的，在源代码中变量名被赋值的位置决定了该变量能被访问的范围。即Python变量的作用域由变量所在源代码中的位置决定。变量查找顺序，<code class="language-plaintext highlighter-rouge">局部变量-&gt;全局变量-&gt;内置变量</code></p>
+
+<p>只有当变量在Module(模块)、Class(类)、def(函数)中定义的时候，才会有作用域的概念。</p>
+
+<p>python在类中查找变量的顺序：<code class="language-plaintext highlighter-rouge">实例变量-&gt;类变量-&gt;父类变量</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="s">'小三'</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">student1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">'小王'</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">student1</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+<span class="s">'小三'</span>
+
+</code></pre></div></div>
+<p>上面代码中，我们只定义<code class="language-plaintext highlighter-rouge">Student</code>类变量<code class="language-plaintext highlighter-rouge">name</code>，没有定义实例变量，当创建<code class="language-plaintext highlighter-rouge">student1</code>实例时，我们尝试能不能打印出实例变量<code class="language-plaintext highlighter-rouge">name</code>。结果输出了<code class="language-plaintext highlighter-rouge">小三</code>。其实student1实例中并没有<code class="language-plaintext highlighter-rouge">name</code>变量，当我们打印实例变量name时，python在实例中找不到变量就会在类中查找变量<code class="language-plaintext highlighter-rouge">name</code>，如果找到就返回，找不到就会向父类查找。</p>
+
+<p>为了验证<code class="language-plaintext highlighter-rouge">student1</code>实例中真的没有<code class="language-plaintext highlighter-rouge">name</code>变量，我们打印一下实例的所有变量</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">student1</span><span class="p">.</span><span class="n">__dict__</span><span class="p">)</span>
+<span class="p">{}</span>
+</code></pre></div></div>
+
+<p>我们将name修改为实例变量</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="s">'小三'</span> <span class="c1">#类变量
+</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">student1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">'小王'</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">student1</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+<span class="s">'小王'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">student1</span><span class="p">.</span><span class="n">__dict__</span><span class="p">)</span>
+<span class="p">{</span><span class="n">name</span><span class="p">:</span><span class="s">'小王'</span><span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="7self与实例方法">7.self与实例方法</h1>
+
+<p>在类下面定义一个方法，这个方法如果是实例方法，那么需要在该方法的参数第一个放上固定的<code class="language-plaintext highlighter-rouge">self</code>(其他名称也行，官方建议是self),<code class="language-plaintext highlighter-rouge">self</code>是python官方固定的，它和其它自定义参数不同，在实例化时，python会将实例传进去，在调用时不需要传递，官方默认帮我们传递了。</p>
+
+<p>在其他语言中，其实也存在self，只不过是隐式的，但是在python中是必须显式声明的，这点开发者需要注意。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//js</span>
+<span class="kd">class</span> <span class="nx">Student</span><span class="p">{</span>
+  <span class="c1">//构造方法</span>
+  <span class="kd">constructor</span><span class="p">(){</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">小三</span><span class="dl">'</span>
+  <span class="p">}</span>
+  
+  <span class="nx">doHomework</span><span class="p">(){</span>
+    <span class="nx">print</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">在做家庭作业</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>这里的this不需要去声明，因为js中自动帮我们声明了，python中必须要手动声明<code class="language-plaintext highlighter-rouge">self</code>，self就是指的是该实例自身</p>
+
+<h1 id="8实例中访问类变量">8.实例中访问类变量</h1>
+
+<p>在实例方法中访问实例变量是通过<code class="language-plaintext highlighter-rouge">self.变量名</code>来访问变量。那么如何在实例中如何访问类变量呢？</p>
+
+<h4 id="通过selfclass变量名访问类变量">通过self.<strong>class</strong>.[变量名]访问类变量</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="s">'小三'</span>
+
+  <span class="k">def</span> <span class="nf">do_homework</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'名称是：'</span> <span class="o">+</span> <span class="bp">self</span><span class="p">.</span><span class="n">__class__</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span><span class="p">.</span><span class="n">do_homework</span><span class="p">()</span>
+<span class="s">'名称是：小三'</span>
+</code></pre></div></div>
+
+<h4 id="通过类名访问类变量">通过类名访问类变量</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="s">'小三'</span>
+  
+  <span class="k">def</span> <span class="nf">do_homework</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'名称是：'</span> <span class="o">+</span> <span class="n">Student</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span><span class="p">.</span><span class="n">do_homework</span><span class="p">()</span>
+<span class="s">'名称是：小三'</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">强烈建议：通过方法来访问类变量,不要通过类来操作类变量。</code></p>
+
+<h1 id="9类方法">9.类方法</h1>
+
+<p>类方法主要是用来描述类的行为,类方法定义</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+  <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span> 
+
+  <span class="c1">#构造行数
+</span>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'构造函数'</span><span class="p">)</span>
+
+  <span class="c1">#类方法
+</span>  <span class="o">@</span><span class="nb">classmethod</span>  <span class="c1">#装饰器
+</span>  <span class="k">def</span> <span class="nf">plus_sum</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+</code></pre></div></div>
+<p>在实例方法中传入第一个参数<code class="language-plaintext highlighter-rouge">self</code>，而在类方法中传入的第一个参数<code class="language-plaintext highlighter-rouge">cls</code>。区分类方法和实例方法是看方法上面有没有<code class="language-plaintext highlighter-rouge">@classmethod</code></p>
+
+<h4 id="类方法操作类变量">类方法操作类变量</h4>
+
+<p>在类方法中直接可以通过<code class="language-plaintext highlighter-rouge">cls</code>来读取类变量，而在实例方法中需要<code class="language-plaintext highlighter-rouge">self.__class__</code>来读取变量</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+  <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span> 
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">pass</span>
+  
+  <span class="o">@</span><span class="nb">classmethod</span>
+  <span class="k">def</span> <span class="nf">plus_sum</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+    <span class="n">cls</span><span class="p">.</span><span class="nb">sum</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">()</span>
+<span class="c1"># 通过实例调用类方法
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span><span class="p">.</span><span class="n">plus_sum</span><span class="p">()</span>
+<span class="c1"># 通过类调用类方法
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">Student</span><span class="p">.</span><span class="n">plus_sum</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h1 id="10静态方法">10.静态方法</h1>
+
+<p>类方法的定义,静态方法不需要传入一个固定名称的参数，静态方法需要用<code class="language-plaintext highlighter-rouge">@staticmethod</code>来声明是静态方法</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+  <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span> 
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+  <span class="o">@</span><span class="nb">staticmethod</span>
+  <span class="k">def</span> <span class="nf">add</span><span class="p">():</span>
+    <span class="c1"># 静态方法 对类变量的读取
+</span>    <span class="k">print</span><span class="p">(</span><span class="n">Student</span><span class="p">.</span><span class="nb">sum</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'这是一个静态方法'</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">()</span>
+<span class="c1"># 实例调用静态方法
+</span><span class="n">d1</span><span class="p">.</span><span class="n">add</span><span class="p">()</span>
+
+<span class="c1"># 类调用静态方法
+</span><span class="n">Student</span><span class="p">.</span><span class="n">add</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>类的静态方法可以被实例或类调用</p>
+<h1 id="11私有性">11.私有性</h1>
+
+<p>成员的可见性是指变量或方法是否能被访问,类的变量或方法都存在外部访问和内部访问。<code class="language-plaintext highlighter-rouge">私有变量</code>只能在实例中访问。</p>
+
+<p>外部访问：指在类的外部调用，内部访问：指在类的内部调用。</p>
+
+<p>其他语言中，成员的可见性是通过明显的标记来标明，如java中就是通过<code class="language-plaintext highlighter-rouge">public</code>、<code class="language-plaintext highlighter-rouge">private</code>标明方法或变量是<code class="language-plaintext highlighter-rouge">公开的</code>、<code class="language-plaintext highlighter-rouge">私有的</code>。在python类中，表示一个实例或
+变量公开还是私有是用<code class="language-plaintext highlighter-rouge">双下划线</code>(__)开头的。如果一个实例方法或变量不是以双下划线开头的，那么就表示这个实例或变量是公开的，反之是私有的。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+
+  <span class="c1">#构造方法
+</span>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">age</span><span class="p">):</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">age</span> <span class="o">=</span> <span class="n">age</span>
+    
+    <span class="c1">#私有变量
+</span>    <span class="bp">self</span><span class="p">.</span><span class="n">__sex</span> <span class="o">=</span> <span class="s">'男'</span>
+  <span class="c1">#私有方法
+</span>  <span class="k">def</span> <span class="nf">__get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">+</span><span class="s">"性别是："</span> <span class="o">+</span> <span class="bp">self</span><span class="p">.</span><span class="n">__sex</span><span class="p">)</span>
+
+  <span class="c1">#公开的
+</span>  <span class="k">def</span> <span class="nf">do_homework</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">+</span> <span class="s">"在做家庭作业"</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">'小王'</span><span class="p">,</span><span class="mi">19</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+<span class="s">'小王'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">__sex</span><span class="p">)</span>
+<span class="s">'会报错，因为__sex变量是私有变量只能在内部访问'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">do_homework</span><span class="p">())</span>
+<span class="s">'小王在做家庭作业'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">__get_name</span><span class="p">())</span>
+<span class="s">'会报错'</span>
+</code></pre></div></div>
+
+<h4 id="__init__构造方法为什么会公开的呢">__init__构造方法为什么会公开的呢？</h4>
+
+<p>上面代码我们在<code class="language-plaintext highlighter-rouge">方法</code>或者<code class="language-plaintext highlighter-rouge">变量</code>前面加了<code class="language-plaintext highlighter-rouge">__</code>使其成员的可见性变为私有。那么可能有小伙伴们想到<code class="language-plaintext highlighter-rouge">__init__</code>构造函数前面不是也有<code class="language-plaintext highlighter-rouge">__</code>，为什么构造函数是公开的呢？</p>
+
+<p>小菜在介绍构造函数时说<code class="language-plaintext highlighter-rouge">构造函数</code>是一种特殊的方法。细心的小伙伴们就注意到<code class="language-plaintext highlighter-rouge">__init__</code>构造函数不仅开头有<code class="language-plaintext highlighter-rouge">__</code>，结尾也有<code class="language-plaintext highlighter-rouge">__</code>。在python中，默认以<code class="language-plaintext highlighter-rouge">__</code>开头方法或变量都会认为是私有的。但是有一种是除外的。</p>
+
+<p><code class="language-plaintext highlighter-rouge">注意：python不会认为以双划线开头 并且 以双下划线结尾的变量 或 方法是私有的。构造函数就属于这种，所以构造函数就不是私有的</code></p>
+
+<h4 id="通过实例添加变量">通过实例添加变量</h4>
+
+<p>python中可以通过实例添加变量</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">age</span><span class="p">)</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">age</span> <span class="o">=</span> <span class="n">age</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">__score</span> <span class="o">=</span> <span class="mi">69</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">'小王'</span><span class="p">,</span><span class="mi">19</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span><span class="p">.</span><span class="n">__score</span> <span class="o">=</span> <span class="mi">70</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">__score</span><span class="p">)</span>
+<span class="mi">70</span>
+</code></pre></div></div>
+<p>如果小伙们读了前面介绍的私有性，再看这段代码，肯定心里一万个<code class="language-plaintext highlighter-rouge">cnm</code>在崩腾，不是说私有变量不能在外部被访问吗？怎么现在居然可以赋值？请听小菜一本正经的瞎说：这段代码中<code class="language-plaintext highlighter-rouge">d1.__score = 70</code>最后打印出了<code class="language-plaintext highlighter-rouge">d1.__score</code>为70。其实这里的<code class="language-plaintext highlighter-rouge">__score</code>不是私有变量，而<code class="language-plaintext highlighter-rouge">__init__</code>构造函数的<code class="language-plaintext highlighter-rouge">__score</code>是私有变量。估计有小伙伴们要懵逼了。</p>
+
+<p>为了演示python是如何操作的，小菜简化代码</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">age</span><span class="p">)</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">age</span> <span class="o">=</span> <span class="n">age</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">__score</span> <span class="o">=</span> <span class="mi">69</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span> <span class="o">=</span> <span class="n">Studnet</span><span class="p">(</span><span class="s">'小王'</span><span class="p">,</span><span class="mi">19</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">__score</span><span class="p">)</span>  
+<span class="s">'这条语句会报错，原因__score是 私有变量'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">__dict__</span><span class="p">)</span>
+<span class="p">{</span><span class="s">'name'</span><span class="p">:</span> <span class="s">'小王'</span><span class="p">,</span> <span class="s">'age'</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="s">'_Student__score'</span><span class="p">:</span> <span class="mi">69</span><span class="p">}</span>
+</code></pre></div></div>
+<p>这里我们看到多了一个<code class="language-plaintext highlighter-rouge">_Student__score</code>，这是为什么呢？在实例化时，python会将私有变量转换成<code class="language-plaintext highlighter-rouge">_Student</code>后面再加变量名。所以当我们在输出<code class="language-plaintext highlighter-rouge">d1.__score</code>时就会报错，报一个<code class="language-plaintext highlighter-rouge">__score</code>变量不存在。</p>
+
+<p>回过头我们在说这段代码</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">age</span><span class="p">)</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">age</span> <span class="o">=</span> <span class="n">age</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">__score</span> <span class="o">=</span> <span class="mi">69</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">'小王'</span><span class="p">,</span><span class="mi">19</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span><span class="p">.</span><span class="n">__score</span> <span class="o">=</span> <span class="mi">70</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">__score</span><span class="p">)</span>
+<span class="mi">70</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">__dict__</span><span class="p">)</span>
+<span class="p">{</span><span class="s">'name'</span><span class="p">:</span> <span class="s">'小王'</span><span class="p">,</span> <span class="s">'age'</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span> <span class="s">'_Student__score'</span><span class="p">:</span> <span class="mi">69</span><span class="p">,</span> <span class="s">'__score'</span><span class="p">:</span><span class="mi">70</span><span class="p">}</span>
+</code></pre></div></div>
+<p>通过<code class="language-plaintext highlighter-rouge">d1.__dict__</code>打印出来实例的所有变量，我们可以分析出<code class="language-plaintext highlighter-rouge">d1.__score=70</code>就是给实例定义了一个<code class="language-plaintext highlighter-rouge">__score</code>变量，但<code class="language-plaintext highlighter-rouge">__score</code>不是私有的，在构造函数中的<code class="language-plaintext highlighter-rouge">__score</code>已经在实例化时被转换成<code class="language-plaintext highlighter-rouge">_Student__score</code></p>
+
+<h1 id="12python的访问私有变量">12.python的访问私有变量</h1>
+
+<p>在上面我们谈了python的私有性,实际上在实例化时将原来的私有变量做了一层命名空间的转换。那么我们如何访问私有变量呢？</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">age</span><span class="p">)</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">age</span> <span class="o">=</span> <span class="n">age</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">__score</span> <span class="o">=</span> <span class="mi">69</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">'小王'</span><span class="p">,</span><span class="mi">19</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">_Student__score</span><span class="p">)</span>
+<span class="mi">69</span>
+</code></pre></div></div>
+
+<h1 id="13继承">13.继承</h1>
+
+<p>类的继承最基本的作用就是为了避免定义重复的变量或方法。</p>
+
+<h4 id="文件结构">文件结构</h4>
+
+<pre><code class="language-txt">./
+|-hu.py
+|-st.py
+</code></pre>
+
+<h4 id="hupy">hu.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Human</span><span class="p">():</span>
+  <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">age</span><span class="p">):</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">age</span>  <span class="o">=</span> <span class="n">age</span>
+  
+  <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="stpy">st.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">hu</span> <span class="kn">import</span> <span class="n">Human</span>
+
+<span class="k">class</span> <span class="nc">Student</span><span class="p">(</span><span class="n">Human</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="nf">do_homework</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'调用Student类的方法'</span><span class="p">)</span>
+
+<span class="c1">#子类调用父类的sum
+</span><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">Student</span><span class="p">.</span><span class="nb">sum</span><span class="p">)</span>  
+<span class="mi">0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">d1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">'小王'</span><span class="p">,</span><span class="mi">19</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1">#实例调用name
+</span><span class="s">'小王'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">get_name</span><span class="p">())</span>  <span class="c1">#实例调用父类的方法
+</span><span class="s">'小王'</span>
+</code></pre></div></div>
+
+<h1 id="14子类方法调用父类方法">14.子类方法调用父类方法</h1>
+<pre><code class="language-txt">./
+|-hu.py
+|-st.py
+</code></pre>
+
+<h4 id="hupy-1">hu.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Human</span><span class="p">():</span>
+  <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">age</span><span class="p">):</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">age</span>  <span class="o">=</span> <span class="n">age</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"父类初始化方法"</span><span class="p">,</span><span class="n">name</span><span class="p">,</span> <span class="n">age</span><span class="p">)</span>
+  
+  <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="stpy-1">st.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">hu</span> <span class="kn">import</span> <span class="n">Human</span>
+
+<span class="k">class</span> <span class="nc">Student</span><span class="p">(</span><span class="n">Human</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">school</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span><span class="n">age</span><span class="p">):</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">school</span> <span class="o">=</span> <span class="n">school</span>
+    <span class="c1">#父类初始化
+</span>    <span class="c1">#Human.__init__(self,name,age) 
+</span>    <span class="c1">#通过 super关键字调用父类
+</span>    <span class="nb">super</span><span class="p">().</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">age</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">do_homework</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'调用Student类的方法'</span><span class="p">)</span>
+  
+<span class="n">stu</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="s">'上海大学'</span><span class="p">,</span><span class="s">'wali'</span><span class="p">,</span><span class="mi">18</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<h1 id="15总结">15.总结</h1>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_3.png" alt="ssl" /></p>
+
+:ET

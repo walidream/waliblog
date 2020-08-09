@@ -1,0 +1,2 @@
+I"@<p>实现爬虫时最经常提到的需求就是能合适的保存爬取到的数据，或者说，生成一个带有爬取数据的<code class="language-plaintext highlighter-rouge">导出文件</code>(通常叫做<code class="language-plaintext highlighter-rouge">export feed</code>)，来供其他系统使用。</p>
+:ET

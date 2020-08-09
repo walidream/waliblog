@@ -1,0 +1,393 @@
+I"�D<p>为什么要处理ES6语法呢？当我们使用新语法来写代码，一些浏览器如果不支持那么就会报错，导致用户体验非常糟糕。我们使用babel来将ES6语法处理成ES5语法，就可以解决这个问题。</p>
+
+<ul>
+  <li><a href="https://babeljs.io/setup" title="https://babeljs.io/setup" target="_blank">Babel官网</a></li>
+</ul>
+
+<h1 id="1安装babel">1.安装Babel</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add babel-loader @babel/core
+</code></pre></div></div>
+
+<h4 id="webpackconfigjs">webpack.config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">const path = require('path');
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');    //生成html文件
+const CleanWebpackPlugin = require('clean-webpack-plugin');  //清除
+</span>
+
+
+module.exports = {
+  mode:'development',
+  entry:'./src/index.js',
+  module:{
+	rules:[
+		{
+			test:/\.css$/,
+			use:[
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:1
+					}					
+				},
+				'postcss-loader'
+				
+			]
+		},
+		{
+			test:/\.scss$/,
+			use:[
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'sass-loader',
+				'postcss-loader'
+			]
+		},
+		{
+			test: /\.less$/,
+			use: [
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'less-loader',
+				'postcss-loader'
+			]
+		},
+		{
+			test:/\.(png|svg|jpeg|jpg|gif)$/,
+			use:[		
+				{
+					loader:'file-loader',
+					options:{
+						name:'[name].[ext]',  //[path] 上下文环境路径
+						publicPath:'./assets/image/',    //公共路径
+						outputPath:'assets/image/',  //输出路径							
+					}
+				},
+				{
+					loader: 'image-webpack-loader',
+					options: {
+						bypassOnDebug: true, // webpack@1.x
+						disable: true,       // webpack@2.x and newer
+					},
+				},
+			]
+		},
+		{
+			test: /\.html$/,
+			use:[
+				{
+					loader:'html-loader',
+					options:{
+						arrts:['img:src','img:data-src'],
+						minimize:false  //是否压缩html
+					}
+				}
+			]
+		},
+		{
+			test: /(iconfont.svg)|\.(woff|woff2|eot|ttf|otf)$/,
+			use:[
+				{
+					loader:'file-loader',
+					options:{
+						name:'[name].[ext]',  //[path] 上下文环境路径
+						publicPath:'./assets/iconfont/',    //公共路径
+						outputPath:'assets/iconfont/',  //输出路径							
+					}
+				}				
+			]
+		},
+<span class="gi">+		{
++			test: /\.js$/,
++			exclude: /(node_modules|bower_components|lib)/,
++			loader: 'babel-loader'
++		}
+</span>	]
+  },
+  plugins: [
+	new HtmlWebpackPlugin({
+		title: '瓦力博客',
+		template: './src/index.html'   //以src/index.html为编译模板
+	}),
+	new CleanWebpackPlugin(),
+	new webpack.HotModuleReplacementPlugin()
+  ],
+  devServer:{
+	contentBase: path.join(__dirname, 'dist'),
+	clientLogLevel: 'info',
+	open:true,  //启动时默认打开浏览器
+	host:'localhost', //域名 0.0.0.0局域网可访问
+	port:'9009',
+	inline:true, //实时更新
+	hot:true,    //热替换
+	hotOnly:true,
+	proxy:{
+		'/':{
+			target:'http://www.waliblog.com'
+		},
+		'/upload':{
+			target:'http://www.waliblog.com'
+		}
+	}
+  },
+  output:{
+    path: path.resolve(__dirname,'dist')
+  }
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="文件结构">文件结构</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">myProject
+</span> |-dist
+ |-node_modules
+ |-src
+     |-assets
+        |-css
+            |-index.css
+        |-less
+            |-index.less     
+        |-sass
+            |-index.scss
+        |-images
+            |-wali_logo.png
+     |-index.html
+     |-index.js
+ |-package.json
+ |-webpack.config.js
+ |-postcss.config.js
+<span class="gi">+ |-.babelrc
+</span></code></pre></div></div>
+
+<h4 id="安装babelpreset-env">安装@babel/preset-env</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add @babel/preset-env
+</code></pre></div></div>
+
+<h4 id="babelrc">.babelrc</h4>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+	</span><span class="nl">"presets"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"@babel/preset-env"</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="srcindexjs">src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="k">new</span> <span class="nb">Promise</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{}),</span>
+    <span class="k">new</span> <span class="nb">Promise</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{})</span>
+<span class="p">]</span>
+
+
+<span class="nx">arr</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">val</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">val</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h4 id="packagejson">package.json</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">{</span>
+  "scripts": {
+    "dev": "npx webpack-dev-server --mode=development --colors",
+    "dist": "npx webpack --mode=production",
+<span class="gi">+    "build": "npx webpack --mode=development --colors"
+</span>  }
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+
+<p>打包完成后我们打开dist目录下main.js，最下面能后找到</p>
+
+<pre><code class="language-javascrip">/***/ "./src/index.js":
+/*!**********************!*\
+  !*** ./src/index.js ***!
+  \**********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("var arr = [new Promise(function () {}), new Promise(function () {})];\narr.map(function (val) {\n  console.log(val);\n});\n\n//# sourceURL=webpack:///./src/index.js?");
+
+/***/ })
+</code></pre>
+
+<p>我们看到ES6语法被转换成了ES5语法，但是只转换了一部分，比如在低版本浏览中还是识别不了<code class="language-plaintext highlighter-rouge">Promise</code>、<code class="language-plaintext highlighter-rouge">Map</code>这样的语法。</p>
+
+<h1 id="2兼容低版本浏览器">2.兼容低版本浏览器</h1>
+
+<h4 id="安装babelpolyfill">安装babel/polyfill</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add @babel/polyfill
+</code></pre></div></div>
+
+<h4 id="srcindexjs-1">src/index.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gi">+ import "@babel/polyfill";
+</span><span class="p">const arr = [
+</span>    new Promise(() =&gt; {}),
+    new Promise(() =&gt; {})
+<span class="err">]</span>
+
+
+arr.map(val =&gt; {
+    console.log(val)
+<span class="err">})</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack-1">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_22.png" alt="ssl" /></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//dist/main.js</span>
+<span class="cm">/***/</span> <span class="dl">"</span><span class="s2">./src/index.js</span><span class="dl">"</span><span class="p">:</span>
+<span class="cm">/*!**********************!*\
+  !*** ./src/index.js ***!
+  \**********************/</span>
+<span class="cm">/*! no exports provided */</span>
+<span class="cm">/*! all exports used */</span>
+<span class="cm">/***/</span> <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">module</span><span class="p">,</span> <span class="nx">__webpack_exports__</span><span class="p">,</span> <span class="nx">__webpack_require__</span><span class="p">)</span> <span class="p">{</span>
+
+<span class="dl">"</span><span class="s2">use strict</span><span class="dl">"</span><span class="p">;</span>
+<span class="nb">eval</span><span class="p">(</span><span class="dl">"</span><span class="s2">__webpack_require__.r(__webpack_exports__);</span><span class="se">\n</span><span class="s2">/* harmony import */ var _babel_polyfill__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/polyfill */ </span><span class="se">\"</span><span class="s2">./node_modules/@babel/polyfill/lib/index.js</span><span class="se">\"</span><span class="s2">);</span><span class="se">\n</span><span class="s2">/* harmony import */ var _babel_polyfill__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_polyfill__WEBPACK_IMPORTED_MODULE_0__);</span><span class="se">\n\n</span><span class="s2">var arr = [new Promise(function () {}), new Promise(function () {})];</span><span class="se">\n</span><span class="s2">arr.map(function (val) {</span><span class="se">\n</span><span class="s2">  console.log(val);</span><span class="se">\n</span><span class="s2">});//# sourceURL=[module]</span><span class="se">\n</span><span class="s2">//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9zcmMvaW5kZXguanMuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9zcmMvaW5kZXguanM/MzcwMCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgXCJAYmFiZWwvcG9seWZpbGxcIjtcbnZhciBhcnIgPSBbbmV3IFByb21pc2UoZnVuY3Rpb24gKCkge30pLCBuZXcgUHJvbWlzZShmdW5jdGlvbiAoKSB7fSldO1xuYXJyLm1hcChmdW5jdGlvbiAodmFsKSB7XG4gIGNvbnNvbGUubG9nKHZhbCk7XG59KTsiXSwibWFwcGluZ3MiOiJBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EiLCJzb3VyY2VSb290IjoiIn0=</span><span class="se">\n</span><span class="s2">//# sourceURL=webpack-internal:///./src/index.js</span><span class="se">\n</span><span class="dl">"</span><span class="p">);</span>
+
+<span class="cm">/***/</span> <span class="p">})</span>
+</code></pre></div></div>
+
+<p>从webpack打包输出的信息中可以看到，<code class="language-plaintext highlighter-rouge">Promise</code>和<code class="language-plaintext highlighter-rouge">Map</code>方法<code class="language-plaintext highlighter-rouge">@babel/polyfill</code>自己帮我们做了实现。可是<code class="language-plaintext highlighter-rouge">dist/mian.js</code>文件突然增大到941kb，原因就是
+main.js文件将整个<code class="language-plaintext highlighter-rouge">polyfill</code>都打包进来。我们想要的其实在main.js中用到的方法帮助我们实现，如果没有用到，就不需要打包进main.js。</p>
+
+<h1 id="3精简代码">3.精简代码</h1>
+
+<h4 id="babelrc-1">.babelrc</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">{</span>
+  "presets": [
+		[
+			"@babel/preset-env",
+<span class="gi">+			{
++				"useBuiltIns": "usage"
+</span>			}
+		]
+	]
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack-2">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_23.png" alt="ssl" /></p>
+
+<p>当我们在<code class="language-plaintext highlighter-rouge">.babelrc</code>文件中配置<code class="language-plaintext highlighter-rouge">"useBuiltIns": "usage"</code>，我们发现打包出来的main.js文件大小变成29kb。<code class="language-plaintext highlighter-rouge">"useBuiltIns": "usage"</code>作用就是当<code class="language-plaintext highlighter-rouge">polyfill</code>去往低版本浏览器添加一些特性的时候，不是把所有的特性都加进了，而是根据你的业务代码来决定添加什么。</p>
+
+<h1 id="4设置浏览器版本">4.设置浏览器版本</h1>
+
+<h4 id="babelrc-2">.babelrc</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">{</span>
+  "presets": [
+		[
+			"@babel/preset-env",
+<span class="gi">+			{
++				"targets": {
++					"edge": "17",
++					"firefox": "60",
++					"safari": "11.1",
++					"chrome": "67"
++				},
++				"useBuiltIns": "usage"
+</span>			}
+		]
+	]
+<span class="err">}</span>
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">"chrome": "67"</code>指编译的代码要运行在67版本的chrom浏览器上，如果67版本chrom支持<code class="language-plaintext highlighter-rouge">promis</code>等新语法，则不转换，否则进行转换。</p>
+
+<h4 id="运行webpack-3">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+
+<h1 id="5插件开发">5.插件开发</h1>
+
+<p>上面教程如果我们开发项目，完全够用了。但是当我们开发插件时就会有问题，因为上面是将<code class="language-plaintext highlighter-rouge">promis</code>等新特性的实现通过全局变量来注入，会污染全局环境。而且写代码还要在js前面添加<code class="language-plaintext highlighter-rouge">import "@babel/polyfill"</code>。所以小菜建议下面这种方式</p>
+
+<h4 id="安装plugintransformruntime">安装pluginTransformRuntime</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add @babel/plugin-transform-runtime
+yarn add @babel/runtime
+yarn add @babel/runtime-corejs2
+</code></pre></div></div>
+
+<h4 id="babelrc-3">.babelrc</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">{</span>
+	"presets": [
+		[
+			"@babel/preset-env",
+			{
+				"targets": {
+					"chrome": "67"
+				},
+				"useBuiltIns": "usage"
+			}
+		]
+	],
+<span class="gi">+  "plugins": [
++    [
++      "@babel/plugin-transform-runtime",
++      {
++        "absoluteRuntime": false,
++        "corejs": 2,
++        "helpers": true,
++        "regenerator": true,
++        "useESModules": false
++      }
++    ]
++  ]
+</span><span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack-4">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+
+<p>打开dist/main.js文件</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/***/</span> <span class="dl">"</span><span class="s2">./src/index.js</span><span class="dl">"</span><span class="p">:</span>
+<span class="cm">/*!**********************!*\
+  !*** ./src/index.js ***!
+  \**********************/</span>
+<span class="cm">/*! no exports provided */</span>
+<span class="cm">/***/</span> <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">module</span><span class="p">,</span> <span class="nx">__webpack_exports__</span><span class="p">,</span> <span class="nx">__webpack_require__</span><span class="p">)</span> <span class="p">{</span>
+
+<span class="dl">"</span><span class="s2">use strict</span><span class="dl">"</span><span class="p">;</span>
+<span class="nb">eval</span><span class="p">(</span><span class="dl">"</span><span class="s2">__webpack_require__.r(__webpack_exports__);</span><span class="se">\n</span><span class="s2">/* harmony import */ var _babel_runtime_corejs2_core_js_promise__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime-corejs2/core-js/promise */ </span><span class="se">\"</span><span class="s2">./node_modules/@babel/runtime-corejs2/core-js/promise.js</span><span class="se">\"</span><span class="s2">);</span><span class="se">\n</span><span class="s2">/* harmony import */ var _babel_runtime_corejs2_core_js_promise__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_corejs2_core_js_promise__WEBPACK_IMPORTED_MODULE_0__);</span><span class="se">\n\n</span><span class="s2">const arr = [new _babel_runtime_corejs2_core_js_promise__WEBPACK_IMPORTED_MODULE_0___default.a(() =&gt; {}), new _babel_runtime_corejs2_core_js_promise__WEBPACK_IMPORTED_MODULE_0___default.a(() =&gt; {})];</span><span class="se">\n</span><span class="s2">arr.map(val =&gt; {</span><span class="se">\n</span><span class="s2">  console.log(val);</span><span class="se">\n</span><span class="s2">});</span><span class="se">\n\n</span><span class="s2">//# sourceURL=webpack:///./src/index.js?</span><span class="dl">"</span><span class="p">);</span>
+
+<span class="cm">/***/</span> <span class="p">})</span>
+</code></pre></div></div>
+
+<p>从打包的代码我们可以看到，向<code class="language-plaintext highlighter-rouge">Promise</code>和<code class="language-plaintext highlighter-rouge">Map</code>都帮助我们实现了。</p>
+
+:ET

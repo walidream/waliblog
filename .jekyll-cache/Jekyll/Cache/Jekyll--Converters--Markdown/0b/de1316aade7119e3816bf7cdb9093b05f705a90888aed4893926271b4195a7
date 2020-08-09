@@ -1,0 +1,230 @@
+I"13<p>我们之前开发的都是业务代码，如果我们需要开发一些库代码给小伙伴们用或者给自己的团队用。那么如何使用webpack打包呢？这小节将带大家写webpack对库进行打包。</p>
+
+<h1 id="1新建项目">1.新建项目</h1>
+
+<p>由于library是要上传到npm或者其他包管理器上的，所以我们需要新建一个项目</p>
+
+<pre><code class="language-txt">webpackLibrary
+</code></pre>
+
+<h4 id="进入项目">进入项目</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd webpackLibrary
+</code></pre></div></div>
+
+<h4 id="初始化项目">初始化项目</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn init
+</code></pre></div></div>
+
+<h4 id="文件结构">文件结构</h4>
+
+<pre><code class="language-txt">webpackLibrary
+|-src
+    |-index.js
+    |-math.js
+    |-string.js
+|-pachage.json    
+</code></pre>
+
+<h4 id="mathjs">math.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">export</span> <span class="kd">function</span> <span class="nx">minus</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">export</span> <span class="kd">function</span> <span class="nx">multiply</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">*</span> <span class="nx">b</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">export</span> <span class="kd">function</span> <span class="nx">division</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">/</span> <span class="nx">b</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="stringjs">string.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="kd">function</span> <span class="nx">join</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="indexjs">index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">math</span>  <span class="k">from</span> <span class="dl">"</span><span class="s2">./math</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">string</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./string</span><span class="dl">"</span><span class="p">;</span>
+
+
+<span class="k">export</span> <span class="k">default</span> <span class="p">{</span>
+    <span class="nx">math</span><span class="p">,</span>
+    <span class="nx">string</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="2安装webpack">2.安装webpack</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add webpack webpack-cli
+</code></pre></div></div>
+
+<h1 id="3创建webpack配置文件">3.创建webpack配置文件</h1>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">webpackLibrary
+</span> |-src
+    |-index.js
+    |-math.js
+    |-string.js
+ |-pachage.json  
+<span class="gi">+|-webpack.config.js  
+</span></code></pre></div></div>
+
+<h4 id="安装cleanwebpackplugin">安装CleanWebpackPlugin</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add clean-webpack-plugin
+</code></pre></div></div>
+
+<h4 id="webpackconfigjs">webpack.config.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">webpack</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">webpack</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">CleanWebpackPlugin</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">clean-webpack-plugin</span><span class="dl">'</span><span class="p">);</span>  <span class="c1">//清除</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="na">mode</span><span class="p">:</span><span class="dl">'</span><span class="s1">production</span><span class="dl">'</span><span class="p">,</span>
+	<span class="na">entry</span><span class="p">:{</span>
+		<span class="na">main</span><span class="p">:</span><span class="dl">'</span><span class="s1">./src/index.js</span><span class="dl">'</span><span class="p">,</span>  
+	<span class="p">},</span>
+	<span class="na">plugins</span><span class="p">:</span> <span class="p">[</span>
+		<span class="k">new</span> <span class="nx">CleanWebpackPlugin</span><span class="p">()</span>
+	<span class="p">],</span>	
+	<span class="na">output</span><span class="p">:{</span>
+        <span class="na">path</span><span class="p">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span><span class="dl">'</span><span class="s1">dist</span><span class="dl">'</span><span class="p">),</span>
+        <span class="na">filename</span><span class="p">:</span> <span class="dl">'</span><span class="s1">library.js</span><span class="dl">'</span><span class="p">,</span>
+        <span class="na">library</span><span class="p">:</span> <span class="dl">'</span><span class="s1">library</span><span class="dl">'</span><span class="p">,</span>
+        <span class="na">libraryTarget</span><span class="p">:</span> <span class="dl">'</span><span class="s1">umd</span><span class="dl">'</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="packagejson">package.json</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">{</span>
+  "name": "webpackLibrary",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/walidream/webpackLibrary.git",
+<span class="gi">+  "scripts":{
++    "prod": "npx webpack --colors --mode=production"
++  },
+</span>  "author": "walidream &lt;walidream@163.com&gt;",
+  "license": "MIT",
+  "dependencies": {
+    "clean-webpack-plugin": "^3.0.0",
+    "webpack": "^4.35.0",
+    "webpack-cli": "^3.3.4"
+  }
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run prod
+</code></pre></div></div>
+
+<p>这样一个库文件就打包好了，小菜在这里想给大家强调<code class="language-plaintext highlighter-rouge">output</code>下面<code class="language-plaintext highlighter-rouge">library</code>和<code class="language-plaintext highlighter-rouge">libraryTarget</code>。我们写第三方库，主要是给别人使用，别人使用的方式会很多如</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//AMD</span>
+<span class="kd">const</span> <span class="nx">lib</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">library</span><span class="dl">'</span><span class="p">);</span>  
+
+<span class="c1">//CommonJS</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">lib</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">library</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="dl">"</span><span class="s2">library.js</span><span class="dl">"</span><span class="o">&gt;&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span></code></pre></div></div>
+
+<p>所以在output中要配置<code class="language-plaintext highlighter-rouge">library</code>和<code class="language-plaintext highlighter-rouge">libraryTarget</code>,强烈建议大家阅读webpack官方文档。</p>
+
+<h1 id="4externals">4.externals</h1>
+
+<p>当我们在代码中使用插件如<code class="language-plaintext highlighter-rouge">loadsh</code>，用户也在自己的代码中使用了<code class="language-plaintext highlighter-rouge">loadsh</code>插件，想要在我们库中去掉<code class="language-plaintext highlighter-rouge">loadsh</code>，就需要用到<code class="language-plaintext highlighter-rouge">externals</code>。</p>
+
+<h4 id="srcstringjs">src/string.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gd">- export function join(a,b){
+-    return a + ' ' + b;
+- }
+</span>
+import _ from 'loadsh';
+<span class="gi">+ export function join(a,b){
++    return _.join([a,b],' ');
++ }
+</span></code></pre></div></div>
+
+<p>然后在externals中把<code class="language-plaintext highlighter-rouge">loadsh</code>去掉</p>
+
+<h4 id="webpackconfigjs-1">webpack.config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">const path = require('path');
+const webpack = require('webpack');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');  //清除
+</span>
+module.exports = {
+	mode:'production',
+	entry:{
+		main:'./src/index.js',  
+	},
+<span class="gi">+    externals:'loadsh',
+</span>	plugins: [
+		new CleanWebpackPlugin()
+	],	
+	output:{
+        path: path.resolve(__dirname,'dist'),
+        filename: 'library.js',
+        library: 'library',
+        libraryTarget: 'umd'
+	}
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h1 id="5上传到npm">5.上传到npm</h1>
+
+<p>在上传到npm之前，我们需要修改<code class="language-plaintext highlighter-rouge">package.json</code>文件main的路径</p>
+
+<h4 id="packagejson-1">package.json</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">{</span>
+  "name": "webpackLibrary",
+  "version": "1.0.0",
+  "main": "./dist/library.js",
+  "repository": "https://github.com/walidream/webpackLibrary.git",
+  "scripts":{
+    "prod": "npx webpack --colors --mode=production"
+  },
+  "author": "walidream &lt;walidream@163.com&gt;",
+  "license": "MIT",
+  "dependencies": {
+    "clean-webpack-plugin": "^3.0.0",
+    "webpack": "^4.35.0",
+    "webpack-cli": "^3.3.4"
+  }
+<span class="err">}</span>
+</code></pre></div></div>
+
+<p>接着我们在npm官网上注册一个账号。打开自己命令窗口</p>
+
+<pre><code class="language-txt">//添加用户
+npm adduser
+//上传包  
+npm publish
+</code></pre>
+
+<p>注册完成账号，记得一定要用邮电验证一下，不然的话是不能上传的。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_48.png" alt="ssl" /></p>
+
+<p>其实真正开发一个库，webpack配置工作量也是蛮大的，小菜只是在这里简单的记录一下。最后建议大家不要随便上传一些没有用的包，尽可能的维护<code class="language-plaintext highlighter-rouge">npm</code>社区的质量。</p>
+
+:ET

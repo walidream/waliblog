@@ -1,0 +1,36 @@
+I"<p>懒加载或者按需加载，是一种很好的优化网页或应用的方式。这种方式实际上是先把你的代码在一些逻辑断点处分离开，然后在一些代码块中完成某些操作后，立即引用或即将引用另外一些新的代码块。这样加快了应用的初始加载速度，减轻了它的总体体积，因为某些代码块可能永远不会被加载。</p>
+
+<blockquote>
+  <p>注意：如果您使用的是 Babel，你将需要添加 syntax-dynamic-import 插件，才能使 Babel 可以正确地解析语法。</p>
+</blockquote>
+
+<h4 id="srcindexjs">src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">getComponent</span><span class="p">(){</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="na">default</span><span class="p">:</span><span class="nx">_</span> <span class="p">}</span> <span class="o">=</span> <span class="k">await</span> <span class="k">import</span><span class="p">(</span><span class="cm">/*webpackChunkName:"loadsh"*/</span> <span class="dl">'</span><span class="s1">loadsh</span><span class="dl">'</span><span class="p">);</span>
+    <span class="kd">const</span> <span class="nx">element</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">'</span><span class="s1">div</span><span class="dl">'</span><span class="p">);</span>
+    <span class="nx">element</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">join</span><span class="p">([</span><span class="dl">'</span><span class="s1">hello</span><span class="dl">'</span><span class="p">,</span><span class="dl">'</span><span class="s1">world</span><span class="dl">'</span><span class="p">],</span><span class="dl">'</span><span class="s1">**</span><span class="dl">'</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">element</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,()</span><span class="o">=&gt;</span><span class="p">{</span>
+    <span class="nx">getComponent</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">ele</span><span class="o">=&gt;</span><span class="p">{</span>
+        <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">ele</span><span class="p">);</span>
+    <span class="p">})</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<p>上面代码功能，当点击页面时，再加载loadsh模块，加载完成后再创建一个div元素，div元素填充hello world，最后将div元素返回挂载到document上。</p>
+
+<h4 id="运行webpack">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+
+<p>打开<code class="language-plaintext highlighter-rouge">dist/index.html</code>,我们点击页面任何一个地方，就会看到页面出现<code class="language-plaintext highlighter-rouge">hello**world</code>。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_24.png" alt="ssl" /></p>
+
+<p>懒加载这个概念还是很有用的，它能够提升我们页面加载速度，提高用户的体验度。在项目后面，小菜会搭一个简易的项目，主要写一下vue中路由懒加载的实现。原理就是利用import()这个新语法，如果要想使用新语法就需要再webpack中配置<code class="language-plaintext highlighter-rouge">syntax-dynamic-import</code></p>
+
+:ET

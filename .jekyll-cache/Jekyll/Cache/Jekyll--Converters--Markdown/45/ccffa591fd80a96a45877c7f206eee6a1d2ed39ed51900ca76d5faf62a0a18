@@ -1,0 +1,321 @@
+I"NI<p>为了更好的开发、维护、管理项目，我们需要了解python中项目的组织结构。</p>
+
+<h1 id="1组织结构">1.组织结构</h1>
+
+<p>在python中最顶级的是<code class="language-plaintext highlighter-rouge">包</code>(文件夹),包下面有<code class="language-plaintext highlighter-rouge">模块</code>(py文件),模块下面有<code class="language-plaintext highlighter-rouge">类</code>。一个<code class="language-plaintext highlighter-rouge">包</code>可以包含多个模块，一个<code class="language-plaintext highlighter-rouge">模块</code>可以包含多个类。</p>
+
+<pre><code class="language-txt">包
+|--模块1
+  |--类11
+  |--类12
+|--模块2
+  |--类21
+  |--类22
+</code></pre>
+
+<p>####示例</p>
+
+<pre><code class="language-txt">server
+|--s1.py
+|--s2.py
+|--s3.py
+</code></pre>
+
+<h1 id="2包与模块命名">2.包与模块命名</h1>
+
+<h4 id="python包">python包</h4>
+<p>一般命名包就是命名一个<code class="language-plaintext highlighter-rouge">文件夹名称</code>,包之间的区分就是通过不同的名称来区分的。包下面也可以有<code class="language-plaintext highlighter-rouge">子包</code>。<code class="language-plaintext highlighter-rouge">python</code>是如何区分<code class="language-plaintext highlighter-rouge">文件夹</code>和<code class="language-plaintext highlighter-rouge">包</code>，在python中，如果定义一个<code class="language-plaintext highlighter-rouge">python包</code>，那么这个<code class="language-plaintext highlighter-rouge">python包</code>下面必须要有<code class="language-plaintext highlighter-rouge">__init__.py</code>文件，如果没有这个文件，python就认为这是一个文件夹而不是一个包。</p>
+
+<p><code class="language-plaintext highlighter-rouge">__init__.py</code>文件是声明这是一个python包，在<code class="language-plaintext highlighter-rouge">__init__.py</code>文件中可以什么都不写，也可以像其他<code class="language-plaintext highlighter-rouge">*.py</code>文件一样在里面声明变量、函数、类等。</p>
+
+<pre><code class="language-txt">server
+|--__init__.py
+|--demo #子包
+   |--d1.py
+|--s1.py
+|--s2.py
+</code></pre>
+
+<h4 id="python模块">python模块</h4>
+
+<p>python模块可以简单的认为是一个后缀为<code class="language-plaintext highlighter-rouge">py</code>的python文件。模块名就是文件的名称。</p>
+
+<pre><code class="language-txt">server
+|--__init__.py
+|--s1.py
+|--s2.py
+net
+|--__init__.py
+|--s1.py
+</code></pre>
+<p>对于上面两个不同包下面相同的模块名称，我们如何区分。在代码中，如果我们引入模块时，有两个相同的模块名称，那么我们需要再模块前面加上包名</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 导入server包下面 s1模块
+</span><span class="kn">import</span> <span class="nn">server.s1</span> 
+</code></pre></div></div>
+
+<h1 id="3导入模块">3.导入模块</h1>
+
+<h3 id="improt-模块">improt 模块</h3>
+<p>在编写代码时，我们有时会需要其他模块的变量或者方法，那么如何导入其他模块的变量、方法呢？</p>
+
+<h4 id="文件结构">文件结构</h4>
+
+<pre><code class="language-txt">./
+|-server
+|--__init__.py
+|--s1.py
+|--s2.py
+</code></pre>
+
+<h4 id="s1py">s1.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+</code></pre></div></div>
+
+<p>如何在<code class="language-plaintext highlighter-rouge">s2.py</code>模块中使用<code class="language-plaintext highlighter-rouge">s1.py</code>模块的变量</p>
+
+<h4 id="s2py">s2.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">s1</span>
+<span class="k">print</span><span class="p">(</span><span class="n">s1</span><span class="p">.</span><span class="n">a</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="使用as重新命名">使用as重新命名</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">server.s1</span> <span class="k">as</span> <span class="n">p</span>
+</code></pre></div></div>
+
+<p>当导入的模块不是当前包中的同级模块时，在导入时需要添加包名<code class="language-plaintext highlighter-rouge">包名.模块名</code></p>
+
+<h3 id="from-import-模块">from import 模块</h3>
+
+<p>上面<code class="language-plaintext highlighter-rouge">import</code>是导入模块，<code class="language-plaintext highlighter-rouge">form improt</code>可以单独导入模块中的变量或方法,依旧用上面的例子举例</p>
+
+<h4 id="s2py-1">s2.py</h4>
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gd">- import s1
+- print(s1.a)
+</span>
++ from s1 import a
+<span class="gi">+ print(a)
+</span></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">from import</code>不仅可以导入模块中的<code class="language-plaintext highlighter-rouge">变量</code>、<code class="language-plaintext highlighter-rouge">方法</code>，也可以导入模块</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#假设在net包下有个n1.py模块
+</span><span class="kn">from</span> <span class="nn">net</span> <span class="kn">import</span> <span class="n">n1</span>
+<span class="c1"># 从net包下面导入 n1模块
+</span></code></pre></div></div>
+
+<h4 id="使用导入模块全部变量">使用*导入模块全部变量</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 导入s1模块下面所有的变量
+</span><span class="kn">from</span> <span class="nn">s1</span> <span class="kn">import</span> <span class="o">*</span>
+</code></pre></div></div>
+<p>一般是不建议导入模块的全部变量，可以在<code class="language-plaintext highlighter-rouge">s1</code>模块中设置</p>
+
+<h4 id="s1py-1">s1.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">'a'</span><span class="p">,</span><span class="s">'b'</span><span class="p">]</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">c</span> <span class="o">=</span> <span class="mi">3</span>
+</code></pre></div></div>
+
+<p>在s2.py模块中<code class="language-plaintext highlighter-rouge">from s1 import *</code>中就只会导入<code class="language-plaintext highlighter-rouge">a</code>、<code class="language-plaintext highlighter-rouge">b</code>两个变量</p>
+
+<h1 id="4__init__的用法">4.__init__的用法</h1>
+
+<p><code class="language-plaintext highlighter-rouge">__init__.py</code>是包的初始化文件，当包被导入时，首先加载执行<code class="language-plaintext highlighter-rouge">__init__.py</code>文件，是自动加载执行的。</p>
+
+<h4 id="批量导入模块">批量导入模块</h4>
+
+<p>当多个模块中需要使用多个系统模块，如果在每个模块中导入相同的系统模块，就会显得比较繁琐。</p>
+
+<pre><code class="language-txt">server
+|--net
+  |--__init__.py
+|--s1.py
+|--s2.py
+</code></pre>
+<p>假设在<code class="language-plaintext highlighter-rouge">s1</code>和<code class="language-plaintext highlighter-rouge">s2</code>中需要引入多个相同的模块时，可以在<code class="language-plaintext highlighter-rouge">__init__.py</code>中引入，然后在<code class="language-plaintext highlighter-rouge">s1</code>和<code class="language-plaintext highlighter-rouge">s2</code>模块中分别导入<code class="language-plaintext highlighter-rouge">net</code>包就可以了</p>
+
+<h4 id="__init__py">__init__.py</h4>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">io</span>
+</code></pre></div></div>
+
+<h4 id="s1py-和-s2py">s1.py 和 s2.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">net</span>
+</code></pre></div></div>
+
+<h1 id="5包与模块几个常见错误">5.包与模块几个常见错误</h1>
+
+<p>包与模块几个常见的错误：</p>
+<ul>
+  <li>包和模块不会被重复导入</li>
+  <li>避免循环导入包(A-&gt;B模块，在B-&gt;A模块)</li>
+  <li>当python中一旦导入一个模块时，就会执行这个模块所有代码</li>
+  <li>通常情况下，一个包只有一个入口文件</li>
+</ul>
+
+<h1 id="6内置变量">6.内置变量</h1>
+
+<p>除了我们可以在模块中定义变量，模块中也会有系统内置变量。 查看模块里内置变量</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">info</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+
+<span class="s">"""
+['__annotations__', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', 'a', 'b']
+"""</span>
+</code></pre></div></div>
+<p>从上面打印出来的变量我们可以看到系统内置变量都是<code class="language-plaintext highlighter-rouge">__</code>开头和结尾的，最后<code class="language-plaintext highlighter-rouge">a</code>、<code class="language-plaintext highlighter-rouge">b</code>变量是我们在文件中自定义的</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>变量</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>annotations</strong></td>
+      <td>注解</td>
+    </tr>
+    <tr>
+      <td><strong>doc</strong></td>
+      <td>模块中的注释</td>
+    </tr>
+    <tr>
+      <td><strong>file</strong></td>
+      <td>模块路径</td>
+    </tr>
+    <tr>
+      <td><strong>name</strong></td>
+      <td>模块名称</td>
+    </tr>
+    <tr>
+      <td><strong>package</strong></td>
+      <td>包的名称</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="7入口文件和普通模块内置变量">7.入口文件和普通模块内置变量</h1>
+
+<p>文件结构</p>
+
+<pre><code class="language-txt">server
+|--demo
+  |--__init__.py
+  |--s1.py
+|--s2.py
+</code></pre>
+
+<h4 id="s1py-2">s1.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">"""
+    s1模块的注释
+"""</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'=======================s1========================'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'package: '</span> <span class="o">+</span> <span class="p">(</span><span class="n">__package__</span> <span class="ow">or</span> <span class="s">'当前模块不属于任何包'</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'name: '</span> <span class="o">+</span> <span class="n">__name__</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'doc: '</span> <span class="o">+</span>  <span class="p">(</span><span class="n">__doc__</span> <span class="ow">or</span> <span class="s">'当前模块没有注释'</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'file: '</span> <span class="o">+</span> <span class="n">__file__</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="s2py-2">s2.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">demo.s1</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'=======================s2========================'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'package: '</span> <span class="o">+</span> <span class="p">(</span><span class="n">__package__</span> <span class="ow">or</span> <span class="s">'当前模块不属于任何包'</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'name: '</span> <span class="o">+</span> <span class="n">__name__</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'doc: '</span> <span class="o">+</span>  <span class="p">(</span><span class="n">__doc__</span> <span class="ow">or</span> <span class="s">'当前模块没有注释'</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'file: '</span> <span class="o">+</span> <span class="n">__file__</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>运行s2模块</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python s2.py
+</code></pre></div></div>
+
+<p>输出内容</p>
+
+<pre><code class="language-txt">================s1======================
+package: demo
+name: demo.s1
+doc:
+    s1模块的注释
+
+file: C:\Users\Administrator\Desktop\py\server\demo\s1.py
+=================s2==================
+package: 当前模块不属于任何包
+name: __main__
+doc: 当前模块没有注释
+file: s2.py
+</code></pre>
+
+<p>从打印的出的信息中可以看出，当<code class="language-plaintext highlighter-rouge">python s2.py</code>时，其实是把s2设置成python的入口文件，在入口文件中导入s1模块,s1是普通模块，s2是入口文件，可以对比一下输出的信息发现入口文件中<code class="language-plaintext highlighter-rouge">package</code>不属于任何包，且<code class="language-plaintext highlighter-rouge">name</code>不在是模块名称，而变成<code class="language-plaintext highlighter-rouge">__mian__</code></p>
+
+<h4 id="__name__应用">__name__应用</h4>
+
+<p>在实际开发中我们可能需要区分入口文件还是普通模块来处理不同的逻辑代码</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__mian__'</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+</code></pre></div></div>
+
+<h1 id="8相对导入和绝对导入">8.相对导入和绝对导入</h1>
+
+<h4 id="文件结构-1">文件结构</h4>
+
+<pre><code class="language-txt">demo
+|--package1
+   |--p1.py
+   |--p2.py
+|--package2
+   |--p3.py
+|--mian.py
+</code></pre>
+
+<h4 id="顶级包和入口文件">顶级包和入口文件</h4>
+
+<p>python中<code class="language-plaintext highlighter-rouge">顶级包</code>是和<code class="language-plaintext highlighter-rouge">入口文件</code>目录级相同，我们看上面的文件结构，<code class="language-plaintext highlighter-rouge">根</code>目录是<code class="language-plaintext highlighter-rouge">demo</code>，当运行<code class="language-plaintext highlighter-rouge">python main.py</code>，将<code class="language-plaintext highlighter-rouge">main.py</code>作为入口文件，此时顶级包就是<code class="language-plaintext highlighter-rouge">package1、package2</code>，而不是<code class="language-plaintext highlighter-rouge">demo</code>，要想将demo做为顶级包，就需要将<code class="language-plaintext highlighter-rouge">mian.py</code>放在和demo同级</p>
+
+<p><code class="language-plaintext highlighter-rouge">入口文件:</code>一般就是<code class="language-plaintext highlighter-rouge">python </code>命令运行某个模块，但是也不一定，如果<code class="language-plaintext highlighter-rouge">python -m 模块</code>就是将这个python模块当做普通模块来运行。具体要判断是不是入口文件,还是要打印模块中<code class="language-plaintext highlighter-rouge">内置变量 __name__</code>看其是不是<code class="language-plaintext highlighter-rouge">__name == '__main__'</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">注意：入口文件不允许使用相对路径，必须使用绝对路径</code></p>
+
+<h4 id="绝对路径">绝对路径</h4>
+
+<p>在python模块中，看到</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># main.py
+</span><span class="kn">import</span> <span class="nn">package1.p2</span>
+</code></pre></div></div>
+<p>这段代码import路径就是一个绝对路径，绝对路径在导入时，一定要从顶级包开始。</p>
+
+<h4 id="相对路径">相对路径</h4>
+
+<p>python 中相对路径<code class="language-plaintext highlighter-rouge">.</code>表示当前目录,<code class="language-plaintext highlighter-rouge">..</code>表示上一层目录，<code class="language-plaintext highlighter-rouge">...</code>表示上上一层目录，然后依次类推。<code class="language-plaintext highlighter-rouge">import</code>只能写绝对路径，如果需要使用相对路径必须使用<code class="language-plaintext highlighter-rouge">from import</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># p3.py 
+#入口文件依然是mian.py
+</span>
+<span class="c1">#绝对路径 
+</span><span class="kn">import</span> <span class="nn">p1</span>
+
+<span class="c1">#相对路径
+</span><span class="kn">from</span> <span class="nn">.p1</span> <span class="kn">import</span> <span class="n">m</span>
+</code></pre></div></div>
+
+<p>python中相对路径之所以能够定位到模块是因为内置变量<code class="language-plaintext highlighter-rouge">__name__</code>，入口文件之所以必须使用绝对路径，是因为一旦被python认为是入口文件,那么<code class="language-plaintext highlighter-rouge">__name__</code>发生了改变。不能定位到模块，这就是为什么入口文件必须使用绝对路径</p>
+
+:ET

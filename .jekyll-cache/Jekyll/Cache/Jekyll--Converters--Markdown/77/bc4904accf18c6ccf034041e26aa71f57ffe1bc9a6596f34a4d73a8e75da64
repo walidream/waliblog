@@ -1,0 +1,188 @@
+I"�P<p>当<code class="language-plaintext highlighter-rouge">Item</code> 在 <code class="language-plaintext highlighter-rouge">Spider</code>中被收集之后，它将会被传递到 <code class="language-plaintext highlighter-rouge">Item Pipeline</code>，一些组件会按照一定的顺序执行对 <code class="language-plaintext highlighter-rouge">Item</code> 的处理</p>
+
+<p>每个 <code class="language-plaintext highlighter-rouge">item pipeline</code> 组件(有时称之为<code class="language-plaintext highlighter-rouge">Item Pipeline</code>)是实现了简单方法的 Python 类。他们接收到<code class="language-plaintext highlighter-rouge">Item</code>并通过它执行一些行为，同时也决定此<code class="language-plaintext highlighter-rouge">Item</code>是否继续通过 <code class="language-plaintext highlighter-rouge">pipeline</code>，或是被丢弃而不再进行处理。</p>
+
+<p>以下是<code class="language-plaintext highlighter-rouge">item pipeline</code>的一些典型应用:</p>
+<ul>
+  <li>清理<code class="language-plaintext highlighter-rouge">HTML</code>数据</li>
+  <li>验证爬取的数据(检查<code class="language-plaintext highlighter-rouge">item</code>包含某些字段)</li>
+  <li>查重(并丢弃)</li>
+  <li>将爬取结果保存到数据库中</li>
+</ul>
+
+<h1 id="1编写你自己的item-pipeline">1.编写你自己的item pipeline</h1>
+
+<p>编写你自己的<code class="language-plaintext highlighter-rouge">item pipeline</code>很简单，每个<code class="language-plaintext highlighter-rouge">item pipeline</code>组件是一个独立的 Python 类，同时必须实现以下方法:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>方法</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>process_item(self, item, spider)</td>
+      <td>每个<code class="language-plaintext highlighter-rouge">item pipeline</code>组件都需要调用该方法，这个方法必须返回一个<code class="language-plaintext highlighter-rouge">Item</code>(或任何继承类)对象， 或是抛出<code class="language-plaintext highlighter-rouge">DropItem</code>异常，被丢弃的 <code class="language-plaintext highlighter-rouge">item</code>将不会被之后的 <code class="language-plaintext highlighter-rouge">pipeline</code> 组件所处理</td>
+    </tr>
+    <tr>
+      <td>open_spider(self, spider)</td>
+      <td>当 <code class="language-plaintext highlighter-rouge">spider</code> 被开启时，这个方法被调用</td>
+    </tr>
+    <tr>
+      <td>close_spider(spider)</td>
+      <td>当 <code class="language-plaintext highlighter-rouge">spider</code>被关闭时，这个方法被调用</td>
+    </tr>
+    <tr>
+      <td>from_crawler(cls, crawler)</td>
+      <td>如果存在，则调用该类方法从<code class="language-plaintext highlighter-rouge">Crawler</code>创建管道实例。它必须返回管道的新实例。<code class="language-plaintext highlighter-rouge">crawler</code>对象提供对所有<code class="language-plaintext highlighter-rouge">Scrapy</code>核心组件（如设置和信号）的访问；这是管道访问它们并将其功能挂钩到Scrapy中的一种方式</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="2item-pipeline示例">2.Item pipeline示例</h1>
+
+<h4 id="验证价格同时丢弃没有价格的-item">验证价格，同时丢弃没有价格的 item</h4>
+
+<p>让我们来看一下以下这个假设的 <code class="language-plaintext highlighter-rouge">pipeline</code>，它为那些不含税(<code class="language-plaintext highlighter-rouge">price_excludes_vat</code> 属性)的<code class="language-plaintext highlighter-rouge">item</code>调整了 <code class="language-plaintext highlighter-rouge">price</code> 属性，同时丢弃了那些没有价格的 item:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">scrapy.exceptions</span> <span class="kn">import</span> <span class="n">DropItem</span>
+
+<span class="k">class</span> <span class="nc">PricePipeline</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="n">vat_factor</span> <span class="o">=</span> <span class="mf">1.15</span>
+
+    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s">'price'</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s">'price_excludes_vat'</span><span class="p">]:</span>
+                <span class="n">item</span><span class="p">[</span><span class="s">'price'</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s">'price'</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">vat_factor</span>
+            <span class="k">return</span> <span class="n">item</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DropItem</span><span class="p">(</span><span class="s">"Missing price in %s"</span> <span class="o">%</span> <span class="n">item</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="将-item-写入-json-文件">将 item 写入 JSON 文件</h4>
+
+<p>以下 <code class="language-plaintext highlighter-rouge">pipeline</code> 将所有(从所有spider中)爬取到的 <code class="language-plaintext highlighter-rouge">item</code>，存储到一个独立地<code class="language-plaintext highlighter-rouge">items.jl</code>文件，每行包含一个序列化为JSON 格式的item</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="k">class</span> <span class="nc">JsonWriterPipeline</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="nb">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">'items.jl'</span><span class="p">,</span> <span class="s">'wb'</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">item</span><span class="p">))</span> <span class="o">+</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span>
+        <span class="bp">self</span><span class="p">.</span><span class="nb">file</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">item</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">JsonWriterPipeline</code> 的目的只是为了介绍怎样编写 <code class="language-plaintext highlighter-rouge">item pipeline</code>，如果你想要将所有爬取的 item 都保存到同一个 <code class="language-plaintext highlighter-rouge">JSON</code> 文件， 你需要使用 <code class="language-plaintext highlighter-rouge">Feed exports</code></p>
+
+<h4 id="将item写入mongodb">将item写入MongoDB</h4>
+
+<p>在此示例中，我们将使用<code class="language-plaintext highlighter-rouge">pymongo</code>将item写入<code class="language-plaintext highlighter-rouge">MongoDB</code>。在Scrapy设置中指定了<code class="language-plaintext highlighter-rouge">MongoDB地址</code>和<code class="language-plaintext highlighter-rouge">数据库名称</code>；MongoDB集合以项类命名。</p>
+
+<p>该示例的主要目的是演示如何使用<code class="language-plaintext highlighter-rouge">from_crawler()</code>方法以及如何正确清理资源。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pymongo</span>
+
+<span class="k">class</span> <span class="nc">MongoPipeline</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="n">collection_name</span> <span class="o">=</span> <span class="s">'scrapy_items'</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mongo_uri</span><span class="p">,</span> <span class="n">mongo_db</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">mongo_uri</span> <span class="o">=</span> <span class="n">mongo_uri</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">mongo_db</span> <span class="o">=</span> <span class="n">mongo_db</span>
+
+    <span class="o">@</span><span class="nb">classmethod</span>
+    <span class="k">def</span> <span class="nf">from_crawler</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">crawler</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span>
+            <span class="n">mongo_uri</span><span class="o">=</span><span class="n">crawler</span><span class="p">.</span><span class="n">settings</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'MONGO_URI'</span><span class="p">),</span>
+            <span class="n">mongo_db</span><span class="o">=</span><span class="n">crawler</span><span class="p">.</span><span class="n">settings</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'MONGO_DATABASE'</span><span class="p">,</span> <span class="s">'items'</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">open_spider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">pymongo</span><span class="p">.</span><span class="n">MongoClient</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">mongo_uri</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">client</span><span class="p">[</span><span class="bp">self</span><span class="p">.</span><span class="n">mongo_db</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">close_spider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="bp">self</span><span class="p">.</span><span class="n">collection_name</span><span class="p">].</span><span class="n">insert_one</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">item</span>
+</code></pre></div></div>
+
+<h4 id="take-screenshot-of-item">Take screenshot of item</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">scrapy</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">quote</span>
+
+
+<span class="k">class</span> <span class="nc">ScreenshotPipeline</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="s">"""Pipeline that uses Splash to render screenshot of
+    every Scrapy item."""</span>
+
+    <span class="n">SPLASH_URL</span> <span class="o">=</span> <span class="s">"http://localhost:8050/render.png?url={}"</span>
+
+    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+        <span class="n">encoded_item_url</span> <span class="o">=</span> <span class="n">quote</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s">"url"</span><span class="p">])</span>
+        <span class="n">screenshot_url</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">SPLASH_URL</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">encoded_item_url</span><span class="p">)</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">scrapy</span><span class="p">.</span><span class="n">Request</span><span class="p">(</span><span class="n">screenshot_url</span><span class="p">)</span>
+        <span class="n">dfd</span> <span class="o">=</span> <span class="n">spider</span><span class="p">.</span><span class="n">crawler</span><span class="p">.</span><span class="n">engine</span><span class="p">.</span><span class="n">download</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+        <span class="n">dfd</span><span class="p">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">return_item</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dfd</span>
+
+    <span class="k">def</span> <span class="nf">return_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">response</span><span class="p">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="c1"># Error happened, return item.
+</span>            <span class="k">return</span> <span class="n">item</span>
+
+        <span class="c1"># Save screenshot to file, filename will be hash of url.
+</span>        <span class="n">url</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s">"url"</span><span class="p">]</span>
+        <span class="n">url_hash</span> <span class="o">=</span> <span class="n">hashlib</span><span class="p">.</span><span class="n">md5</span><span class="p">(</span><span class="n">url</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s">"utf8"</span><span class="p">)).</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s">"{}.png"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">url_hash</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="n">body</span><span class="p">)</span>
+
+        <span class="c1"># Store filename in item.
+</span>        <span class="n">item</span><span class="p">[</span><span class="s">"screenshot_filename"</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="k">return</span> <span class="n">item</span>
+</code></pre></div></div>
+
+<h4 id="去重">去重</h4>
+
+<p>一个用于去重的过滤器，丢弃那些已经被处理过的<code class="language-plaintext highlighter-rouge">item</code>。让我们假设我们的<code class="language-plaintext highlighter-rouge">item</code>有一个唯一的<code class="language-plaintext highlighter-rouge">id</code>，但是我们 spider 返回的多个 item 中包含有相同的 id:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">scrapy.exceptions</span> <span class="kn">import</span> <span class="n">DropItem</span>
+
+<span class="k">class</span> <span class="nc">DuplicatesPipeline</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">ids_seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s">'id'</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">ids_seen</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DropItem</span><span class="p">(</span><span class="s">"Duplicate item found: %s"</span> <span class="o">%</span> <span class="n">item</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">ids_seen</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s">'id'</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">item</span>
+</code></pre></div></div>
+
+<h4 id="启用一个-item-pipeline-组件">启用一个 Item Pipeline 组件</h4>
+
+<p>为了启用一个<code class="language-plaintext highlighter-rouge">Item Pipeline</code>组件，你必须将它的类添加到<code class="language-plaintext highlighter-rouge">ITEM_PIPELINES</code>配置，就像下面这个例子:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ITEM_PIPELINES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'myproject.pipelines.PricePipeline'</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
+    <span class="s">'myproject.pipelines.JsonWriterPipeline'</span><span class="p">:</span> <span class="mi">800</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>数值越小优先级越高,通常将这些数字定义在 0-1000 范围内。</p>
+
+:ET

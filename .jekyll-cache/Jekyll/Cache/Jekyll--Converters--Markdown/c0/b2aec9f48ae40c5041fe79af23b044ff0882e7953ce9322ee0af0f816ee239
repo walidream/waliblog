@@ -1,0 +1,163 @@
+I"�<p>Apache Cordova是一个开放源代码的移动开发框架。它允许您使用标准的Web技术-HTML5，CSS3和JavaScript进行跨平台开发。应用程序在针对每个平台的包装器中执行，并依赖于符合标准的API绑定来访问每个设备的功能，例如传感器，数据，网络状态等。简单来说就是将h5打包成一个app,允许页面调用android的API设备。</p>
+
+<ul>
+  <li><a href="https://cordova.apache.org/" title="https://cordova.apache.org">cordova 官方网站</a></li>
+</ul>
+
+<p>cordova运行项目环境：</p>
+<ul>
+  <li>node</li>
+  <li>npm 或者 (建议使用<code class="language-plaintext highlighter-rouge">yarn</code>安装)</li>
+</ul>
+
+<p>如果使用npm安装cordova，在创建项目时报错，请查看3三步。</p>
+
+<h1 id="1创建cordova项目">1.创建cordova项目</h1>
+
+<h4 id="安装cordova">安装cordova</h4>
+
+<p>Cordova命令行在Node.js上运行，并且在NPM上可用。请遵循特定于平台的指南来安装其他平台依赖项。打开命令提示符或终端，然后键入</p>
+
+<pre><code class="language-txt">$ npm install -g cordova
+</code></pre>
+
+<p>安装cordova后，输入</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cordova -version
+</code></pre></div></div>
+<p>命令框提示出cordova版本就表示cordova成功安装</p>
+
+<h4 id="创建一个项目">创建一个项目</h4>
+
+<p>创建一个包名为<code class="language-plaintext highlighter-rouge">com.example.hello</code>的Helloworld项目</p>
+
+<pre><code class="language-txt">$ cordova create hello com.example.hello HelloWorld
+</code></pre>
+
+<p>创建成功后，进入项目</p>
+
+<pre><code class="language-txt">$ cd hello 
+</code></pre>
+
+<p>项目结构</p>
+
+<pre><code class="language-txt">hello
+|--hooks
+   |--README.md
+|--platforms     #平台
+|--plugins       #存放插件
+|--www           #web工程
+   |--css
+      |--index.css
+   |--img
+      |--logo.png
+   |--js
+      |--index.js
+   |--index.html
+|--config.xml
+|--package.json
+</code></pre>
+
+<h4 id="添加应用平台">添加应用平台</h4>
+
+<p>将添加<code class="language-plaintext highlighter-rouge">ios</code>和<code class="language-plaintext highlighter-rouge">android</code>平台，并确保将它们保存到<code class="language-plaintext highlighter-rouge">config.xml</code>和<code class="language-plaintext highlighter-rouge">package.json</code>中</p>
+
+<pre><code class="language-txt">$ cordova platform add ios
+$ cordova platform add android
+</code></pre>
+
+<p>查看安装的平台</p>
+
+<pre><code class="language-txt">$ cordova platform ls
+</code></pre>
+
+<p>要检查您是否满足构建平台的要求：</p>
+
+<pre><code class="language-txt">$ cordova requirements
+Requirements check results for android:
+Java JDK: installed .
+Android SDK: installed
+Android target: installed android-19,android-21,android-22,android-23,Google Inc.:Google APIs:19,Google Inc.:Google APIs (x86 System Image):19,Google Inc.:Google APIs:23
+Gradle: installed
+
+Requirements check results for ios:
+Apple OS X: not installed
+Cordova tooling for iOS requires Apple OS X
+Error: Some of requirements check failed
+</code></pre>
+
+<h4 id="运行cordova项目">运行cordova项目</h4>
+
+<p>默认情况下，cordova create脚本会生成一个基于骨骼的基于Web的应用程序，其起始页面为项目的<code class="language-plaintext highlighter-rouge">www/index.html</code>文件。任何初始化都应指定为<code class="language-plaintext highlighter-rouge">www/js/ index.js</code>中定义的deviceready事件处理程序的一部分。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 运行android
+$ cordova run android
+
+# 运行ios
+$ cordova run ios
+
+# 运行浏览器(需要添加浏览平台  cordova platform add browser)
+$ cordova run browser
+</code></pre></div></div>
+
+<h1 id="2添加插件">2.添加插件</h1>
+
+<pre><code class="language-txt"># 添加插件
+$ cordova plugin add cordova-plugin-camera
+
+# 查看插件
+$ cordova plugin ls
+
+# 移除插件
+$ cordova plugin remove cordova-plugin-camera
+</code></pre>
+
+<h1 id="3cordova创建项目出错">3.cordova创建项目出错</h1>
+
+<h4 id="cordova-create-project-error-解决方法">Cordova create project error 解决方法</h4>
+
+<p>使用npm安装cordova,然后使用cordova create oo报错</p>
+
+<pre><code class="language-txt">Error: Uncaught, unspecified "error" event. (  Error from Cordova Fetch: Error:
+cmd: Command failed with exit code 4294963238 Error output:
+npm ERR! not a package C:\Users\Administrator\AppData\Roaming\npm\node_modules\c
+ordova\node_modules\.3.12.0@cordova-app-hello-world\index.js
+npm ERR! addLocal Could not install C:\Users\Administrator\AppData\Roaming\npm\n
+ode_modules\cordova\node_modules\.3.12.0@cordova-app-hello-world\index.js
+npm ERR! Windows_NT 6.1.7601
+npm ERR! argv "C:\\Program Files\\nodejs\\node.exe" "C:\\Program Files\\nodejs\\
+node_modules\\npm\\bin\\npm-cli.js" "install" "C:\\Users\\Administrator\\AppData
+\\Roaming\\npm\\node_modules\\cordova\\node_modules\\.3.12.0@cordova-app-hello-w
+orld\\index.js"
+npm ERR! node v6.10.1
+npm ERR! npm  v3.10.10
+npm ERR! path C:\Users\ADMINI~1\AppData\Local\Temp\npm-5648-2836ec66\unpack-bfff
+7e3c\package.json
+npm ERR! code ENOENT
+npm ERR! errno -4058
+npm ERR! syscall open
+
+npm ERR! enoent ENOENT: no such file or directory, open 'C:\Users\ADMINI~1\AppDa
+ta\Local\Temp\npm-5648-2836ec66\unpack-bfff7e3c\package.json'
+npm ERR! enoent ENOENT: no such file or directory, open 'C:\Users\ADMINI~1\AppDa
+ta\Local\Temp\npm-5648-2836ec66\unpack-bfff7e3c\package.json'
+npm ERR! enoent This is most likely not a problem with npm itself
+npm ERR! enoent and is related to npm not being able to find a file.
+npm ERR! enoent
+
+npm ERR! Please include the following file with any support request:
+npm ERR!     C:\Users\Administrator\.cordova\node_modules\npm-debug.log)
+</code></pre>
+
+<p>猜测可能是cordova 和 npm的版本冲突了，使用yarn来安装，小菜亲测成功</p>
+
+<p>解决方法</p>
+<ul>
+  <li>1.安装yarn</li>
+  <li>2.用yarn来安装cordova</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn global add cordova
+</code></pre></div></div>
+
+:ET

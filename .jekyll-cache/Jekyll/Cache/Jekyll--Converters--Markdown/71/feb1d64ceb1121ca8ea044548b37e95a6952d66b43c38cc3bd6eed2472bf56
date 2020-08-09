@@ -1,0 +1,420 @@
+I"��<p>echars帖子将记录小菜在工作用所用到的echars配置，避免在日后工作中反复配置。</p>
+
+<h1 id="1在线演示地址">1.在线演示地址</h1>
+
+<p><a href="http://walidream.com/example/js/echarts/" title="http://walidream.com/example/js/echarts/" target="_blank">http://walidream.com/example/js/echarts/</a></p>
+
+<p>在开始之前，小菜分享自己用echars的经验，就是将echars组件化，echars图表配置其实就是将options参数配置好，最后调用<code class="language-plaintext highlighter-rouge">this.chart.setOption(this.option)</code>，但是每次配置同类型的<code class="language-plaintext highlighter-rouge">options</code>就会很烦，而且文件会很大，所以小菜将echars配置抽出来了。</p>
+
+<h1 id="2配置文件">2.配置文件</h1>
+
+<h4 id="echartsconfjs">echarts.conf.js</h4>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="p">{</span>
+    <span class="na">linearMarkArea</span><span class="p">:{</span>
+        <span class="na">tooltip</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">trigger</span><span class="p">:</span> <span class="dl">"</span><span class="s2">axis</span><span class="dl">"</span><span class="p">,</span>
+            <span class="na">axisPointer</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">type</span><span class="p">:</span> <span class="dl">"</span><span class="s2">cross</span><span class="dl">"</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="na">grid</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">left</span><span class="p">:</span> <span class="mi">35</span><span class="p">,</span>
+            <span class="na">top</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+            <span class="na">bottom</span><span class="p">:</span> <span class="mi">20</span>
+        <span class="p">},</span>
+        <span class="na">xAxis</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">type</span><span class="p">:</span> <span class="dl">"</span><span class="s2">category</span><span class="dl">"</span><span class="p">,</span>
+            <span class="na">axisLine</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+                <span class="na">lineStyle</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="dl">"</span><span class="s2">color</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">#D9D9D9</span><span class="dl">"</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="na">boundaryGap</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="na">data</span><span class="p">:</span> <span class="kc">null</span>
+        <span class="p">},</span>
+        <span class="na">yAxis</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">type</span><span class="p">:</span> <span class="dl">"</span><span class="s2">value</span><span class="dl">"</span><span class="p">,</span>
+            <span class="na">axisLine</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+                <span class="na">lineStyle</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="na">color</span><span class="p">:</span> <span class="dl">"</span><span class="s2">#D9D9D9</span><span class="dl">"</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="na">axisLabel</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">formatter</span><span class="p">:</span> <span class="dl">"</span><span class="s2">{value} </span><span class="dl">"</span>
+            <span class="p">},</span>
+            <span class="na">axisPointer</span><span class="p">:</span> <span class="p">{</span>
+                <span class="dl">"</span><span class="s2">snap</span><span class="dl">"</span><span class="p">:</span> <span class="kc">true</span>
+            <span class="p">},</span>
+            <span class="na">axisTick</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">axisLabel</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">splitLine</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">splitArea</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">},</span>					
+        <span class="na">series</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="na">name</span><span class="p">:</span> <span class="dl">"</span><span class="s2">房价</span><span class="dl">"</span><span class="p">,</span>
+                <span class="na">type</span><span class="p">:</span> <span class="dl">"</span><span class="s2">line</span><span class="dl">"</span><span class="p">,</span>
+                <span class="na">label</span><span class="p">:{</span>
+                    <span class="na">color</span><span class="p">:</span><span class="dl">'</span><span class="s1">#FF9800</span><span class="dl">'</span>
+                <span class="p">},</span>
+                <span class="na">itemStyle</span><span class="p">:{</span>
+                    <span class="na">color</span><span class="p">:</span><span class="dl">'</span><span class="s1">#FF9800</span><span class="dl">'</span>  
+                <span class="p">},</span>
+                <span class="na">smooth</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+                <span class="na">data</span><span class="p">:</span> <span class="kc">null</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="na">name</span><span class="p">:</span><span class="dl">''</span><span class="p">,</span>
+                <span class="na">type</span><span class="p">:</span><span class="dl">'</span><span class="s1">line</span><span class="dl">'</span><span class="p">,</span>
+                <span class="na">markLine</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="na">name</span><span class="p">:</span><span class="dl">'</span><span class="s1">房价平均线</span><span class="dl">'</span><span class="p">,</span>
+                    <span class="na">lineStyle</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">dotted</span><span class="dl">'</span><span class="p">,</span>
+                        <span class="na">color</span><span class="p">:</span> <span class="dl">'</span><span class="s1">#FF9800</span><span class="dl">'</span>
+                    <span class="p">},</span>
+                    <span class="na">label</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="na">position</span><span class="p">:</span> <span class="dl">'</span><span class="s1">end</span><span class="dl">'</span><span class="p">,</span>
+                        <span class="na">formatter</span><span class="p">:</span><span class="dl">'</span><span class="s1">平均值</span><span class="dl">'</span>
+                    <span class="p">},</span>
+                    <span class="na">data</span><span class="p">:</span> <span class="kc">null</span> 
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="na">hBar</span><span class="p">:{</span>
+        <span class="na">textStyle</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">fontSize</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+            <span class="na">color</span><span class="p">:</span> <span class="dl">'</span><span class="s1">#D9D9D9</span><span class="dl">'</span>
+        <span class="p">},</span>
+        <span class="na">grid</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">left</span><span class="p">:</span> <span class="mi">35</span><span class="p">,</span>
+            <span class="na">top</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="na">bottom</span><span class="p">:</span> <span class="mi">65</span>
+        <span class="p">},</span>
+        <span class="na">xAxis</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">show</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+            <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">category</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">axisLine</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span>
+                <span class="na">lineStyle</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="na">color</span><span class="p">:</span> <span class="dl">'</span><span class="s1">#D9D9D9</span><span class="dl">'</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="na">nameRotate</span><span class="p">:</span><span class="mi">15</span><span class="p">,</span>
+            <span class="na">data</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+            <span class="na">axisTick</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+                <span class="na">color</span><span class="p">:</span><span class="dl">'</span><span class="s1">red</span><span class="dl">'</span>
+            <span class="p">},</span>
+            <span class="na">axisLabel</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+                <span class="na">interval</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="c1">//横轴信息全部显示</span>
+                <span class="na">rotate</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span><span class="c1">//-30度角倾斜显示</span>
+            <span class="p">},</span>
+            <span class="na">splitLine</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">splitArea</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="na">yAxis</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">show</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+            <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">value</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">axisLine</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+                <span class="na">lineStyle</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="na">color</span><span class="p">:</span> <span class="dl">'</span><span class="s1">#D9D9D9</span><span class="dl">'</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="na">axisTick</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">axisLabel</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">splitLine</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">splitArea</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="na">series</span> <span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="na">type</span><span class="p">:</span><span class="dl">'</span><span class="s1">bar</span><span class="dl">'</span><span class="p">,</span>
+                <span class="na">barWidth</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+                <span class="na">data</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+                <span class="na">itemStyle</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="na">color</span><span class="p">:</span> <span class="dl">'</span><span class="s1">#FF9800</span><span class="dl">'</span>
+                <span class="p">},</span>
+            <span class="p">},</span>
+
+        <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="na">vBar</span><span class="p">:{</span>
+	    <span class="na">textStyle</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">fontSize</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+            <span class="na">color</span><span class="p">:</span> <span class="dl">'</span><span class="s1">#D9D9D9</span><span class="dl">'</span>
+        <span class="p">},</span>
+        <span class="na">grid</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">left</span><span class="p">:</span> <span class="mi">35</span><span class="p">,</span>
+            <span class="na">top</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="na">bottom</span><span class="p">:</span> <span class="mi">10</span>
+        <span class="p">},</span>
+        <span class="na">xAxis</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">show</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+            <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">value</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">axisLine</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span>
+                <span class="na">lineStyle</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="na">color</span><span class="p">:</span> <span class="dl">'</span><span class="s1">#D9D9D9</span><span class="dl">'</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="na">axisTick</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">axisLabel</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">splitLine</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">splitArea</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="na">yAxis</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">show</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+            <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">category</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">axisLine</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+                <span class="na">lineStyle</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="na">color</span><span class="p">:</span> <span class="dl">'</span><span class="s1">#D9D9D9</span><span class="dl">'</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="na">axisTick</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">axisLabel</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">splitLine</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">splitArea</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">show</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">data</span><span class="p">:</span> <span class="kc">null</span> <span class="c1">// y轴数据</span>
+        <span class="p">},</span>
+        <span class="na">series</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="na">data</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span> <span class="c1">// seriesData</span>
+                <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">bar</span><span class="dl">'</span><span class="p">,</span>
+                <span class="na">barWidth</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+                <span class="na">itemStyle</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="na">color</span><span class="p">:</span> <span class="dl">'</span><span class="s1">#FF9800</span><span class="dl">'</span>
+                <span class="p">},</span>
+                <span class="na">label</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="na">show</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+                    <span class="na">color</span><span class="p">:</span> <span class="dl">'</span><span class="s1">#FF9800</span><span class="dl">'</span><span class="p">,</span>
+                    <span class="na">position</span><span class="p">:</span> <span class="dl">'</span><span class="s1">right</span><span class="dl">'</span><span class="p">,</span>
+                    <span class="na">formatter</span><span class="p">:</span> <span class="p">(</span><span class="nx">v</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+                        <span class="k">return</span> <span class="s2">`</span><span class="p">${</span><span class="nx">v</span><span class="p">.</span><span class="nx">value</span><span class="p">}</span><span class="s2">`</span>
+                    <span class="p">},</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h1 id="3处理数据并返回options">3.处理数据并返回options</h1>
+
+<h4 id="utilechartsjs">util/echarts.js</h4>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">echartsConfig</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@/config/echars.conf.js</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">arrayFormat</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">Util/util</span><span class="dl">'</span>
+
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">Echars</span><span class="p">{</span>
+    <span class="kd">constructor</span><span class="p">(</span><span class="nx">options</span> <span class="o">=</span> <span class="p">{}){</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span>
+    <span class="p">}</span>
+
+    <span class="c1">//获取canvas options参数</span>
+    <span class="nx">getCancasOptions</span><span class="p">(</span><span class="nx">summary</span><span class="p">){</span>
+        <span class="kd">const</span> <span class="nx">summaryType</span> <span class="o">=</span> <span class="nx">summary</span><span class="p">.</span><span class="nx">summaryType</span>
+        <span class="k">switch</span><span class="p">(</span><span class="nx">summaryType</span><span class="p">){</span>
+            <span class="k">case</span> <span class="dl">'</span><span class="s1">linear</span><span class="dl">'</span><span class="p">:{</span> 
+                <span class="kd">let</span> <span class="nx">xAxisData</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">summary</span><span class="p">.</span><span class="nx">summaryDetail</span><span class="p">,</span><span class="dl">'</span><span class="s1">xAxis</span><span class="dl">'</span><span class="p">);</span>
+                <span class="kd">let</span> <span class="nx">seriesData</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">summary</span><span class="p">.</span><span class="nx">summaryDetail</span><span class="p">,</span><span class="dl">'</span><span class="s1">value</span><span class="dl">'</span><span class="p">);</span>
+                <span class="kd">let</span> <span class="nx">seriesMarkAreaData</span> <span class="o">=</span> <span class="nx">arrayFormat</span><span class="p">(</span><span class="nx">summary</span><span class="p">.</span><span class="nx">currentData</span><span class="p">,</span><span class="dl">'</span><span class="s1">xAxis</span><span class="dl">'</span><span class="p">);</span>
+                <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">linearMarkArea</span><span class="p">({</span><span class="nx">xAxisData</span><span class="p">,</span> <span class="nx">seriesData</span><span class="p">,</span> <span class="nx">seriesMarkAreaData</span><span class="p">});</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">case</span> <span class="dl">'</span><span class="s1">hbar</span><span class="dl">'</span><span class="p">:{</span>
+                <span class="kd">let</span> <span class="nx">xAxisData</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">summary</span><span class="p">.</span><span class="nx">summaryDetail</span><span class="p">,</span><span class="dl">'</span><span class="s1">xAxis</span><span class="dl">'</span><span class="p">);</span>
+                <span class="kd">let</span> <span class="nx">seriesData</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">summary</span><span class="p">.</span><span class="nx">summaryDetail</span><span class="p">,</span><span class="dl">'</span><span class="s1">value</span><span class="dl">'</span><span class="p">);</span>
+                <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">hBar</span><span class="p">({</span><span class="nx">xAxisData</span><span class="p">,</span> <span class="nx">seriesData</span><span class="p">});</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">case</span> <span class="dl">'</span><span class="s1">vbar</span><span class="dl">'</span><span class="p">:{</span>
+                <span class="kd">let</span> <span class="nx">xAxisData</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">summary</span><span class="p">.</span><span class="nx">summaryDetail</span><span class="p">,</span><span class="dl">'</span><span class="s1">xAxis</span><span class="dl">'</span><span class="p">);</span>
+                <span class="kd">let</span> <span class="nx">seriesData</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">summary</span><span class="p">.</span><span class="nx">summaryDetail</span><span class="p">,</span><span class="dl">'</span><span class="s1">value</span><span class="dl">'</span><span class="p">);</span>
+                <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">vBar</span><span class="p">({</span><span class="nx">xAxisData</span><span class="p">,</span> <span class="nx">seriesData</span><span class="p">});</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="nl">default</span><span class="p">:</span> <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="c1">//折线图 有阴影区间</span>
+    <span class="nx">linearMarkArea</span><span class="p">({</span><span class="nx">xAxisData</span><span class="p">,</span><span class="nx">seriesData</span><span class="p">,</span><span class="nx">seriesMarkAreaData</span><span class="p">}){</span>
+        <span class="c1">//深度拷贝</span>
+        <span class="kd">let</span> <span class="nx">linearMarkAreaConf</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">cloneDeep</span><span class="p">(</span><span class="nx">echartsConfig</span><span class="p">.</span><span class="nx">linearMarkArea</span><span class="p">)</span>
+        <span class="nx">linearMarkAreaConf</span><span class="p">[</span><span class="dl">'</span><span class="s1">xAxis</span><span class="dl">'</span><span class="p">][</span><span class="dl">'</span><span class="s1">data</span><span class="dl">'</span><span class="p">]</span> <span class="o">=</span> <span class="nx">xAxisData</span>
+        <span class="nx">linearMarkAreaConf</span><span class="p">[</span><span class="dl">'</span><span class="s1">series</span><span class="dl">'</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="dl">'</span><span class="s1">data</span><span class="dl">'</span><span class="p">]</span> <span class="o">=</span> <span class="nx">seriesData</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">seriesMarkAreaData</span><span class="p">){</span>
+            <span class="nx">linearMarkAreaConf</span><span class="p">[</span><span class="dl">'</span><span class="s1">series</span><span class="dl">'</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="dl">'</span><span class="s1">markLine</span><span class="dl">'</span><span class="p">][</span><span class="dl">'</span><span class="s1">label</span><span class="dl">'</span><span class="p">][</span><span class="dl">'</span><span class="s1">formatter</span><span class="dl">'</span><span class="p">]</span> <span class="o">=</span> <span class="nx">seriesMarkAreaData</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="dl">'</span><span class="s1">name</span><span class="dl">'</span><span class="p">]</span>
+            <span class="nx">linearMarkAreaConf</span><span class="p">[</span><span class="dl">'</span><span class="s1">series</span><span class="dl">'</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="dl">'</span><span class="s1">markLine</span><span class="dl">'</span><span class="p">][</span><span class="dl">'</span><span class="s1">data</span><span class="dl">'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[</span>
+                <span class="p">{</span><span class="na">coord</span><span class="p">:[</span><span class="nx">seriesMarkAreaData</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="dl">'</span><span class="s1">xAxis</span><span class="dl">'</span><span class="p">],</span><span class="nx">seriesMarkAreaData</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="dl">'</span><span class="s1">yAxis</span><span class="dl">'</span><span class="p">]]},</span>
+                <span class="p">{</span><span class="na">coord</span><span class="p">:[</span><span class="nx">seriesMarkAreaData</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="dl">'</span><span class="s1">xAxis</span><span class="dl">'</span><span class="p">],</span><span class="nx">seriesMarkAreaData</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="dl">'</span><span class="s1">yAxis</span><span class="dl">'</span><span class="p">]]}</span>
+            <span class="p">]]</span>
+        <span class="p">}</span>       
+        <span class="c1">//深度继承对象属性</span>
+  
+        <span class="k">if</span><span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">options</span><span class="p">).</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">linearMarkAreaConf</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">assignIn</span><span class="p">(</span><span class="nx">linearMarkAreaConf</span><span class="p">,</span><span class="k">this</span><span class="p">.</span><span class="nx">options</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nx">linearMarkAreaConf</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">//垂直柱状图</span>
+    <span class="nx">vBar</span><span class="p">({</span><span class="nx">yAxisData</span><span class="p">,</span><span class="nx">seriesData</span><span class="p">}){</span>
+        <span class="c1">//深度拷贝vBar配置</span>
+        <span class="kd">let</span> <span class="nx">vBarConf</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">cloneDeep</span><span class="p">(</span><span class="nx">echartsConfig</span><span class="p">.</span><span class="nx">vBar</span><span class="p">)</span>       
+        <span class="nx">vBarConf</span><span class="p">[</span><span class="dl">'</span><span class="s1">yAxis</span><span class="dl">'</span><span class="p">][</span><span class="dl">'</span><span class="s1">data</span><span class="dl">'</span><span class="p">]</span> <span class="o">=</span> <span class="nx">yAxisData</span>
+        <span class="nx">vBarConf</span><span class="p">[</span><span class="dl">'</span><span class="s1">series</span><span class="dl">'</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="dl">'</span><span class="s1">data</span><span class="dl">'</span><span class="p">]</span> <span class="o">=</span> <span class="nx">seriesData</span>
+        <span class="c1">//深度继承对象属性</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">options</span><span class="p">).</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">vBarConf</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">assignIn</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">options</span><span class="p">,</span><span class="nx">vBarConf</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nx">vBarConf</span><span class="p">;</span>        
+    <span class="p">}</span>
+
+    <span class="c1">//水平柱状图</span>
+    <span class="nx">hBar</span><span class="p">({</span><span class="nx">xAxisData</span><span class="p">,</span><span class="nx">seriesData</span><span class="p">}){</span>
+        <span class="kd">let</span> <span class="nx">hBarConf</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">cloneDeep</span><span class="p">(</span><span class="nx">echartsConfig</span><span class="p">.</span><span class="nx">hBar</span><span class="p">)</span>
+        <span class="nx">hBarConf</span><span class="p">[</span><span class="dl">'</span><span class="s1">xAxis</span><span class="dl">'</span><span class="p">][</span><span class="dl">'</span><span class="s1">data</span><span class="dl">'</span><span class="p">]</span> <span class="o">=</span> <span class="nx">xAxisData</span>
+        <span class="nx">hBarConf</span><span class="p">[</span><span class="dl">'</span><span class="s1">series</span><span class="dl">'</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="dl">'</span><span class="s1">data</span><span class="dl">'</span><span class="p">]</span> <span class="o">=</span> <span class="nx">seriesData</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">options</span><span class="p">).</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">hBarConf</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">assignIn</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">options</span><span class="p">,</span><span class="nx">hBarConf</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="nx">hBarConf</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">getSumHBar</span><span class="p">(</span><span class="nx">hBarObj</span><span class="p">){</span>
+        <span class="kd">let</span> <span class="nx">heigth</span> <span class="o">=</span> <span class="mi">220</span><span class="p">;</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">hBarObj</span><span class="p">.</span><span class="nx">summaryType</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">hbar</span><span class="dl">'</span><span class="p">){</span>
+            <span class="nx">heigth</span> <span class="o">=</span> <span class="nx">hBarObj</span><span class="p">.</span><span class="nx">summaryDetail</span><span class="p">.</span><span class="nx">length</span> <span class="o">*</span> <span class="mi">15</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">heigth</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">getArraySumHBar</span><span class="p">(</span><span class="nx">arr</span><span class="p">){</span>
+        <span class="kd">let</span> <span class="nx">heigth</span> <span class="o">=</span> <span class="mi">220</span><span class="p">;</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">arr</span><span class="p">.</span><span class="nx">length</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
+            <span class="nx">heigth</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">.</span><span class="nx">length</span> <span class="o">*</span> <span class="mi">15</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">heigth</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h1 id="4vue组件">4.vue组件</h1>
+<h4 id="componentsechartscreatervue">components/EchartsCreater.vue</h4>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;template&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"echarts-wrap"</span> <span class="na">:id=</span><span class="s">"echartsId"</span><span class="nt">&gt;&lt;/div&gt;</span>
+<span class="nt">&lt;/template&gt;</span>
+
+<span class="nt">&lt;script&gt;</span>
+<span class="k">import</span> <span class="nx">echarts</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">echarts</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">getGuid</span> <span class="p">}</span>  <span class="k">from</span> <span class="dl">'</span><span class="s1">Util/util</span><span class="dl">'</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="p">{</span>
+    <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">EchartsCreater</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">props</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">option</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">type</span><span class="p">:</span> <span class="nb">Object</span><span class="p">,</span>
+            <span class="na">default</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="p">{}</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="na">clickHandler</span><span class="p">:</span> <span class="nb">Function</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="nx">mounted</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">init</span><span class="p">()</span>  
+    <span class="p">},</span>
+    <span class="nx">data</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="na">echartsId</span><span class="p">:</span> <span class="nx">getGuid</span><span class="p">(),</span>
+            <span class="na">chart</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="na">methods</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nx">init</span><span class="p">()</span> <span class="p">{</span>
+            <span class="kd">let</span> <span class="nx">dom</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">echartsId</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">dom</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+            <span class="k">this</span><span class="p">.</span><span class="nx">chart</span> <span class="o">=</span> <span class="nx">echarts</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="nx">dom</span><span class="p">)</span>
+
+            <span class="k">this</span><span class="p">.</span><span class="nx">chart</span><span class="p">.</span><span class="nx">setOption</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">option</span><span class="p">)</span>
+
+            <span class="k">this</span><span class="p">.</span><span class="nx">chart</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">$emit</span><span class="p">(</span><span class="dl">'</span><span class="s1">clickHandler</span><span class="dl">'</span><span class="p">,</span> <span class="nx">params</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">chart</span><span class="p">)</span>
+            <span class="p">})</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="na">watch</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nx">option</span><span class="p">(</span><span class="nx">newVal</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">chart</span><span class="p">.</span><span class="nx">setOption</span><span class="p">(</span><span class="nx">newVal</span><span class="p">)</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">chart</span><span class="p">.</span><span class="nx">resize</span><span class="p">()</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="nt">&lt;/script&gt;</span>
+
+<span class="nt">&lt;style </span><span class="na">lang=</span><span class="s">"scss"</span> <span class="na">scoped</span>  <span class="na">module=</span><span class="s">"EchartsCreater"</span><span class="nt">&gt;</span>
+<span class="nc">.echarts-wrap</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">100%</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">100%</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">&lt;/style&gt;</span>
+</code></pre></div></div>
+
+<h1 id="5工具方法">5.工具方法</h1>
+
+<h4 id="utilutil">util/util</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="kd">function</span> <span class="nx">getGuid</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="dl">'</span><span class="s1">xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx</span><span class="dl">'</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">[</span><span class="sr">xy</span><span class="se">]</span><span class="sr">/g</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">16</span> <span class="o">|</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kd">const</span> <span class="nx">v</span> <span class="o">=</span> <span class="nx">c</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">x</span><span class="dl">'</span> <span class="p">?</span> <span class="nx">r</span> <span class="p">:</span> <span class="p">(</span><span class="nx">r</span> <span class="o">&amp;</span> <span class="mh">0x3</span> <span class="o">|</span> <span class="mh">0x8</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">v</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>
+    <span class="p">}).</span><span class="nx">toUpperCase</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">arrayFormat</span> <span class="o">=</span> <span class="p">(</span><span class="nx">arr</span><span class="p">,</span><span class="nx">key</span><span class="p">)</span> <span class="o">=&gt;</span><span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">arr</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="k">return</span> <span class="p">[];</span>
+    <span class="kd">let</span> <span class="nx">brr</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">val</span> <span class="o">=&gt;</span><span class="p">{</span>
+        <span class="nx">val</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">val</span><span class="p">[</span><span class="nx">key</span><span class="p">].</span><span class="nx">toString</span><span class="p">();</span>
+        <span class="k">return</span> <span class="nx">val</span><span class="p">;</span>
+    <span class="p">})</span>
+    <span class="k">return</span> <span class="nx">brr</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+:ET

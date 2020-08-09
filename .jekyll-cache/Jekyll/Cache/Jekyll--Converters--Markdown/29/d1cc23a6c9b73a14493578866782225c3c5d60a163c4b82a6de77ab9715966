@@ -1,0 +1,206 @@
+I"$<p>不知道大家记不记得，之前我们配置样式，在命令窗口中运行webpack打包然后在<code class="language-plaintext highlighter-rouge">dist</code>目录中打开本地<code class="language-plaintext highlighter-rouge">index.html</code>。在html中我们手动引入了<code class="language-plaintext highlighter-rouge">main.js</code>文件。当我们需要打包多个js文件时，我们手动引入js文件是非常繁琐的一件事，有没有什么配置可以帮我们做这件事呢？<code class="language-plaintext highlighter-rouge">HtmlWebpackPlugin</code>就可为帮助我们自动引入打包好的文件。</p>
+
+<h1 id="1设定htmlwebpackplugin">1.设定HtmlWebpackPlugin</h1>
+
+<p><code class="language-plaintext highlighter-rouge">HtmlWebpackPlugin</code>会在打包结束后，自动生成一个html文件，并把打包生成的js自动引入到这个html文件中。</p>
+
+<h4 id="安装htmlwebpackplugin">安装HtmlWebpackPlugin</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add html-webpack-plugin
+</code></pre></div></div>
+
+<h4 id="webpackconfigjs">webpack.config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  const path = require('path');
+<span class="gi">+ const HtmlWebpackPlugin = require('html-webpack-plugin');    //生成html文件
+</span>
+module.exports = {
+  mode:'development',
+  entry:'./src/index.js',
+  module:{
+	rules:[
+		{
+			test:/\.css$/,
+			use:[
+				'style-loader',
+				'css-loader',
+				'postcss-loader'
+				
+			]
+		},
+		{
+			test:/\.scss$/,
+			use:[
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'sass-loader',
+				'postcss-loader'
+			]
+		},
+		{
+			test: /\.less$/,
+			use: [
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'less-loader',
+				'postcss-loader'
+			]
+		}
+	]
+  },
+<span class="gi">+ plugins: [
++   new HtmlWebpackPlugin({
++       title: '瓦力博客',
++       template: './src/index.html'   //以src/index.html为编译模板
++   })
++  ],
+</span>  output:{
+    path: path.resolve(__dirname,'dist')
+  }
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="srcindexhtml">src/index.html</h4>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;title&gt;&lt;</span><span class="err">%=</span> <span class="na">htmlWebpackPlugin.options.title</span> <span class="err">%</span><span class="nt">&gt;&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;h1&gt;</span>!!!欢迎来到瓦力博客!!!<span class="nt">&lt;/h1&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<h4 id="清空dist目录">清空dist目录</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">myProject
+</span> |-dist
+<span class="gd">-     |-index.html
+-     |-main.js   //这个是打包后的js文件
+</span> |-node_modules
+ |-src
+     |-assets
+        |-css
+            |-index.css
+        |-less
+            |-index.less     
+        |-sass
+            |-index.scss
+     |-index.html
+     |-index.js
+ |-package.json
+ |-webpack.config.js
+ |-postcss.config.js
+</code></pre></div></div>
+<p>在运行webpack之前，我们把<code class="language-plaintext highlighter-rouge">dist</code>目录下的文件清空，我们在src/index.html只写了dom结构，没有引入任何脚本和样式。</p>
+
+<h4 id="运行webpack">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run dev
+</code></pre></div></div>
+
+<p>在打开dist目录下面的index.html文件，就会看到webpack打包好的main.js文件被自动引入进去。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_8.png" alt="ssl" /></p>
+
+<h1 id="2自动清除dist目录">2.自动清除dist目录</h1>
+
+<p>我们现在使用webpack打包前都会清除dist目录下面的所有文件，目的是为了防止干扰，让我们更清楚的了解到打包后的文件结构。下面使用<code class="language-plaintext highlighter-rouge">clean-webpack-plugin</code>插件，该插件在webpack打包前先帮我们清除dist目录下的文件。</p>
+
+<h4 id="安装插件">安装插件</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add clean-webpack-plugin
+</code></pre></div></div>
+
+<h4 id="webpackconfigjs-1">webpack.config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');    //生成html文件
+</span><span class="gi">+ const CleanWebpackPlugin = require('clean-webpack-plugin');  //清除
+</span>
+
+
+module.exports = {
+  mode:'development',
+  entry:'./src/index.js',
+  module:{
+	rules:[
+		{
+			test:/\.css$/,
+			use:[
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:1
+					}					
+				},
+				'postcss-loader'
+				
+			]
+		},
+		{
+			test:/\.scss$/,
+			use:[
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'sass-loader',
+				'postcss-loader'
+			]
+		},
+		{
+			test: /\.less$/,
+			use: [
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'less-loader',
+				'postcss-loader'
+			]
+		}
+
+	]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: '瓦力博客',
+      template: './src/index.html'   //以src/index.html为编译模板
+    }),
+<span class="gi">+   new CleanWebpackPlugin()
+</span>  ],
+  output:{
+    path: path.resolve(__dirname,'dist')
+  }
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack-1">运行webpack</h4>
+
+<p>在运行前，我们可以在dist目录下面多建几个文件，看看dist目录下面的文件是否都被删除了。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run dev
+</code></pre></div></div>
+
+:ET

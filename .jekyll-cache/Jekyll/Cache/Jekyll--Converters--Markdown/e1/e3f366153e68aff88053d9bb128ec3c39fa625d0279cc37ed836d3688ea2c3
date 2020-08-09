@@ -1,0 +1,460 @@
+I"$O<p>webpack 只能理解 JavaScript 和 JSON 文件。loader 让 webpack 能够去处理其他类型的文件，并将它们转换为有效 模块，以供应用程序使用，以及被添加到依赖图中。</p>
+
+<blockquote>
+  <p>注意，loader 能够 import 导入任何类型的模块（例如 .css 文件），这是 webpack 特有的功能，其他打包程序或任务执行器的可能并不支持。我们认为这种语言扩展是很有必要的，因为这可以使开发人员创建出更准确的依赖关系图。</p>
+</blockquote>
+
+<p>在更高层面，在 webpack 的配置中 loader 有两个属性：</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">test</code> 属性，用于标识出应该被对应的 loader 进行转换的某个或某些文件</li>
+  <li><code class="language-plaintext highlighter-rouge">use</code> 属性，表示进行转换时，应该使用哪个 loader</li>
+</ul>
+
+<p>本节要实现的功能：</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">css</code></li>
+  <li><code class="language-plaintext highlighter-rouge">sass</code></li>
+  <li><code class="language-plaintext highlighter-rouge">less</code></li>
+  <li><code class="language-plaintext highlighter-rouge">postCss</code></li>
+  <li>添加厂商前缀</li>
+</ul>
+
+<h1 id="1loader执行顺序">1.loader执行顺序</h1>
+
+<pre><code class="language-txt">rules:[
+    {
+        test:/\.css$/,
+        use:[
+            'style-loader',
+            'css-loader',
+            'sass-loader'
+        ]
+    }
+]
+</code></pre>
+<p>rules执行顺序由右往左，由下往上。所以会先执行<code class="language-plaintext highlighter-rouge">sass-loader</code> -&gt; <code class="language-plaintext highlighter-rouge">css-loader</code> -&gt; <code class="language-plaintext highlighter-rouge">style-loader</code></p>
+
+<h1 id="2打包css文件">2.打包css文件</h1>
+
+<h4 id="文件结构">文件结构</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">myProject
+</span> |-dist
+<span class="gi">+    |-index.html
+</span> |-node_modules
+ |-src
+<span class="gi">+    |-assets
++        |-css
++            |-index.css
++    |-index.html
+</span>     |-index.js
+ |-package.json
+ |-webpack.config.js
+</code></pre></div></div>
+
+<h4 id="distindexhtml">dist/index.html</h4>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Title<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;h1&gt;</span>欢迎来到瓦力博客<span class="nt">&lt;/h1&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"./main.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</code></pre></div></div>
+
+<h4 id="srcassetscssindexcss">src/assets/css/index.css</h4>
+
+<p>将<code class="language-plaintext highlighter-rouge">欢迎来到瓦力博客</code>加一点样式，让文字的颜色变红，水平居中</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">h1</span><span class="p">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="no">brown</span><span class="p">;</span>
+    <span class="nl">text-align</span><span class="p">:</span> <span class="nb">center</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="srcindexjs">src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="dl">"</span><span class="s2">./assets/css/index.css</span><span class="dl">"</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">欢迎来到wali博客！</span><span class="dl">"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h4 id="webpackconfigjs">webpack.config.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">mode</span><span class="p">:</span><span class="dl">'</span><span class="s1">development</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">entry</span><span class="p">:</span><span class="dl">'</span><span class="s1">./src/index.js</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">module</span><span class="p">:{</span>
+        <span class="na">rules</span><span class="p">:[</span>
+            <span class="p">{</span>
+                <span class="na">test</span><span class="p">:</span><span class="sr">/</span><span class="se">\.</span><span class="sr">css$/</span><span class="p">,</span>
+                <span class="na">use</span><span class="p">:[</span>
+                    <span class="dl">'</span><span class="s1">style-loader</span><span class="dl">'</span><span class="p">,</span>  <span class="c1">//将 JS 字符串生成为 style 节点</span>
+                    <span class="dl">'</span><span class="s1">css-loader</span><span class="dl">'</span>     <span class="c1">//将 CSS 转化成 CommonJS 模块</span>
+                <span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+	  
+    <span class="p">},</span>
+    <span class="na">output</span><span class="p">:{</span>
+        <span class="na">path</span><span class="p">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span><span class="dl">'</span><span class="s1">dist</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>在 <code class="language-plaintext highlighter-rouge">webpack.config.js</code>文件中处理css文件规则写好后，我们还需要安装<code class="language-plaintext highlighter-rouge">style-loader</code>、<code class="language-plaintext highlighter-rouge">css-loader</code> loader。安装方式如下。如果想要了解<a href="https://webpack.docschina.org/loaders/style-loader/" title="https://webpack.docschina.org/loaders/style-loader/" target="_blank">style-loader</a>、<a href="https://webpack.docschina.org/loaders/css-loader/" title="https://webpack.docschina.org/loaders/css-loader/" target="_blank">css-loader</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add style-loader
+yarn add css-loader
+</code></pre></div></div>
+
+<h4 id="运行webpack">运行webpack</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run dev
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_3.png" alt="ssl" /></p>
+
+<p>看到命令框输出的信息中包含<code class="language-plaintext highlighter-rouge">./src/index.js</code>和<code class="language-plaintext highlighter-rouge">./src/assets/css/index.css</code>就说明css样式被打包到了main.js文件中。接下来手动打开<code class="language-plaintext highlighter-rouge">dist/index.html</code>文件</p>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_4.png" alt="ssl" /></p>
+
+<h1 id="3打包sass文件">3.打包sass文件</h1>
+
+<h4 id="文件结构-1">文件结构</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">myProject
+</span> |-dist
+     |-index.html
+ |-node_modules
+ |-src
+     |-assets
+         |-css
+             |-index.css
+<span class="gi">+        |-sass
++            |-index.scss
+</span>     |-index.html
+     |-index.js
+ |-package.json
+ |-webpack.config.js
+</code></pre></div></div>
+<p>在<code class="language-plaintext highlighter-rouge">assets</code>目录下面新增<code class="language-plaintext highlighter-rouge">sass</code>目录，然后在<code class="language-plaintext highlighter-rouge">sass</code>目录下新建一个<code class="language-plaintext highlighter-rouge">index.scss</code></p>
+
+<h4 id="srcassetssassindexscss">src/assets/sass/index.scss</h4>
+
+<p>将字体颜色变成白色，背景色变为蓝色。</p>
+
+<div class="language-sass highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">body</span> <span class="err">{</span>
+  <span class="nt">h1</span><span class="err">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="mh">#fff</span><span class="err">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">darkblue</span><span class="err">;</span>
+    <span class="nl">text-align</span><span class="p">:</span> <span class="nb">center</span><span class="err">;</span>
+  <span class="err">}</span>
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="webpackconfigjs-1">webpack.config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">module.exports = {
+</span>  mode:'development',
+  entry:'./src/index.js',
+  module:{
+	rules:[
+		{
+			test:/\.css$/,
+			use:[
+				'style-loader',
+				'css-loader'
+			]
+		},
+<span class="gi">+		{
++			test:/\.scss$/,
++			use:[
++				'style-loader',
++				{
++					loader:'css-loader',
++					options:{
++						importLoaders:2
++					}					
++				},
++				'sass-loader'
++			]
++		}
+</span>	]
+	  
+  },
+  output:{
+    path: path.resolve(__dirname,'dist')
+  }
+<span class="err">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">在这里解释一下 importLoaders:2，当a.scss文件中有 @improt b.scss文件时，需要重新加载css-loader前两个loader插件，在这里就是sass-loader，因为执行顺序是由下往上，由右往左</code></p>
+
+<h4 id="srcindexjs-1">src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="dl">"</span><span class="s2">./assets/sass/index.scss</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">欢迎来到wali博客！</span><span class="dl">"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h4 id="运行">运行</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>安装
+yarn add sass-loader 
+yarn add node-sass
+运行
+yarn run dev
+</code></pre></div></div>
+
+<h1 id="4打包less文件">4.打包less文件</h1>
+
+<h4 id="文件结构-2">文件结构</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">myProject
+</span> |-dist
+     |-index.html
+ |-node_modules
+ |-src
+     |-assets
+        |-css
+            |-index.css
+<span class="gi">+        |-less
++            |-index.less     
+</span>        |-sass
+            |-index.scss
+     |-index.html
+     |-index.js
+ |-package.json
+ |-webpack.config.js
+</code></pre></div></div>
+<p>在<code class="language-plaintext highlighter-rouge">assets</code>目录下面新增<code class="language-plaintext highlighter-rouge">less</code>目录，然后在<code class="language-plaintext highlighter-rouge">less</code>目录下新建一个<code class="language-plaintext highlighter-rouge">index.less</code></p>
+
+<h4 id="srcassetslessindexless">src/assets/less/index.less</h4>
+
+<p>将字体颜色变黑，然后添加一个红色的边框</p>
+
+<div class="language-sass highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">body</span><span class="err">{</span>
+  <span class="nt">h1</span><span class="err">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="mh">#000</span><span class="err">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="mh">#fff</span><span class="err">;</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">3px</span> <span class="nb">solid</span> <span class="no">red</span><span class="err">;</span>
+  <span class="err">}</span>
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="webpackconfigjs-2">webpack.config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">const path = require('path');
+</span>
+module.exports = {
+  mode:'development',
+  entry:'./src/index.js',
+  module:{
+	rules:[
+		{
+			test:/\.css$/,
+			use:[
+				'style-loader',
+				'css-loader'
+			]
+		},
+		{
+			test:/\.scss$/,
+			use:[
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'sass-loader'
+			]
+		},
+<span class="gi">+		{
++			test: /\.less$/,
++			use: [
++				'style-loader',
++				{
++					loader:'css-loader',
++					options:{
++						importLoaders:2
++					}					
++				},
++				'less-loader'
++			]
++		}
+</span>	]
+  },
+  output:{
+    path: path.resolve(__dirname,'dist')
+  }
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="srcindexjs-2">src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="dl">"</span><span class="s2">./assets/less/index.less</span><span class="dl">"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h4 id="运行-1">运行</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>安装
+yarn add less-loader 
+yarn add less
+
+运行
+yarn run dev
+</code></pre></div></div>
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_6.png" alt="ssl" /></p>
+
+<h1 id="5添加厂商前缀和postcss">5.添加厂商前缀和postCss</h1>
+
+<p>不管是写<code class="language-plaintext highlighter-rouge">css</code>,<code class="language-plaintext highlighter-rouge">sass</code>,<code class="language-plaintext highlighter-rouge">less</code>,<code class="language-plaintext highlighter-rouge">postCss</code>样式，在css3新特性下，我们是要添加浏览器厂商前缀的。如果没有浏览器厂商前缀，同一套样式不同浏览器展现的样式是不同的。之前写css都是手动添加，那样子实在是太繁琐了。</p>
+
+<h4 id="文件结构-3">文件结构</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">myProject
+</span> |-dist
+     |-index.html
+ |-node_modules
+ |-src
+     |-assets
+        |-css
+            |-index.css
+        |-less
+            |-index.less     
+        |-sass
+            |-index.scss
+     |-index.html
+     |-index.js
+ |-package.json
+ |-webpack.config.js
+<span class="gi">+|-postcss.config.js
+</span></code></pre></div></div>
+
+<h4 id="srcassetscssindexcss-1">src/assets/css/index.css</h4>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">h1</span><span class="p">{</span>
+     <span class="nl">color</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span>
+     <span class="nl">text-align</span><span class="p">:</span> <span class="nb">center</span><span class="p">;</span>
+     <span class="nl">transform</span><span class="p">:</span> <span class="n">scale</span><span class="p">(</span><span class="m">0.5</span><span class="p">);</span>
+ <span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="srcassetssassindexscss-1">src/assets/sass/index.scss</h4>
+
+<div class="language-sass highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">body</span><span class="err">{</span>
+  <span class="nt">h1</span><span class="err">{</span>
+    <span class="nl">transform</span><span class="p">:</span> <span class="nf">translate</span><span class="p">(</span><span class="m">100px</span><span class="o">,</span> <span class="m">100px</span><span class="p">)</span><span class="err">;</span>
+  <span class="err">}</span>
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="srcassetslessindexless-1">src/assets/less/index.less</h4>
+
+<pre><code class="language-less">body{
+  h1{
+    transform: rotate(90deg);
+  }
+}
+</code></pre>
+
+<h4 id="srcindexjs-3">src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="dl">"</span><span class="s2">./assets/css/index.css</span><span class="dl">"</span>
+<span class="k">import</span> <span class="dl">"</span><span class="s2">./assets/less/index.less</span><span class="dl">"</span>
+<span class="k">import</span> <span class="dl">"</span><span class="s2">./assets/sass/index.scss</span><span class="dl">"</span>
+</code></pre></div></div>
+
+<h4 id="postcssconfigjs">postcss.config.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="na">plugins</span><span class="p">:[</span>
+		<span class="nx">require</span><span class="p">(</span><span class="dl">"</span><span class="s2">autoprefixer</span><span class="dl">"</span><span class="p">)</span>
+	<span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="webpackconfigjs-3">webpack.config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">const path = require('path');
+</span>
+module.exports = {
+  mode:'development',
+  entry:'./src/index.js',
+  module:{
+	rules:[
+		{
+			test:/\.css$/,
+			use:[
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:1
+					}					
+				},
+<span class="gi">+				'postcss-loader'
+</span>				
+			]
+		},
+		{
+			test:/\.scss$/,
+			use:[
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'sass-loader',
+<span class="gi">+				'postcss-loader'
+</span>			]
+		},
+		{
+			test: /\.less$/,
+			use: [
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'less-loader',
+<span class="gi">+				'postcss-loader'
+</span>			]
+		}
+	]
+  },
+  output:{
+    path: path.resolve(__dirname,'dist')
+  }
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="安装插件">安装插件</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add postcss-loader
+yarn add autoprefixer
+</code></pre></div></div>
+
+<h4 id="运行webpack-1">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run dev
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_7.png" alt="ssl" /></p>
+
+<p>从小菜的截图中可以看到<code class="language-plaintext highlighter-rouge">css</code>、<code class="language-plaintext highlighter-rouge">less</code>、<code class="language-plaintext highlighter-rouge">scss</code>文件。css3新属性的浏览器厂商前缀已经添加上了。</p>
+
+:ET

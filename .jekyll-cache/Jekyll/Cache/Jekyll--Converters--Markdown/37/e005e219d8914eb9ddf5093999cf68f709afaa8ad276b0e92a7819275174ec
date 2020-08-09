@@ -1,0 +1,251 @@
+I"�)<p>Flask是一个使用Python编写的<code class="language-plaintext highlighter-rouge">轻量级Web应用框架</code>。基于<code class="language-plaintext highlighter-rouge">Werkzeug</code> WSGI工具箱和<code class="language-plaintext highlighter-rouge">Jinja2</code>模板引擎。</p>
+
+<ul>
+  <li><a href="https://palletsprojects.com/p/flask/" title="https://palletsprojects.com/p/flask/">Flask 官方网站</a></li>
+  <li><a href="https://dormousehole.readthedocs.io/en/latest/" title="https://dormousehole.readthedocs.io/en/latest/">Flask 中文文档网站</a></li>
+</ul>
+
+<p>在学习python入门教程后，个人觉得掌握基础知识点只是学习阶段的开始，要想深入理解，必须从项目入手，真正了解一门语言的用途及特色。为此小菜就选择<code class="language-plaintext highlighter-rouge">Flask 项目实战</code>通过一个完整的项目，快速了解python开发web项目流程及如何在项目中应用之前学习到的知识。进一步理解python知识点。小菜本来将教程命名为<code class="language-plaintext highlighter-rouge">Flask 实战</code>，但是考虑到在实战中又会涉及到Flask单点知识，这样穿插很容易让初学者困惑,如果不讲解Flask知识点，初学者又不理解为什么这么做。所以小菜将本教程一分为二，<code class="language-plaintext highlighter-rouge">Flask</code>和<code class="language-plaintext highlighter-rouge">Flask 项目实战</code>，在Flask中只讲一些知识点，在Flask 项目实战中遇到知识点，小菜会放上链接，方便初学者快速找到知识点。</p>
+
+<h1 id="1开发环境">1.开发环境</h1>
+
+<h4 id="环境搭建">环境搭建</h4>
+
+<ul>
+  <li>安装Python</li>
+  <li>检测Python 和 pip是否安装成功</li>
+  <li>安装pipenv</li>
+  <li>安装Flask</li>
+</ul>
+
+<h1 id="2安装python">2.安装python</h1>
+
+<p>在<a href="https://www.python.org/" title="https://www.python.org/" target="_blank">python官网上</a>找到<code class="language-plaintext highlighter-rouge">downloads</code>按钮，选择自己PC的操作系统，点击下载。windows下面安装很简单，基本就是下一步，下一步。</p>
+
+<p><code class="language-plaintext highlighter-rouge">注意:</code></p>
+<ul>
+  <li>在windows上安装时，记得要勾选<code class="language-plaintext highlighter-rouge">Add Python 3.7 to PATH</code></li>
+  <li>请注意安装Python的版本，小菜这里安装的3.7，建议大家安装python3.6版本之上的</li>
+</ul>
+
+<h1 id="3检测python和pip">3.检测python和pip</h1>
+
+<h4 id="检测python是否安装成功">检测python是否安装成功</h4>
+
+<p>打开windows的cmd窗口输入</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python -V
+</code></pre></div></div>
+
+<p>出现 <code class="language-plaintext highlighter-rouge">Python 3.7.4</code>说明python安装成功</p>
+
+<h4 id="检测pip是否安装成功">检测pip是否安装成功</h4>
+
+<p>在python3版本之后，python安装包中会自带pip</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip -V
+</code></pre></div></div>
+
+<p>输出<code class="language-plaintext highlighter-rouge">pip 19.0.3 from d:\python\lib\site-packages\pip (python 3.7)</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_4.png" alt="ssl" /></p>
+
+<h1 id="4安装pipenv">4.安装pipenv</h1>
+
+<p>在安装pipenv之前，需要知道为什么安装pipenv。pipenv只是一个工具，我们用pipenv创建一个虚拟环境。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip install pipenv
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_5.png" alt="ssl" /></p>
+
+<h1 id="5创建虚拟环境">5.创建虚拟环境</h1>
+
+<h4 id="虚拟环境">虚拟环境</h4>
+
+<p>建议在开发环境和生产环境下都使用虚拟环境来管理项目的依赖。</p>
+
+<p>为什么要使用虚拟环境？随着你的 Python 项目越来越多，你会发现不同的项目会需要 不同的版本的 Python 库。同一个 Python 库的不同版本可能不兼容。</p>
+
+<p>虚拟环境可以为每一个项目安装独立的 Python 库，这样就可以隔离不同项目之间的 Python 库，也可以隔离项目与操作系统之间的 Python 库。</p>
+
+<h4 id="创建虚拟环境">创建虚拟环境</h4>
+<p>我们在桌面创建一个文件夹<code class="language-plaintext highlighter-rouge">fisher</code>，在<code class="language-plaintext highlighter-rouge">fisher</code>文件夹里打开cmd</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pipenv install
+</code></pre></div></div>
+
+<p>在创建好虚拟环境后，我们进入虚拟环境</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pipenv shell
+</code></pre></div></div>
+
+<h4 id="pipenv常用命令">pipenv常用命令</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>命令</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>pipenv –upgrade</td>
+      <td>更新pipenv＆pip到最新版本</td>
+    </tr>
+    <tr>
+      <td>pipenv –where</td>
+      <td>输出虚拟环境执行档所在目录</td>
+    </tr>
+    <tr>
+      <td>pipenv –py</td>
+      <td>输出现在使用python执行档资讯</td>
+    </tr>
+    <tr>
+      <td>pipenv –envs</td>
+      <td>输出相关环境参数</td>
+    </tr>
+    <tr>
+      <td>pipenv –rm</td>
+      <td>删除此虚拟环境</td>
+    </tr>
+    <tr>
+      <td>pipenv –bare</td>
+      <td>最小化输出</td>
+    </tr>
+    <tr>
+      <td>pipenv –man</td>
+      <td>详细说明</td>
+    </tr>
+    <tr>
+      <td>pipenv –version</td>
+      <td>显示版本</td>
+    </tr>
+    <tr>
+      <td>pipenv check</td>
+      <td>检查已安装套件安全性</td>
+    </tr>
+    <tr>
+      <td>pipenv clean</td>
+      <td>删除不在popfile.lock中的套件</td>
+    </tr>
+    <tr>
+      <td>pipenv graph</td>
+      <td>显示目前安装的套件以及相依性</td>
+    </tr>
+    <tr>
+      <td>pipenv install [OPTIONS] [PACKAGE_NAME] [MORE_PACKAGES]</td>
+      <td>安装套件，若后面没有带参数则会安装pipfile内所有套件</td>
+    </tr>
+    <tr>
+      <td>pipenv lock [OPTIONS]</td>
+      <td>生成pipfile.lock</td>
+    </tr>
+    <tr>
+      <td>pipenv open [OPTIONS] MODULE</td>
+      <td>在编辑器中打开指定的套件</td>
+    </tr>
+    <tr>
+      <td>pipenv run [OPTIONS] COMMAND</td>
+      <td>在虚拟环境内执行指令</td>
+    </tr>
+    <tr>
+      <td>pipenv shell [OPTIONS] [SHELL_ARGS]</td>
+      <td>进入虚拟环境</td>
+    </tr>
+    <tr>
+      <td>exit</td>
+      <td>退出虚拟环境</td>
+    </tr>
+    <tr>
+      <td>pipenv sync [OPTIONS]</td>
+      <td>安装所有在pipfile.lock中的套件</td>
+    </tr>
+    <tr>
+      <td>pipenv uninstall [OPTIONS] [PACKAGE_NAME] [MORE_PACKAGES]</td>
+      <td>反安装指定的套件并将其从pipfile中清除</td>
+    </tr>
+    <tr>
+      <td>pipenv update [OPTIONS] [PACKAGES]</td>
+      <td>更新指定套件</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="6安装flask">6.安装flask</h1>
+
+<p>上一步<code class="language-plaintext highlighter-rouge">pipenv shell</code> 我们已经进入到虚拟环境了，接下来在虚拟环境中安装<code class="language-plaintext highlighter-rouge">flask</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pipenv install flask
+</code></pre></div></div>
+
+<p>安装完成后，我们可以使用</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#查看安装包列表
+pip list 
+</code></pre></div></div>
+<p>发现<code class="language-plaintext highlighter-rouge">Flask</code>已经在安装的列表里了</p>
+
+<pre><code class="language-txt">Package      Version
+------------ -------
+Click        7.0
+Flask        1.1.1
+itsdangerous 1.1.0
+Jinja2       2.10.3
+MarkupSafe   1.1.1
+pip          19.2.3
+setuptools   41.4.0
+Werkzeug     0.16.0
+wheel        0.33.6
+</code></pre>
+
+<h1 id="7创建flask最小应用">7.创建Flask最小应用</h1>
+
+<p>在<code class="language-plaintext highlighter-rouge">fisher</code>目录下面创建一个<code class="language-plaintext highlighter-rouge">fisher.py</code></p>
+<pre><code class="language-txt">fisher
+|-fisher.py
+</code></pre>
+
+<h4 id="fisherpy">fisher.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello_world</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s">'hello world!'</span>
+
+<span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>保存后，在cmd中运行(在虚拟环境运行)</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python fisher.py
+</code></pre></div></div>
+
+<p>运行后，出现如下信息</p>
+
+<pre><code class="language-txt">(fisher-susCSosD) C:\Users\Administrator\Desktop\fisher&gt;python fisher.py
+ * Serving Flask app "fisher" (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+127.0.0.1 - - [08/Oct/2019 14:48:33] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [08/Oct/2019 14:48:33] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [08/Oct/2019 14:48:35] "GET / HTTP/1.1" 200 -
+</code></pre>
+
+<p>在本地起了一个127.0.0.1:5000的服务，在浏览器上输入,在页面可以看到我们成功的访问到<code class="language-plaintext highlighter-rouge">hello world</code></p>
+
+<pre><code class="language-txt">http://127.0.0.1:5000/
+</code></pre>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_6.png" alt="ssl" /></p>
+
+<p>到此，我们的开发环境基本准备完成。</p>
+
+:ET

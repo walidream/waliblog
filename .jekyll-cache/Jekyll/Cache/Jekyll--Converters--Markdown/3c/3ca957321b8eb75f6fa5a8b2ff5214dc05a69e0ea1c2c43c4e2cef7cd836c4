@@ -1,0 +1,33 @@
+I"�<p>Vim编辑器<code class="language-plaintext highlighter-rouge">.</code>命令可以用于重复执行命令。</p>
+
+<p>在Vim尾行模式下，通过 :h.查看vim的帮助手册，可以看到：</p>
+
+<p>. Repeat last change, with count replaced with [count]. Also repeat a yank command, when the ‘y’ flag is included in ‘cpoptions’. Does not repeat a command-line command</p>
+
+<p>举例来说，删除一个单词，可以使用命令<code class="language-plaintext highlighter-rouge">dw</code>(w是word的缩写，表示一个单词。接着，我们可以使用命令5.再连续删除5个单词，这就是Vim中.点命令的重复功能。</p>
+
+<p>再考虑以下场景：某个源文件中，有若干行以注释符号//结尾，现在我们要在这些行末添加一些相同的内容</p>
+
+<p>我们可以使用如下方式来实现：</p>
+
+<h4 id="1搜索字符串">(1)搜索字符串</h4>
+
+<p><code class="language-plaintext highlighter-rouge">/\/\/</code> (/需要使用\进行转义)</p>
+
+<p>现在，只要按下n键就会跳转到下一个搜索到的目标字符串。</p>
+
+<h4 id="2从第一个匹配实例开始添加文本">(2)从第一个匹配实例开始添加文本</h4>
+
+<p>按下<code class="language-plaintext highlighter-rouge">A</code>进入行尾追加模式，在行末添加文本 (假设为 comment)</p>
+
+<p>按[Esc]退出编辑模式，这条命令执行完成了。但是接下来还有多个个地方需要执行相同的操作。这时，我们便可以使用<code class="language-plaintext highlighter-rouge">.</code>点命令重复执行上一条命令。</p>
+
+<h4 id="3跳转到下一个匹配实例并向行末添加文本">(3)跳转到下一个匹配实例并向行末添加文本</h4>
+
+<p><code class="language-plaintext highlighter-rouge">n.</code></p>
+
+<p>上述介绍的Vim中使用.命令重复执行操作的示例如下图所示，大家可以参考并做练习。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_5.gif" alt="ssl" /></p>
+
+:ET

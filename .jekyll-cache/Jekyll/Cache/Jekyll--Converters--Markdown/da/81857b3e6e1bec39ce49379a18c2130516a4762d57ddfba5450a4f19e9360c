@@ -1,0 +1,152 @@
+I"�<p>Vim8.0是近十年来的一次大更新，支持任务、异步I/O、Channels和JSON以及异步计时器、Lambdas 和 Closures等，还包括对GTK + 3的支持。由于ubuntu默认安装的Vim版本一般都是7.4.52，该版本不满足许多vim插件的需求(如YouCompleteMe)，因此需要升级Vim到新版本。</p>
+
+<ul>
+  <li><a href="https://www.cnblogs.com/brooksj/p/10428705.html" title="https://www.cnblogs.com/brooksj/p/10428705.html" target="_blank">参考 编程匠心者博客</a></li>
+</ul>
+
+<h1 id="1安装python3">1.安装python3</h1>
+
+<p>vim8版本不支持python3，所以我们需要安装python3，<a href="/python/2019/08/05/python-centos7.html" title="/python/2019/08/05/python-centos7.html" target="_blank">centos7安装 python3.6
+</a></p>
+
+<h1 id="2安装编译插件">2.安装编译插件</h1>
+
+<p>为了使vim支持ruby、lua、perl、python2、python3编写的插件，在正式编译安装vim之前需要在系统中安装好相关插件，否则编译vim会出错。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum install ruby ruby-devel lua lua-devel luajit \
+luajit-devel ctags git python python-devel \
+python36 python36-devel tcl-devel \
+perl perl-devel perl-Extutils-ParseXS \
+perl-ExtUtils-XSpp perl-ExtUtils-CBuilder \
+perl-ExtUtils-Embed libX* ncurses-devel gtk2-devel
+</code></pre></div></div>
+<p>如果系统中有可用的python2.7或者python3.6则将上面安装项中的python和python36去除。（小菜没有移除）</p>
+
+<h1 id="3卸载原来vim">3.卸载原来vim</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum -y remove vim
+</code></pre></div></div>
+
+<h1 id="4获取vim">4.获取vim</h1>
+
+<h4 id="下载vim的项目源码">下载vim的项目源码</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/vim/vim.git
+</code></pre></div></div>
+
+<h4 id="下载好后进入到vim目录下进行配置编译安装">下载好后进入到vim目录下进行配置、编译、安装</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./configure --with-features=huge \
+--enable-gui=gtk2 \
+--with-x \
+--enable-fontset \
+--enable-cscope \
+--enable-multibyte \
+--enable-pythoninterp \
+--with-python-config-dir=/usr/lib64/python2.7/config \
+--enable-python3interp \
+--with-python3-config-dir=/usr/lib64/python3.6/config \
+--enable-luainterp \
+--enable-rubyinterp \
+--enable-perlinterp \
+--enable-multibyte \
+--prefix=/usr/local/vim \
+--with-compiledby="brooksj"
+</code></pre></div></div>
+
+<h4 id="参数说明如下">参数说明如下：</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>–with-features=huge</td>
+      <td>支持最大特性</td>
+    </tr>
+    <tr>
+      <td>–enable-rubyinterp</td>
+      <td>启用Vim对ruby编写的插件的支持</td>
+    </tr>
+    <tr>
+      <td>–enable-pythoninterp</td>
+      <td>启用Vim对python编写的插件的支持</td>
+    </tr>
+    <tr>
+      <td>-enable-python3interp</td>
+      <td>启用对python3编写的插件的支持</td>
+    </tr>
+    <tr>
+      <td>–enable-luainterp</td>
+      <td>启用Vim对lua编写的插件的支持</td>
+    </tr>
+    <tr>
+      <td>–enable-perlinterp</td>
+      <td>启用Vim对perl编写的插件的支持</td>
+    </tr>
+    <tr>
+      <td>–enable-multibyte</td>
+      <td>多字节支持 可以在Vim中输入中文</td>
+    </tr>
+    <tr>
+      <td>–enable-fontset</td>
+      <td>支持字体设置</td>
+    </tr>
+    <tr>
+      <td>–enable-cscope</td>
+      <td>Vim对cscope支持 ，cscope是一款优秀的代码浏览工具</td>
+    </tr>
+    <tr>
+      <td>–enable-gui=gtk2</td>
+      <td>gtk2支持,也可以使用gnome，表示生成gvim</td>
+    </tr>
+    <tr>
+      <td>-–with-python-config-dir</td>
+      <td>指定 python配置 路径</td>
+    </tr>
+    <tr>
+      <td>–with-python3-config-dir</td>
+      <td>指定python3配置路径</td>
+    </tr>
+    <tr>
+      <td>–-prefix</td>
+      <td>编译安装路径</td>
+    </tr>
+    <tr>
+      <td>–with-compiledby</td>
+      <td>编译者</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>配置很关键，这直接关系到你以后vim的功能使用，这里建议最好按照上面我所给出的的配置方案来配置，以免后续出现问题。</p>
+
+<h4 id="编译">编译</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make
+</code></pre></div></div>
+
+<p>如果编译错误则可能是缺少相关插件，回过头去查看上面那些插件是否都已安装上。</p>
+
+<h4 id="安装">安装</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make install
+</code></pre></div></div>
+
+<h1 id="5设置系统环境变量">5.设置系统环境变量</h1>
+
+<p>设置系统环境变量，把vim的bin目录添加到path中，在<code class="language-plaintext highlighter-rouge">/etc/bashrc</code>末尾添加</p>
+
+<div class="language-vim highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 注意<span class="sr">/usr/</span>local换成你的vim安装路径
+<span class="k">export</span> PATH<span class="p">=</span><span class="sr">/usr/</span>local<span class="sr">/vim/</span><span class="nb">bin</span><span class="p">:</span>$PATH 
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">source /etc/bashrc</code>或者重新打开一个终端就可以使用vim和gvim来打开文件了。下图是我安装好之后执行vim –version的输出截图</p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_50.gif" alt="ssl" /></p>
+
+:ET

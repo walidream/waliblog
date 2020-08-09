@@ -1,0 +1,445 @@
+I"�R<p>在上一小节，我们将开发环境和生产环境区分开来。这一小节，我们来操作如何将<code class="language-plaintext highlighter-rouge">样式文件的代码分割</code>。</p>
+
+<ul>
+  <li><a href="https://webpack.docschina.org/plugins/mini-css-extract-plugin/" title="https://webpack.docschina.org/plugins/mini-css-extract-plugin/" target="_blank">MiniCssExtractPlugin</a></li>
+</ul>
+
+<h1 id="1安装">1.安装</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add mini-css-extract-plugin
+</code></pre></div></div>
+
+<p>此插件将CSS提取到单独的文件中。它为每个包含CSS的JS文件创建一个CSS文件。它支持CSS和SourceMaps的按需加载。</p>
+
+<p>它建立在新的webpack v4功能（模块类型）之上，并且需要webpack 4才能工作。</p>
+
+<p><code class="language-plaintext highlighter-rouge">注意:MiniCssExtractPlugin 目前不支持HMR support(热重载)</code></p>
+
+<h1 id="2提取css">2.提取css</h1>
+
+<h4 id="bulidpluginsjs">bulid/plugins.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">const srcPath = require('./base/path');
+const config = require('./base/config');
+</span>
+const webpack = require('webpack');
+<span class="p">const HtmlWebpackPlugin = require('html-webpack-plugin');    //生成html文件
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');  //清除
+</span><span class="gi">+  const MiniCssExtractPlugin = require("mini-css-extract-plugin");  //css样式提取
+</span>
+
+<span class="p">let plugins = [
+</span>	new HtmlWebpackPlugin({
+		title: '瓦力博客',
+		template: srcPath.src + '/index.html'   //以src/index.html为编译模板
+	}),
+<span class="gi">+	new  MiniCssExtractPlugin({
++		filename: config.NODE_ENV == 'development'?'[name.css]': `${srcPath.css}/[name].[hash].css`,
++		chunkFilename: config.NODE_ENV == 'development'?'[id].css': `${srcPath.css}/[id].[hash].css`
++	}),   //css提取
+</span>	new CleanWebpackPlugin(),
+	new webpack.HotModuleReplacementPlugin()	
+<span class="err">]</span>
+
+
+module.exports = plugins;
+</code></pre></div></div>
+
+<h4 id="buildmodulejs">build/module.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">const srcPath = require('./base/path');
+const config = require('./base/config');
+</span><span class="gi">+  const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+</span>
+
+<span class="p">let _module = {
+</span>	rules:[
+		{
+			test:/\.css$/,
+			use:[
+<span class="gi">+				config.NODE_ENV == 'development'?'style-loader': MiniCssExtractPlugin.loader,
+</span>				{
+					loader:'css-loader',
+					options:{
+						importLoaders:1
+					}					
+				},
+				'postcss-loader'				
+			]
+		},
+		{
+			test:/\.scss$/,
+			use:[
+<span class="gi">+				config.NODE_ENV == 'development'?'style-loader': MiniCssExtractPlugin.loader,
+</span>				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'sass-loader',
+				'postcss-loader'
+			]
+		},
+		{
+			test: /\.less$/,
+			use: [
+<span class="gi">+				config.NODE_ENV == 'development'?'style-loader': MiniCssExtractPlugin.loader,
+</span>				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'less-loader',
+				'postcss-loader'
+			]
+		},
+		{
+			test:/\.(png|svg|jpeg|jpg|gif)$/,
+			use:[		
+				{
+					loader:'file-loader',
+					options:{
+						name:'[name][sha512:hash:base64:7].[ext]',  //[path] 上下文环境路径						
+						outputPath: srcPath.images,  //输出路径
+						publicPath: config.NODE_ENV === 'development'?srcPath.images:srcPath.images   //公共路径						
+					}
+				},
+				{
+					loader: 'image-webpack-loader',
+					options: {
+						bypassOnDebug: true, // webpack@1.x
+						disable: true,       // webpack@2.x and newer
+					},
+				},
+			]
+		},
+		{
+			test: /\.html$/,
+			use:[
+				{
+					loader:'html-loader',
+					options:{
+						arrts:['img:src','img:data-src'],
+<span class="gi">+						minimize:config.NODE_ENV === 'development'? false:false  //是否压缩html
+</span>					}
+				}
+			]
+		},
+		{
+			test: /(iconfont.svg)|\.(woff|woff2|eot|ttf|otf)$/,
+			use:[
+				{
+					loader:'file-loader',
+					options:{
+						name:'[name].[ext]',  //[path] 上下文环境路径						
+						outputPath: srcPath.iconfont,  //输出路径		
+						publicPath: config.NODE_ENV === 'development'? srcPath.iconfont: srcPath.iconfont,    //公共路径						
+					}
+				}				
+			]
+		},
+		{
+			test: /\.js$/,
+			exclude: /(node_modules|bower_components|lib)/,
+			loader: 'babel-loader'
+		}		
+	]
+<span class="err">}</span>
+
+<span class="p">module.exports = _module;
+</span></code></pre></div></div>
+
+<h4 id="buildbaseconfigjs">build/base/config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">let _mode = process.argv[process.argv.length - 1];
+let env = _mode.replace(/--mode=(.+)/g,"$1");
+</span>
+let config = {
+	NODE_ENV: env == 'development'?'development':'production',  //development 开发 production 线上
+<span class="gi">+	publicPath: env == 'development'?'./':'./',
+</span>	apiUrl:'http://www.waliblog.com',
+	port: 9999
+<span class="err">}</span>
+
+<span class="p">module.exports = config;
+</span></code></pre></div></div>
+
+<h4 id="packagejson">package.json</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">{</span>
+  "name": "webpack",
+  "version": "1.0.0",
+  "description": "webpack测试",
+  "sideEffects": [
+    "*.css",
+<span class="gi">+	"*.less",
++	"*.scss"
+</span>  ],
+  "main": "index.js",
+  "author": "wali",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "dev": "npx webpack-dev-server --colors --mode=development",
+    "prod": "npx webpack --colors --mode=production",
+    "build": "npx webpack --colors --mode=development",
+    "analyse": "npx webpack --profile --json&gt; stats.json --colors  --mode=development"
+  },
+  "dependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/plugin-transform-runtime": "^7.4.4",
+    "@babel/polyfill": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/runtime": "^7.4.5",
+    "@babel/runtime-corejs2": "^7.4.5",
+    "autoprefixer": "^9.5.1",
+    "babel-loader": "^8.0.6",
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^2.1.1",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "file-loader": "^3.0.1",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
+    "image-webpack-loader": "^4.6.0",
+    "json5-loader": "^2.0.0",
+    "less": "^3.9.0",
+    "less-loader": "^5.0.0",
+    "loadsh": "^0.0.4",
+    "lodash": "^4.17.11",
+    "mini-css-extract-plugin": "^0.7.0",
+    "node-sass": "^4.12.0",
+    "postcss-loader": "^3.0.0",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.32.0",
+    "webpack-cli": "^3.3.2",
+    "webpack-dev-server": "^3.4.1"
+  },
+  "devDependencies": {
+    "webpack-bundle-analyzer": "^3.3.2"
+  }
+<span class="err">}</span>
+
+</code></pre></div></div>
+
+<h4 id="indexjs">index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="dl">'</span><span class="s1">./assets/css/index.css</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h4 id="assetscssindexcss">assets/css/index.css</h4>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">h1</span><span class="p">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="no">blue</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run prod
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_33.png" alt="ssl" /></p>
+
+<p>打开<code class="language-plaintext highlighter-rouge">dist/index.html</code>,看到<code class="language-plaintext highlighter-rouge">/assets/css/index.css</code>文件样式生效了</p>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_34.png" alt="ssl" /></p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!--dist/index.html--&gt;</span>
+<span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;title&gt;</span>title<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">"./assets/css/main.2df4cfd436df0ec42c4d.css"</span> <span class="na">rel=</span><span class="s">"stylesheet"</span><span class="nt">&gt;&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;h1&gt;</span>欢迎来到瓦力博客<span class="nt">&lt;/h1&gt;</span>
+<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"iconfont wali-icon-fuzhi"</span><span class="nt">&gt;&lt;/span&gt;</span>
+<span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">"assets/images/wali_logo2BQg9e7.png"</span> <span class="na">alt=</span><span class="s">""</span><span class="nt">&gt;</span>
+<span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">src=</span><span class="s">"./main.2df4cfd436df0ec42c4d.js"</span><span class="nt">&gt;&lt;/script&gt;&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<p>从<code class="language-plaintext highlighter-rouge">index.html</code>文件中可以看到css文件被提取出来，并且被引用。</p>
+
+<h1 id="3提取sass">3.提取sass</h1>
+
+<p>上面配置已经写了，在<code class="language-plaintext highlighter-rouge">plugins.js</code>和<code class="language-plaintext highlighter-rouge">module.js</code>文件中配置了，这里就简单的验证一下</p>
+
+<h4 id="修改indexjs">修改index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="dl">'</span><span class="s1">./assets/sass/index.scss</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h4 id="assetssassindexscss">assets/sass/index.scss</h4>
+
+<div class="language-scss highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">body</span><span class="p">{</span>
+  <span class="nt">h1</span><span class="p">{</span>
+    <span class="nl">transform</span><span class="p">:</span> <span class="nf">translate</span><span class="p">(</span><span class="m">100px</span><span class="o">,</span> <span class="m">100px</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack-1">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run prod
+</code></pre></div></div>
+
+<p>打开<code class="language-plaintext highlighter-rouge">dist/index.html</code>发现<code class="language-plaintext highlighter-rouge">欢迎来到瓦力博客</code>几个字发生偏移，说明<code class="language-plaintext highlighter-rouge">/assets/sass/index.scss</code>样式已经生效</p>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_35.png" alt="ssl" /></p>
+
+<h1 id="4提取less">4.提取less</h1>
+
+<p>上面配置已经写了，在<code class="language-plaintext highlighter-rouge">plugins.js</code>和<code class="language-plaintext highlighter-rouge">module.js</code>文件中配置了，这里就简单的验证一下</p>
+
+<h4 id="修改indexjs-1">修改index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="dl">'</span><span class="s1">./assets/less/index.less</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+<h4 id="assetslessindexless">assets/less/index.less</h4>
+
+<pre><code class="language-less">body{
+  h1{
+    transform: rotate(90deg);
+    background: red;
+    text-align: center;
+  }
+}
+</code></pre>
+
+<h4 id="运行webpack-2">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run prod
+</code></pre></div></div>
+
+<p>打开<code class="language-plaintext highlighter-rouge">dist/index.html</code>发现<code class="language-plaintext highlighter-rouge">欢迎来到瓦力博客</code>几个字旋转90度，背景变红，字体居中，说明<code class="language-plaintext highlighter-rouge">/assets/less/index.less</code>样式已经生效</p>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_36.png" alt="ssl" /></p>
+
+<h1 id="5生产环境css压缩">5.生产环境css压缩</h1>
+
+<h4 id="安装optimize-css-assets-webpack-plugin">安装optimize-css-assets-webpack-plugin</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add optimize-css-assets-webpack-plugin
+</code></pre></div></div>
+
+<h4 id="optimizationjs">optimization.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gi">+  const config = require('./base/config');
++  const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+</span>
+let optimization = {
+	usedExports: true,
+	splitChunks: {
+		chunks: 'all',
+		minSize: 30000,
+		maxSize: 0,
+		minChunks: 1,
+		maxAsyncRequests: 5,
+		maxInitialRequests: 3,
+		automaticNameDelimiter: '~',
+		name: true,
+		cacheGroups: {
+			vendors: {
+				test: /[\\/]node_modules[\\/]/,
+				priority: -10
+			},
+			default: {
+				minChunks: 2,
+				priority: -20,
+				reuseExistingChunk: true
+			}
+		}
+	}
+<span class="err">}</span>
+
+<span class="gi">+if(config.NODE_ENV != 'development'){
++	optimization['minimizer'] = [new OptimizeCssAssetsPlugin({})]
++}
+</span>
+module.exports = optimization
+</code></pre></div></div>
+
+<h4 id="运行开发环境">运行开发环境</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+<p>发现没有发生什么改变，样式都在<code class="language-plaintext highlighter-rouge">head</code>标签内</p>
+
+<h4 id="运行生产环境">运行生产环境</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run prod
+</code></pre></div></div>
+
+<p>发现dist目录下有css目录生成，打开css文件，看到css被压缩了。</p>
+
+<h1 id="6总结">6.总结</h1>
+
+<p>测试这小节其实遇到几个问题，小菜写出来：</p>
+
+<h4 id="调试">调试</h4>
+
+<p>这小节的测试命令都变成<code class="language-plaintext highlighter-rouge">yarn run prod</code>，是测试生产环境下webpack配置，生产环境下<code class="language-plaintext highlighter-rouge">css</code>,<code class="language-plaintext highlighter-rouge">less</code>,<code class="language-plaintext highlighter-rouge">scss</code>都会被压缩，去注释，<code class="language-plaintext highlighter-rouge">index.html</code>文件也会被压缩，去注释，还要添加域名。这样一来从生成的文件方面就不容易看出webpack到底是否配置正确。所以小菜将<code class="language-plaintext highlighter-rouge">config.js</code>中修改</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gi">+	publicPath: env == 'development'?'./':'./',
+</span></code></pre></div></div>
+
+<p>就是生成后index.html文件能直接在本地打开而不报错。</p>
+
+<p><code class="language-plaintext highlighter-rouge">build/module.js</code>修改</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gi">+	minimize:config.NODE_ENV === 'development'? false:false  //是否压缩html
+</span></code></pre></div></div>
+
+<p>生成后index.html文件不要被压缩，还保留树形结构，便于查找</p>
+
+<h4 id="less和scss文件样式不起作用">less和scss文件样式不起作用</h4>
+
+<p>小菜起初测试<code class="language-plaintext highlighter-rouge">css</code>文件，发现打包后css样式被提取出来，样式也生效了，但是换成</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="dl">'</span><span class="s1">./assets/less/index.less</span><span class="dl">'</span><span class="p">;</span>
+<span class="c1">//或</span>
+<span class="k">import</span> <span class="dl">'</span><span class="s1">./assets/sass/index.scss</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+<p>时，在运行打包命令时，样式没有被提取出来。后来经过认真分析，发现<a href="/webpack/2019/05/24/webpack-10.html" title="/webpack/2019/05/24/webpack-10.html">/webpack/2019/05/24/webpack-10.html</a>一节中配置了<code class="language-plaintext highlighter-rouge">Tree Shaking</code>。<code class="language-plaintext highlighter-rouge">Tree shaking</code>作用就是当我在<code class="language-plaintext highlighter-rouge">index.js</code>文件中使用<code class="language-plaintext highlighter-rouge">import './assets/less/index.less'</code>写法时，会检测在js文件中是否使用了引入来的<code class="language-plaintext highlighter-rouge">less</code>，很明显在<code class="language-plaintext highlighter-rouge">index.js</code>文件中没有使用，只是单纯的引入，所以<code class="language-plaintext highlighter-rouge">Tree shaking</code>就会自动帮我们过滤掉这行代码，就导致最终生成的js文件中没有样式，也就提取不出来样式了。</p>
+
+<p>看了上面的解释，有的小伙伴可能会问<code class="language-plaintext highlighter-rouge">import './assets/css/index.css'</code>也在<code class="language-plaintext highlighter-rouge">index.js</code>文件中只引用没有使用，为什么css文件中的样式就能够生效呢？原因还是在<a href="/webpack/2019/05/24/webpack-10.html" title="/webpack/2019/05/24/webpack-10.html">/webpack/2019/05/24/webpack-10.html</a>一节中，小菜在<code class="language-plaintext highlighter-rouge">package.json</code>中配置了css，没有配置<code class="language-plaintext highlighter-rouge">less</code>,<code class="language-plaintext highlighter-rouge">scss</code>。</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  "sideEffects": [
+    "*.css",
+<span class="gi">+	"*.less",
++	"*.scss"
+</span>  ],
+</code></pre></div></div>
+
+<p>当我们配置<code class="language-plaintext highlighter-rouge">*.css</code>,<code class="language-plaintext highlighter-rouge">*.less</code>,<code class="language-plaintext highlighter-rouge">*.scss</code>后，在<code class="language-plaintext highlighter-rouge">Tree shaking</code>时，webpack就会知道忽略<code class="language-plaintext highlighter-rouge">css</code>,<code class="language-plaintext highlighter-rouge">less</code>,<code class="language-plaintext highlighter-rouge">scss</code>所有文件，即使在js文件中<code class="language-plaintext highlighter-rouge">css</code>,<code class="language-plaintext highlighter-rouge">less</code>,<code class="language-plaintext highlighter-rouge">scss</code>只引用没有使用，也不要删除这行代码。</p>
+
+<h1 id="7代码回滚">7.代码回滚</h1>
+
+<h4 id="buildmodulejs-1">build/module.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gd">- minimize:config.NODE_ENV === 'development'? false:false  //是否压缩html
+</span><span class="gi">+ minimize:config.NODE_ENV === 'development'? false:true  //是否压缩html
+</span></code></pre></div></div>
+
+<h4 id="buildbaseconfigjs-1">build/base/config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">let _mode = process.argv[process.argv.length - 1];
+let env = _mode.replace(/--mode=(.+)/g,"$1");
+</span>
+let config = {
+	NODE_ENV: env == 'development'?'development':'production',  //development 开发 production 线上
+<span class="gd">-	publicPath: env == 'development'?'./':'./',
+</span><span class="gi">+	publicPath: env == 'development'?'./':'http://www.waliblog.com/',
+</span>	apiUrl:'http://www.waliblog.com',
+	port: 9999
+<span class="err">}</span>
+
+<span class="p">module.exports = config;
+</span></code></pre></div></div>
+
+:ET

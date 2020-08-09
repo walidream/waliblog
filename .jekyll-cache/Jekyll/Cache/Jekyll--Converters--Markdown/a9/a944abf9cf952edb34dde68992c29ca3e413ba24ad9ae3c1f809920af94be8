@@ -1,0 +1,127 @@
+I"e4<p>变量存储在内存中的值。这就意味着在创建变量时会在内存中开辟一个空间。基于变量的数据类型，解释器会分配指定内存，并决定什么数据可以被存储在内存中。</p>
+
+<h1 id="1变量的定义">1.变量的定义</h1>
+
+<p>js中需要用<code class="language-plaintext highlighter-rouge">let</code>、<code class="language-plaintext highlighter-rouge">const</code>、<code class="language-plaintext highlighter-rouge">var</code>关键字来声明，如在js定义一个局部变量<code class="language-plaintext highlighter-rouge">let name = '张三'</code>。 在java中定义变量需要声明变量的类型，go语言也一样。但是在python中变量定义不需要关键字声明，也不需要声明类型。</p>
+
+<p>变量的命名规则：</p>
+<ul>
+  <li>系统关键字 不能用在变量中</li>
+  <li>变量名由数字、字母、下划线组合，但是首字符不能是数字。</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="k">class</span> <span class="err">'</span><span class="nc">int</span><span class="s">'&gt;
+
+&gt;&gt;&gt; name = '</span><span class="n">张三</span><span class="s">'
+&gt;&gt;&gt; type(name)
+&lt;class '</span><span class="nb">str</span><span class="s">'&gt;
+
+&gt;&gt;&gt; tu = (1,2,3,4)
+&gt;&gt;&gt; type(tu)
+&lt;class '</span><span class="nb">tuple</span><span class="s">'&gt;
+
+&gt;&gt;&gt; li = [1,2,3,4,5]
+&gt;&gt;&gt; type(li)
+&lt;class '</span><span class="nb">list</span><span class="s">'&gt;
+
+&gt;&gt;&gt; aset = {1,2,3,'</span><span class="n">hell</span><span class="s">'}
+&gt;&gt;&gt; type(aset)
+&lt;class '</span><span class="nb">set</span><span class="s">'&gt;
+
+&gt;&gt;&gt; di = {'</span><span class="n">name</span><span class="s">':'</span><span class="n">张三</span><span class="s">','</span><span class="n">age</span><span class="s">':19}
+&gt;&gt;&gt; type(di)
+&lt;class '</span><span class="nb">dict</span><span class="s">'&gt;
+</span></code></pre></div></div>
+
+<h1 id="2多个变量赋值">2.多个变量赋值</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s">"john"</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s">"john"</span>
+</code></pre></div></div>
+
+<h1 id="3值类型和引用类型">3.值类型和引用类型</h1>
+
+<p><code class="language-plaintext highlighter-rouge">值类型</code>：对象本身不允许修改，数值的修改实际上是让变量指向了一个新的对象
+包含：字符串、元组、数值，本身不允许被修改</p>
+
+<p><code class="language-plaintext highlighter-rouge">引用类型</code>：对象本身可以修改
+包含：列表、字典，本身允许修改</p>
+
+<h4 id="值类型">值类型</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a</span> <span class="o">+=</span><span class="mi">2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a</span>
+<span class="mi">3</span>
+</code></pre></div></div>
+<p>小伙伴在看了上面的定义，阅读了代码肯定就有疑问了，<code class="language-plaintext highlighter-rouge">a</code>变量中初始值是1，在自身加2后，变量<code class="language-plaintext highlighter-rouge">a</code>值变成了3，<code class="language-plaintext highlighter-rouge">a</code>的值发生了改变，怎么就不允许修改，这不明明改变了吗？针对小伙伴这个疑问，小菜用下面代码来解释一下</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">id</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="mi">1471308976</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a</span> <span class="o">+=</span><span class="mi">2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">id</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="mi">1471309008</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a</span>
+<span class="mi">3</span>
+</code></pre></div></div>
+<p>小菜将上面代码重复了一遍，不同的是在每次运算完后添加了一行<code class="language-plaintext highlighter-rouge">id(a)</code>。在本小节开始的时候小菜记得写过<code class="language-plaintext highlighter-rouge">变量存储在内存中的值。这就意味着在创建变量时会在内存中开辟一个空间</code>。当我们定义一个变量<code class="language-plaintext highlighter-rouge">a</code>，python就会在内存中为变量<code class="language-plaintext highlighter-rouge">a</code>开辟一块内存空间，让变量<code class="language-plaintext highlighter-rouge">a</code>来存储值。<code class="language-plaintext highlighter-rouge">id</code>的作用就是打印变量<code class="language-plaintext highlighter-rouge">a</code>在内存中的地址，可以看到当<code class="language-plaintext highlighter-rouge">a=1</code>时，<code class="language-plaintext highlighter-rouge">a</code>在内存中的地址是<code class="language-plaintext highlighter-rouge">1471308976</code>，当我们在对<code class="language-plaintext highlighter-rouge">a +=2</code>时，<code class="language-plaintext highlighter-rouge">a</code>在内存中的地址<code class="language-plaintext highlighter-rouge">1471309008</code>。变量<code class="language-plaintext highlighter-rouge">a</code>在内存中的地址发生了改变。</p>
+
+<p>过程演示 <code class="language-plaintext highlighter-rouge">a = 1</code> 为变量<code class="language-plaintext highlighter-rouge">a</code>分配内存空间，存储地址<code class="language-plaintext highlighter-rouge">1471308976</code>，存放值<code class="language-plaintext highlighter-rouge">1</code>, <code class="language-plaintext highlighter-rouge">a +=2</code> 重新分配一块内存，存储地址是<code class="language-plaintext highlighter-rouge">1471309008</code>,存放值<code class="language-plaintext highlighter-rouge">3</code>,内存释放原来<code class="language-plaintext highlighter-rouge">a</code>变量，将<code class="language-plaintext highlighter-rouge">1471309008</code>内存重新命名变量<code class="language-plaintext highlighter-rouge">a</code>。</p>
+
+<h4 id="引用类型">引用类型</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">user</span> <span class="o">=</span> <span class="p">{</span><span class="s">'name'</span><span class="p">:</span><span class="s">'张三'</span><span class="p">,</span><span class="s">'age'</span><span class="p">:</span><span class="mi">18</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">user</span><span class="p">[</span><span class="s">'name'</span><span class="p">]</span> <span class="o">=</span> <span class="s">'王五'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">user</span>
+<span class="p">{</span><span class="s">'name'</span><span class="p">:</span> <span class="s">'王五'</span><span class="p">,</span> <span class="s">'age'</span><span class="p">:</span> <span class="mi">18</span><span class="p">}</span>
+</code></pre></div></div>
+
+<p>这样一看好像看不出和上面到底有什么区别，将上面代码改一下，打印一下它们在内存中的地址</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">user</span> <span class="o">=</span> <span class="p">{</span><span class="s">'name'</span><span class="p">:</span><span class="s">'张三'</span><span class="p">,</span><span class="s">'age'</span><span class="p">:</span><span class="mi">18</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">id</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+<span class="mi">6150160</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">user</span><span class="p">[</span><span class="s">'name'</span><span class="p">]</span> <span class="o">=</span> <span class="s">'王五'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">id</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+<span class="mi">6150160</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">user</span>
+<span class="p">{</span><span class="s">'name'</span><span class="p">:</span> <span class="s">'王五'</span><span class="p">,</span> <span class="s">'age'</span><span class="p">:</span> <span class="mi">18</span><span class="p">}</span>
+</code></pre></div></div>
+<p>这样看着就明白许多了，变量<code class="language-plaintext highlighter-rouge">user</code>修改前后在内存中的地址都是<code class="language-plaintext highlighter-rouge">6150160</code>，没有发生改变。<code class="language-plaintext highlighter-rouge">值类型</code>和<code class="language-plaintext highlighter-rouge">引用类型</code>的本质区别就是对象的本身是否可以被修改。小菜在下面写一个例子</p>
+
+<h4 id="值类型的例子">值类型的例子</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a</span>
+<span class="mi">2</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="n">b</span>
+<span class="mi">1</span>
+</code></pre></div></div>
+
+<h4 id="引用类型的例子">引用类型的例子</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">auser</span> <span class="o">=</span> <span class="p">{</span><span class="s">'name'</span><span class="p">:</span><span class="s">'张三'</span><span class="p">,</span><span class="s">'age'</span><span class="p">:</span><span class="mi">19</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">buser</span> <span class="o">=</span> <span class="n">auser</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">auser</span><span class="p">[</span><span class="s">'name'</span><span class="p">]</span> <span class="o">=</span> <span class="s">'隔壁老王'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">auser</span>
+<span class="p">{</span><span class="s">'name'</span><span class="p">:</span> <span class="s">'隔壁老王'</span><span class="p">,</span> <span class="s">'age'</span><span class="p">:</span> <span class="mi">19</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">buser</span>
+<span class="p">{</span><span class="s">'name'</span><span class="p">:</span> <span class="s">'隔壁老王'</span><span class="p">,</span> <span class="s">'age'</span><span class="p">:</span> <span class="mi">19</span><span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">值类型</code>和<code class="language-plaintext highlighter-rouge">引用类型</code>最基本的分别在复制之后的结果。当一个值类型被复制的时候，相当于创造了一个完全独立的实例，这个实例保有属于自己的独有数据，数据不会受到其他实例的数据变化影响</p>
+
+<p><code class="language-plaintext highlighter-rouge">值类型</code>就好像身份证复印件一样，复印出来之后，修改原件上面的内容，复印件上的内容不会变。复制一个<code class="language-plaintext highlighter-rouge">引用类型</code>的时候，实际上是默默地创造了一个共享的实例分身，两者是共用一套数据。因此修改其中任何一个实例的数据，也会影响到另外那个。</p>
+:ET

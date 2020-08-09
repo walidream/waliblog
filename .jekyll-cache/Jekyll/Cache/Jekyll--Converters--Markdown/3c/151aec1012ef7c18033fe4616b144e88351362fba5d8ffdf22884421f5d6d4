@@ -1,0 +1,185 @@
+I"�*<p><code class="language-plaintext highlighter-rouge">shimming</code>简单翻译是<code class="language-plaintext highlighter-rouge">垫片</code>。我们之前写代码会遇到向下面情况一样，在一个文件中引入很多第三方库</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">$</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">jquery</span><span class="dl">'</span>
+<span class="k">import</span> <span class="nx">_</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">loadsh</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span><span class="nx">http</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">util/http</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span><span class="nx">api</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">config/api</span><span class="dl">'</span>
+
+<span class="p">.....</span>
+</code></pre></div></div>
+
+<p>反正是引入很多第三方库或者是自己写的库，每个js文件用到的库都要引入，让人很繁琐，但又不能不引入。在webpack中<code class="language-plaintext highlighter-rouge">ProvidePlugin</code>插件能帮助我们解决上面遇到的问题。</p>
+
+<h1 id="1安装">1.安装</h1>
+
+<p>这个插件是webpack官方自带的<a href="https://webpack.docschina.org/plugins/provide-plugin/" title="https://webpack.docschina.org/plugins/provide-plugin/" target="_blank">ProvidePlugin 文档</a> 所以要安装webpack,安装过的小伙伴就不要在安装了。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add webpack
+</code></pre></div></div>
+
+<h1 id="2配置">2.配置</h1>
+
+<h4 id="buildpluginsjs">build/plugins.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">const dirpath = require('./base/path');
+const config = require('./base/config');
+</span>
+const webpack = require('webpack');
+<span class="p">const HtmlWebpackPlugin = require('html-webpack-plugin');    //生成html文件
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');  //清除
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");  //css样式提取
+</span>
+
+<span class="p">let plugins = [
+</span>	new HtmlWebpackPlugin({
+		title: '瓦力博客',
+		template: dirpath.src + '/index.html'   //以src/index.html为编译模板
+	}),
+	new  MiniCssExtractPlugin({
+		filename: config.NODE_ENV == 'development'?'[name.css]': `${dirpath.css}/[name].[hash].css`,
+		chunkFilename: config.NODE_ENV == 'development'?'[id].css': `${dirpath.css}/[id].[hash].css`
+	}),   //css提取
+<span class="gi">+	new webpack.ProvidePlugin({
++		_:'loadsh'
++	}),
+</span>	new CleanWebpackPlugin()
+<span class="err">]</span>
+
+<span class="p">if('development' == config.NODE_ENV){
+</span>	plugins.push(new webpack.HotModuleReplacementPlugin());
+<span class="err">}</span>
+
+<span class="p">module.exports = plugins;
+</span></code></pre></div></div>
+
+<h4 id="indexjs">index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">strJoin</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./util/math</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">let</span> <span class="nx">arr</span> <span class="o">=</span> <span class="nx">strJoin</span><span class="p">([</span><span class="dl">'</span><span class="s1">欢迎</span><span class="dl">'</span><span class="p">,</span><span class="dl">'</span><span class="s1">来到</span><span class="dl">'</span><span class="p">,</span><span class="dl">'</span><span class="s1">瓦力</span><span class="dl">'</span><span class="p">,</span><span class="dl">'</span><span class="s1">博客</span><span class="dl">'</span><span class="p">])</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">arr</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="uildmathjs">uild/math.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="kd">const</span> <span class="nx">strJoin</span> <span class="o">=</span> <span class="nx">arr</span><span class="o">=&gt;</span><span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">str</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">arr</span><span class="p">,</span><span class="dl">'</span><span class="s1">++</span><span class="dl">'</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">str</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run dev
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_42.png" alt="ssl" /></p>
+
+<p>在<code class="language-plaintext highlighter-rouge">index.js</code>和<code class="language-plaintext highlighter-rouge">math.js</code>文件中我们没有引入<code class="language-plaintext highlighter-rouge">loadsh</code>库，但是代码还能够正常运行，是因为我们在<code class="language-plaintext highlighter-rouge">plugins.js</code>中配置了<code class="language-plaintext highlighter-rouge">loadsh</code>库。</p>
+
+<p><code class="language-plaintext highlighter-rouge">ProvidePlugin</code>插件作用是<code class="language-plaintext highlighter-rouge">自动加载模块，而不必到处 import 或 require</code>。只要在<code class="language-plaintext highlighter-rouge">ProvidePlugin</code>插件中配置了变量。凡是在源码中用到<code class="language-plaintext highlighter-rouge">_</code>变量，在webpack打包时，就会文件最前面引入<code class="language-plaintext highlighter-rouge">import _ from 'loadsh'</code>就不要我们自己手动引入了。</p>
+
+<h1 id="3引申">3.引申</h1>
+
+<p>其实<code class="language-plaintext highlighter-rouge">ProvidePlugin</code>不仅可以适用第三方库，还可以自定义自己常用的库。</p>
+
+<h4 id="文件结构">文件结构</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">myProject
+</span><span class="err">|-build</span>
+   |-base
+       |-path.js
+       |-config.js
+   |-mode.js
+   |-entry.js
+   |-devtool.js
+   |-module.js
+   |-plugins.js
+   |-devServer.js
+   |-optimization.js
+   |-output.js
+ |-dist
+ |-node_modules
+ |-src
+<span class="gi">+    |-api
++        |-apiPath.js
+</span>     |-util
+        |-math.js
+     |-assets
+        |-css
+            |-index.css
+        |-less
+            |-index.less     
+        |-sass
+            |-index.scss
+        |-images
+            |-wali_logo.png
+     |-index.html
+     |-index.js
+ |-package.json
+ |-webpack.config.js
+ |-postcss.config.js
+ |-.babelrc
+</code></pre></div></div>
+
+<h4 id="apiapipathjs">api/apiPath.js</h4>
+
+<p>在apiPath.js中定义所有接口</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">host</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">http://www.walibo.com</span><span class="dl">'</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">login</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nx">host</span><span class="p">}</span><span class="s2">/login`</span><span class="p">,</span>         <span class="c1">//登录</span>
+    <span class="na">signout</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nx">host</span><span class="p">}</span><span class="s2">/signout`</span>      <span class="c1">//退出登录</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="indexjs-1">index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="buildpluginsjs-1">build/plugins.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">const dirpath = require('./base/path');
+const config = require('./base/config');
+</span>
+const webpack = require('webpack');
+<span class="p">const HtmlWebpackPlugin = require('html-webpack-plugin');    //生成html文件
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');  //清除
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");  //css样式提取
+</span>
+
+<span class="p">let plugins = [
+</span>	new HtmlWebpackPlugin({
+		title: '瓦力博客',
+		template: dirpath.src + '/index.html'   //以src/index.html为编译模板
+	}),
+	new  MiniCssExtractPlugin({
+		filename: config.NODE_ENV == 'development'?'[name.css]': `${dirpath.css}/[name].[hash].css`,
+		chunkFilename: config.NODE_ENV == 'development'?'[id].css': `${dirpath.css}/[id].[hash].css`
+	}),   //css提取
+	new webpack.ProvidePlugin({
+		_:'loadsh',
+<span class="gi">+		url:['../src/api/apipath','url']	
+</span>	}),
+	new CleanWebpackPlugin()
+<span class="err">]</span>
+
+<span class="p">if('development' == config.NODE_ENV){
+</span>	plugins.push(new webpack.HotModuleReplacementPlugin());
+<span class="err">}</span>
+
+<span class="p">module.exports = plugins;
+</span></code></pre></div></div>
+
+<h4 id="运行webpack-1">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run dev
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_43.png" alt="ssl" /></p>
+
+<p>只要在<code class="language-plaintext highlighter-rouge">plugins.js</code>插件中配置，那么在所有源码中都不需要单独引入了。<code class="language-plaintext highlighter-rouge">ProvidePlugin</code>不仅可以配置第三方库，还可以配置自己的库文件。配置自己的库文件一定要将路径写对，不然会报错的。小菜这节就做到这里，小伙伴们尽情的发挥想象吧！</p>
+
+:ET

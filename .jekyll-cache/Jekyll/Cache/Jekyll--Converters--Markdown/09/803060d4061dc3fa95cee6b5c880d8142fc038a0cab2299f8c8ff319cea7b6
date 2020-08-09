@@ -1,0 +1,54 @@
+I"�<p>虽然<code class="language-plaintext highlighter-rouge">chromedriver</code>已经可以可以使用浏览器登录了，但是由于浏览器还是被<code class="language-plaintext highlighter-rouge">chromedriver</code>控制的，chromedriver有一些特性可以被js感知到，所以很多网站可以在网站中加入js逻辑来判断当前的浏览器是否是由driver控制，比如检测是否存在特有标识<code class="language-plaintext highlighter-rouge">$cdc_lasutopfhvcZLmcfl</code>、<code class="language-plaintext highlighter-rouge">window.navigator.webdriver</code>：</p>
+
+<h1 id="1cdc_lasutopfhvczlmcfl解决方案">1.cdc_lasutopfhvcZLmcfl解决方案</h1>
+
+<p>解决上面的问题<code class="language-plaintext highlighter-rouge">$cdc_lasutopfhvcZLmcfl</code> 需要去修改driver文件，具体修改方法<a href="https://stackoverflow.com/questions/33225947/can-a-website-detect-when-you-are-using-selenium-with-chromedriver" title="https://stackoverflow.com/questions/33225947/can-a-website-detect-when-you-are-using-selenium-with-chromedriver">解决方案</a></p>
+
+<p>windows和linux下修改过的文件可以到<a href="https://git.imooc.com/coding-92/coding-92/src/master/chrome_nocdc" title="https://git.imooc.com/coding-92/coding-92/src/master/chrome_nocdc">这里下载</a>, chrome使用73版本。<a href="https://pan.baidu.com/s/1HPA3lCPk1KK4z528KmdHdQ" title="https://pan.baidu.com/s/1HPA3lCPk1KK4z528KmdHdQ">百度网盘 备份下载</a> 提取码<code class="language-plaintext highlighter-rouge">fyom</code></p>
+
+<h1 id="2webdriver解决方案">2.webdriver解决方案</h1>
+
+<p>解决window.navigator.webdriver的方法可以通过：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">option</span> <span class="o">=</span> <span class="n">webdriver</span><span class="p">.</span><span class="n">ChromeOptions</span><span class="p">()</span>
+<span class="n">option</span><span class="p">.</span><span class="n">add_experimental_option</span><span class="p">(</span><span class="s">'excludeSwitches'</span><span class="p">,</span> <span class="p">[</span><span class="s">'enable-automation'</span><span class="p">])</span> <span class="c1">#这里去掉window.navigator.webdriver的特性
+</span>    
+</code></pre></div></div>
+
+<p>下面给出简单的模拟淘宝登录的代码：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+
+<span class="n">option</span> <span class="o">=</span> <span class="n">webdriver</span><span class="p">.</span><span class="n">ChromeOptions</span><span class="p">()</span>
+<span class="n">option</span><span class="p">.</span><span class="n">add_experimental_option</span><span class="p">(</span><span class="s">'excludeSwitches'</span><span class="p">,</span> <span class="p">[</span><span class="s">'enable-automation'</span><span class="p">])</span> <span class="c1">#这里去掉window.navigator.webdriver的特性
+</span>
+<span class="n">domain</span> <span class="o">=</span> <span class="s">"https://www.taobao.com/"</span>
+
+<span class="c1">#下面的chromedriver.exe使用特殊的可执行文件，去掉了$cdc_lasutopfhvcZLmcfl等特性
+</span><span class="n">browser</span> <span class="o">=</span> <span class="n">webdriver</span><span class="p">.</span><span class="n">Chrome</span><span class="p">(</span><span class="n">executable_path</span><span class="o">=</span><span class="s">"C:/360安全浏览器下载/chromedriver_win32/test/chromedriver.exe"</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">option</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="n">browser</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+<span class="n">browser</span><span class="p">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s">'//*[@id="J_SiteNavLogin"]/div[1]/div[1]/a[1]'</span><span class="p">).</span><span class="n">click</span><span class="p">()</span>
+<span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">browser</span><span class="p">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s">'//*[@id="J_Quick2Static"]'</span><span class="p">).</span><span class="n">click</span><span class="p">()</span>
+<span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">username_el</span> <span class="o">=</span> <span class="n">browser</span><span class="p">.</span><span class="n">find_element_by_id</span><span class="p">(</span><span class="s">"TPL_username_1"</span><span class="p">)</span>
+<span class="c1">#淘宝会检测输入的速度，所以控制一下输入速度
+</span><span class="n">username</span> <span class="o">=</span> <span class="s">"xxx"</span>
+<span class="k">for</span> <span class="n">character</span> <span class="ow">in</span> <span class="n">username</span><span class="p">:</span>
+    <span class="n">username_el</span><span class="p">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">character</span><span class="p">)</span>
+    <span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span> <span class="c1"># pause for 0.3 seconds
+</span>
+<span class="n">pwd_el</span> <span class="o">=</span> <span class="n">browser</span><span class="p">.</span><span class="n">find_element_by_id</span><span class="p">(</span><span class="s">"TPL_password_1"</span><span class="p">)</span>
+<span class="n">password</span> <span class="o">=</span> <span class="s">"xxx"</span>
+<span class="k">for</span> <span class="n">character</span> <span class="ow">in</span> <span class="n">password</span><span class="p">:</span>
+    <span class="n">pwd_el</span><span class="p">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">character</span><span class="p">)</span>
+    <span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span> <span class="c1"># pause for 0.3 seconds
+</span>
+<span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">browser</span><span class="p">.</span><span class="n">find_element_by_id</span><span class="p">(</span><span class="s">"J_SubmitStatic"</span><span class="p">).</span><span class="n">click</span><span class="p">()</span>
+<span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+</code></pre></div></div>
+
+:ET

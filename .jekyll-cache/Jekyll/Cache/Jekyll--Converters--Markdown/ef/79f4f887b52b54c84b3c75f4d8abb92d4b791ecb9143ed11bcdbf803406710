@@ -1,0 +1,143 @@
+I"�;<p><code class="language-plaintext highlighter-rouge">python</code>中常见的循环语句<code class="language-plaintext highlighter-rouge">while</code>、<code class="language-plaintext highlighter-rouge">for</code>、<code class="language-plaintext highlighter-rouge">range()</code>。</p>
+
+<h1 id="1while语句">1.while语句</h1>
+<p>Python 编程中 while 语句用于循环执行程序，即在某条件下，循环执行某段程序，以处理需要重复处理的相同任务。其基本形式为：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#while
+</span><span class="k">while</span> <span class="n">条件</span><span class="p">:</span>
+    <span class="k">pass</span>    
+
+<span class="c1">#while else语句
+</span>
+<span class="k">while</span> <span class="n">条件</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"结束"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">注意：如果条件判断语句永远为 true，循环将会无限的执行下去</code></p>
+
+<h4 id="示例">示例</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">counter</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">while</span> <span class="n">counter</span> <span class="o">&lt;</span> <span class="mi">10</span>
+    <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s">"|"</span><span class="p">)</span>
+
+<span class="c1">#输出
+</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span><span class="o">|</span><span class="mi">4</span><span class="o">|</span><span class="mi">5</span><span class="o">|</span><span class="mi">6</span><span class="o">|</span><span class="mi">7</span><span class="o">|</span><span class="mi">8</span><span class="o">|</span><span class="mi">9</span><span class="o">|</span><span class="mi">10</span><span class="o">|</span>
+
+<span class="n">counter</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">while</span> <span class="n">counter</span> <span class="o">&lt;</span> <span class="mi">10</span>
+    <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s">"|"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"EOF"</span><span class="p">)</span>   
+<span class="c1">#输出     
+</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span><span class="o">|</span><span class="mi">4</span><span class="o">|</span><span class="mi">5</span><span class="o">|</span><span class="mi">6</span><span class="o">|</span><span class="mi">7</span><span class="o">|</span><span class="mi">8</span><span class="o">|</span><span class="mi">9</span><span class="o">|</span><span class="mi">10</span><span class="o">|</span><span class="n">EOF</span>
+</code></pre></div></div>
+<p>根据上面的示例可以得到<code class="language-plaintext highlighter-rouge">while else</code>语句中 如果<code class="language-plaintext highlighter-rouge">while</code>中的条件为<code class="language-plaintext highlighter-rouge">False</code>将终止循环，并执行<code class="language-plaintext highlighter-rouge">else</code>语句。</p>
+
+<h1 id="2for语句">2.for语句</h1>
+
+<p>python中 <code class="language-plaintext highlighter-rouge">for</code>循环可以遍历任何序列，一般用来迭代<code class="language-plaintext highlighter-rouge">列表</code>、<code class="language-plaintext highlighter-rouge">字符串</code>、<code class="language-plaintext highlighter-rouge">元组</code>、<code class="language-plaintext highlighter-rouge">集合</code>、<code class="language-plaintext highlighter-rouge">字典</code>。</p>
+
+<p>在<code class="language-plaintext highlighter-rouge">for</code>循环语句中想要跳出循环，需要使用<code class="language-plaintext highlighter-rouge">break</code>、<code class="language-plaintext highlighter-rouge">continue</code>，<code class="language-plaintext highlighter-rouge">break</code>是结束当前的<code class="language-plaintext highlighter-rouge">for</code>语句，<code class="language-plaintext highlighter-rouge">continue</code>是跳过这一轮循环</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#for语句
+</span><span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">序列</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="c1">#for else语句
+</span><span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">序列</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"EOF"</span><span class="p">)</span>
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">for else</code>语句中，当所有序列遍历完成后会执行<code class="language-plaintext highlighter-rouge">else</code>语句，如果在迭代的过程中<code class="language-plaintext highlighter-rouge">break</code>语句跳出，则不执行<code class="language-plaintext highlighter-rouge">else</code>语句</p>
+
+<h4 id="示例1">示例1</h4>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s">"|"</span><span class="p">)</span>
+
+<span class="c1">#输出
+</span><span class="mi">1</span><span class="o">|</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span><span class="o">|</span><span class="mi">4</span><span class="o">|</span><span class="mi">5</span><span class="o">|</span><span class="mi">6</span><span class="o">|</span>
+</code></pre></div></div>
+
+<h4 id="示例2">示例2</h4>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">:</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">v</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">):</span> <span class="k">break</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s">"|"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"EOF"</span><span class="p">)</span>
+
+<span class="c1">#输出
+</span><span class="mi">1</span><span class="o">|</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span><span class="o">|</span>
+</code></pre></div></div>
+
+<h1 id="3range函数">3.range函数</h1>
+
+<p>python中<code class="language-plaintext highlighter-rouge">for</code>语句用来变量序列，当我们需要遍历一个数字序列，在python中就可以用<code class="language-plaintext highlighter-rouge">range()函数</code>,它生成算术级数:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s">"|"</span><span class="p">)</span>
+
+<span class="c1"># 输出
+</span><span class="mi">0</span><span class="o">|</span><span class="mi">1</span><span class="o">|</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span><span class="o">|</span><span class="mi">4</span><span class="o">|</span><span class="mi">5</span><span class="o">|</span><span class="mi">6</span><span class="o">|</span><span class="mi">7</span><span class="o">|</span><span class="mi">8</span><span class="o">|</span><span class="mi">9</span><span class="o">|</span>
+</code></pre></div></div>
+
+<h4 id="求100以内的和">求100以内的和</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">101</span><span class="p">):</span>
+    <span class="nb">sum</span> <span class="o">+=</span> <span class="n">v</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"0-100之间的和："</span><span class="p">,</span><span class="nb">sum</span><span class="p">)</span>
+
+<span class="c1"># 输出
+</span><span class="mi">0</span><span class="o">-</span><span class="mi">100</span><span class="n">之间的和</span><span class="err">：</span><span class="mi">5050</span>
+</code></pre></div></div>
+<p>ange也可以以另一个数字开头，或者以指定的幅度增加（甚至是负数；有时这也被叫做 ‘步进’）</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+<span class="c1"># 输出
+</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span>
+
+<span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+<span class="c1"># 输出
+</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">9</span>
+</code></pre></div></div>
+
+<p>要以序列的索引来迭代，您可以将 range() 和 len() 组合如下:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="s">'Mary'</span><span class="p">,</span> <span class="s">'had'</span><span class="p">,</span> <span class="s">'a'</span><span class="p">,</span> <span class="s">'little'</span><span class="p">,</span> <span class="s">'lamb'</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="c1">#输出
+</span><span class="mi">0</span> <span class="n">Mary</span>
+<span class="mi">1</span> <span class="n">had</span>
+<span class="mi">2</span> <span class="n">a</span>
+<span class="mi">3</span> <span class="n">little</span>
+<span class="mi">4</span> <span class="n">lamb</span>
+</code></pre></div></div>
+
+<p>如果你只打印 range，会出现奇怪的结果:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>range() 所返回的对象在许多方面表现得像一个列表，但实际上却并不是。此对象会在你迭代它时基于所希望的序列返回连续的项，但它没有真正生成列表，这样就能节省空间。</p>
+
+<p>我们说这样的对象是 可迭代的 ，也就是说，适合作为函数和结构体的参数，这些函数和结构体期望在迭代结束之前可以从中获取连续的元素。我们已经看到 for 语句就是这样一个迭代器。函数 list() 是另外一个；它从可迭代对象中创建列表。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+</code></pre></div></div>
+:ET

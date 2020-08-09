@@ -1,0 +1,493 @@
+I"}<p>在小菜初学<code class="language-plaintext highlighter-rouge">scrapy</code>时，从google上发现了几篇非常不错的文章，未经博主同意擅自将博主的文章收藏，主要怕日后看时，找不到此文章。小菜在这里向博主致敬，希望看到这篇帖子的小伙伴能够阅读原贴。</p>
+
+<ul>
+  <li><a href="http://kaito-kidd.com/2016/11/01/scrapy-code-analyze-architecture/" title="http://kaito-kidd.com/2016/11/01/scrapy-code-analyze-architecture/">Kaito 博主</a></li>
+</ul>
+
+<p>在上篇文章中：<a href="http://kaito-kidd.com/2016/11/01/scrapy-code-analyze-architecture/" title="http://kaito-kidd.com/2016/11/01/scrapy-code-analyze-architecture/">Scrapy源码分析（一）架构概览</a>，主要从整体介绍了Scrapy架构和数据流转，这篇文章从运行开始来分析，来看一下Scrapy是如何运行起来的。</p>
+
+<h1 id="1scrapy命令">1.scrapy命令</h1>
+
+<p>当用scrapy写好一个爬虫后，使用<code class="language-plaintext highlighter-rouge">scrapy crawl &lt;spider_name&gt;</code>命令就可以运行这个爬虫，那么这个过程中到底发生了什么？</p>
+
+<p>scrapy命令从何而来？</p>
+
+<p>实际上，当你成功安装scrapy后，使用如下命令，就能找到这个命令：</p>
+
+<pre><code class="language-txt">$ which scrapy
+/usr/local/bin/scrapy
+</code></pre>
+
+<p>使用<code class="language-plaintext highlighter-rouge">vim</code>或其他编辑器打开它：</p>
+
+<pre><code class="language-txt">$ vim /usr/local/bin/scrapy
+</code></pre>
+
+<p>其实它就是一个python脚本，而且代码非常少</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/python
+# -*- coding: utf-8 -*-
+</span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">scrapy.cmdline</span> <span class="kn">import</span> <span class="n">execute</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="s">r'(-script\.pyw|\.exe)?$'</span><span class="p">,</span> <span class="s">''</span><span class="p">,</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">sys</span><span class="p">.</span><span class="nb">exit</span><span class="p">(</span><span class="n">execute</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>安装scrapy后，为什么入口点是这里呢？</p>
+
+<p>原因是在scrapy的安装文件<code class="language-plaintext highlighter-rouge">setup.py</code>中，声明了程序的入口处：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">join</span>
+<span class="kn">from</span> <span class="nn">setuptools</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">find_packages</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s">'scrapy/VERSION'</span><span class="p">),</span> <span class="s">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">version</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">read</span><span class="p">().</span><span class="n">decode</span><span class="p">(</span><span class="s">'ascii'</span><span class="p">).</span><span class="n">strip</span><span class="p">()</span>
+<span class="n">setup</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s">'Scrapy'</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
+    <span class="n">url</span><span class="o">=</span><span class="s">'http://scrapy.org'</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s">'A high-level Web Crawling and Screen Scraping framework'</span><span class="p">,</span>
+    <span class="n">long_description</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s">'README.rst'</span><span class="p">).</span><span class="n">read</span><span class="p">(),</span>
+    <span class="n">author</span><span class="o">=</span><span class="s">'Scrapy developers'</span><span class="p">,</span>
+    <span class="n">maintainer</span><span class="o">=</span><span class="s">'Pablo Hoffman'</span><span class="p">,</span>
+    <span class="n">maintainer_email</span><span class="o">=</span><span class="s">'pablo@pablohoffman.com'</span><span class="p">,</span>
+    <span class="n">license</span><span class="o">=</span><span class="s">'BSD'</span><span class="p">,</span>
+    <span class="n">packages</span><span class="o">=</span><span class="n">find_packages</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">(</span><span class="s">'tests'</span><span class="p">,</span> <span class="s">'tests.*'</span><span class="p">)),</span>
+    <span class="n">include_package_data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">zip_safe</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+    <span class="n">entry_points</span><span class="o">=</span><span class="p">{</span>
+        <span class="s">'console_scripts'</span><span class="p">:</span> <span class="p">[</span><span class="s">'scrapy = scrapy.cmdline:execute'</span><span class="p">]</span>
+    <span class="p">},</span>
+    <span class="n">classifiers</span><span class="o">=</span><span class="p">[</span>
+        <span class="s">'Framework :: Scrapy'</span><span class="p">,</span>
+        <span class="s">'Development Status :: 5 - Production/Stable'</span><span class="p">,</span>
+        <span class="s">'Environment :: Console'</span><span class="p">,</span>
+        <span class="s">'Intended Audience :: Developers'</span><span class="p">,</span>
+        <span class="s">'License :: OSI Approved :: BSD License'</span><span class="p">,</span>
+        <span class="s">'Operating System :: OS Independent'</span><span class="p">,</span>
+        <span class="s">'Programming Language :: Python'</span><span class="p">,</span>
+        <span class="s">'Programming Language :: Python :: 2'</span><span class="p">,</span>
+        <span class="s">'Programming Language :: Python :: 2.7'</span><span class="p">,</span>
+        <span class="s">'Topic :: Internet :: WWW/HTTP'</span><span class="p">,</span>
+        <span class="s">'Topic :: Software Development :: Libraries :: Application Frameworks'</span><span class="p">,</span>
+        <span class="s">'Topic :: Software Development :: Libraries :: Python Modules'</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="n">install_requires</span><span class="o">=</span><span class="p">[</span>
+        <span class="s">'Twisted&gt;=10.0.0'</span><span class="p">,</span>
+        <span class="s">'w3lib&gt;=1.8.0'</span><span class="p">,</span>
+        <span class="s">'queuelib'</span><span class="p">,</span>
+        <span class="s">'lxml'</span><span class="p">,</span>
+        <span class="s">'pyOpenSSL'</span><span class="p">,</span>
+        <span class="s">'cssselect&gt;=0.9'</span><span class="p">,</span>
+        <span class="s">'six&gt;=1.5.2'</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">entry_points</code>指明了入口是<code class="language-plaintext highlighter-rouge">cmdline.py</code>的<code class="language-plaintext highlighter-rouge">execute</code>方法，在安装过程中，setuptools这个包管理工具，就会把上述那一段代码生成放在可执行路径下。</p>
+
+<p>这里也有必要说一下，如何用python编写一个可执行文件，其实非常简单，只需要以下几步即可完成：</p>
+<ul>
+  <li>编写一个带有<code class="language-plaintext highlighter-rouge">main</code>方法的python模块（首行必须注明python执行路径）</li>
+  <li>去掉<code class="language-plaintext highlighter-rouge">.py</code>后缀名</li>
+  <li>修改权限为可执行：<code class="language-plaintext highlighter-rouge">chmod +x</code>脚本</li>
+</ul>
+
+<p>这样，你就可以直接使用文件名执行此脚本了，而不用通过<code class="language-plaintext highlighter-rouge">python &lt;file.py&gt;</code>的方式去执行，是不是很简单？</p>
+
+<h1 id="2入口">2.入口</h1>
+
+<p>既然现在已经知道了scrapy的入口是<code class="language-plaintext highlighter-rouge">scrapy/cmdline.py</code>的execute方法，我们来看一下这个方法。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">argv</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">argv</span> <span class="o">=</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span>
+    <span class="c1"># --- 兼容之前scrapy.conf.settings的配置 ---
+</span>    <span class="k">if</span> <span class="n">settings</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="s">'scrapy.conf'</span> <span class="ow">in</span> <span class="n">sys</span><span class="p">.</span><span class="n">modules</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">scrapy</span> <span class="kn">import</span> <span class="n">conf</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="s">'settings'</span><span class="p">):</span>
+            <span class="n">settings</span> <span class="o">=</span> <span class="n">conf</span><span class="p">.</span><span class="n">settings</span>
+    <span class="c1"># ------------------------------------------------------------------
+</span>	<span class="c1"># 初始化环境、获取项目配置参数，返回settings对象
+</span>    <span class="k">if</span> <span class="n">settings</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="n">get_project_settings</span><span class="p">()</span>
+    <span class="c1"># 校验弃用的配置项
+</span>    <span class="n">check_deprecated_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+    <span class="c1"># --- 兼容之前scrapy.conf.settings的配置 ---
+</span>    <span class="kn">import</span> <span class="nn">warnings</span>
+    <span class="kn">from</span> <span class="nn">scrapy.exceptions</span> <span class="kn">import</span> <span class="n">ScrapyDeprecationWarning</span>
+    <span class="k">with</span> <span class="n">warnings</span><span class="p">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="p">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s">"ignore"</span><span class="p">,</span> <span class="n">ScrapyDeprecationWarning</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">scrapy</span> <span class="kn">import</span> <span class="n">conf</span>
+        <span class="n">conf</span><span class="p">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">settings</span>
+    <span class="c1"># ------------------------------------------------------------------
+</span>    <span class="c1"># 执行环境是否在项目中，主要检查scrapy.cfg配置文件是否存在
+</span>    <span class="n">inproject</span> <span class="o">=</span> <span class="n">inside_project</span><span class="p">()</span>
+    <span class="c1"># 读取commands文件夹，把所有的命令类转换为{cmd_name: cmd_instance}的字典
+</span>    <span class="n">cmds</span> <span class="o">=</span> <span class="n">_get_commands_dict</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">inproject</span><span class="p">)</span>
+    <span class="c1"># 从命令行解析出执行的是哪个命令
+</span>    <span class="n">cmdname</span> <span class="o">=</span> <span class="n">_pop_command_name</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">optparse</span><span class="p">.</span><span class="n">OptionParser</span><span class="p">(</span><span class="n">formatter</span><span class="o">=</span><span class="n">optparse</span><span class="p">.</span><span class="n">TitledHelpFormatter</span><span class="p">(),</span> \
+        <span class="n">conflict_handler</span><span class="o">=</span><span class="s">'resolve'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cmdname</span><span class="p">:</span>
+        <span class="n">_print_commands</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">inproject</span><span class="p">)</span>
+        <span class="n">sys</span><span class="p">.</span><span class="nb">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">cmdname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cmds</span><span class="p">:</span>
+        <span class="n">_print_unknown_command</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">cmdname</span><span class="p">,</span> <span class="n">inproject</span><span class="p">)</span>
+        <span class="n">sys</span><span class="p">.</span><span class="nb">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># 根据命令名称找到对应的命令实例
+</span>    <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmds</span><span class="p">[</span><span class="n">cmdname</span><span class="p">]</span>
+    <span class="n">parser</span><span class="p">.</span><span class="n">usage</span> <span class="o">=</span> <span class="s">"scrapy %s %s"</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmdname</span><span class="p">,</span> <span class="n">cmd</span><span class="p">.</span><span class="n">syntax</span><span class="p">())</span>
+    <span class="n">parser</span><span class="p">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">.</span><span class="n">long_desc</span><span class="p">()</span>
+    <span class="c1"># 设置项目配置和级别为command
+</span>    <span class="n">settings</span><span class="p">.</span><span class="n">setdict</span><span class="p">(</span><span class="n">cmd</span><span class="p">.</span><span class="n">default_settings</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="s">'command'</span><span class="p">)</span>
+    <span class="n">cmd</span><span class="p">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">settings</span>
+    <span class="c1"># 添加解析规则
+</span>    <span class="n">cmd</span><span class="p">.</span><span class="n">add_options</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+    <span class="c1"># 解析命令参数，并交由Scrapy命令实例处理
+</span>    <span class="n">opts</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="p">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">_run_print_help</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">cmd</span><span class="p">.</span><span class="n">process_options</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+    <span class="c1"># 初始化CrawlerProcess实例，并给命令实例添加crawler_process属性
+</span>    <span class="n">cmd</span><span class="p">.</span><span class="n">crawler_process</span> <span class="o">=</span> <span class="n">CrawlerProcess</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+    <span class="c1"># 执行命令实例的run方法
+</span>    <span class="n">_run_print_help</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">_run_command</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+    <span class="n">sys</span><span class="p">.</span><span class="nb">exit</span><span class="p">(</span><span class="n">cmd</span><span class="p">.</span><span class="n">exitcode</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>主要的运行流程已经加好注释，这里我总结出了每个流程执行过程：</p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_26.png" alt="ssl" /></p>
+
+<h1 id="3流程解析">3.流程解析</h1>
+
+<h4 id="初始化项目配置">初始化项目配置</h4>
+
+<p>这个流程比较简单，主要是根据环境变量和<code class="language-plaintext highlighter-rouge">scrapy.cfg</code>初始化环境，最终生成一个Settings实例，来看代码<code class="language-plaintext highlighter-rouge">get_project_settings</code>方法：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">get_project_settings</span><span class="p">():</span>
+    <span class="c1"># 环境变量中是否有SCRAPY_SETTINGS_MODULE配置
+</span>    <span class="k">if</span> <span class="n">ENVVAR</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'SCRAPY_PROJECT'</span><span class="p">,</span> <span class="s">'default'</span><span class="p">)</span>
+        <span class="c1"># 初始化环境,找到用户配置文件settings.py,设置到环境变量SCRAPY_SETTINGS_MODULE中
+</span>        <span class="n">init_env</span><span class="p">(</span><span class="n">project</span><span class="p">)</span>
+    <span class="c1"># 加载默认配置文件default_settings.py，生成settings实例
+</span>    <span class="n">settings</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">()</span>
+    <span class="c1"># 取得用户配置文件
+</span>    <span class="n">settings_module_path</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">ENVVAR</span><span class="p">)</span>
+    <span class="c1"># 更新配置，用户配置覆盖默认配置
+</span>    <span class="k">if</span> <span class="n">settings_module_path</span><span class="p">:</span>
+        <span class="n">settings</span><span class="p">.</span><span class="n">setmodule</span><span class="p">(</span><span class="n">settings_module_path</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="s">'project'</span><span class="p">)</span>
+	<span class="c1"># 如果环境变量中有其他scrapy相关配置则覆盖
+</span>    <span class="n">pickled_settings</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"SCRAPY_PICKLED_SETTINGS_TO_OVERRIDE"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pickled_settings</span><span class="p">:</span>
+        <span class="n">settings</span><span class="p">.</span><span class="n">setdict</span><span class="p">(</span><span class="n">pickle</span><span class="p">.</span><span class="n">loads</span><span class="p">(</span><span class="n">pickled_settings</span><span class="p">),</span> <span class="n">priority</span><span class="o">=</span><span class="s">'project'</span><span class="p">)</span>
+    <span class="n">env_overrides</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">[</span><span class="mi">7</span><span class="p">:]:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
+                     <span class="n">k</span><span class="p">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">'SCRAPY_'</span><span class="p">)}</span>
+    <span class="k">if</span> <span class="n">env_overrides</span><span class="p">:</span>
+        <span class="n">settings</span><span class="p">.</span><span class="n">setdict</span><span class="p">(</span><span class="n">env_overrides</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="s">'project'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">settings</span>
+</code></pre></div></div>
+
+<p>这个过程中进行了Settings配置初始化：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Settings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="s">'project'</span><span class="p">):</span>
+        <span class="c1"># 调用父类构造初始化
+</span>        <span class="nb">super</span><span class="p">(</span><span class="n">Settings</span><span class="p">,</span> <span class="bp">self</span><span class="p">).</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="c1"># 把default_settings.py的所有配置set到settings实例中
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">setmodule</span><span class="p">(</span><span class="n">default_settings</span><span class="p">,</span> <span class="s">'default'</span><span class="p">)</span>
+        <span class="c1"># 把attributes属性也set到settings实例中
+</span>        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">six</span><span class="p">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="bp">self</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">BaseSettings</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s">'default'</span><span class="p">),</span> <span class="s">'default'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">priority</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>程序加载默认配置文件<code class="language-plaintext highlighter-rouge">default_settings.py</code>中的所有配置项设置到Settings中，且这个配置是有优先级的。</p>
+
+<p>这个默认配置文件<code class="language-plaintext highlighter-rouge">default_settings.py</code>是非常重要的，个人认为还是有必要看一下里面的内容，这里包含了所有默认的配置，例如调度器类、爬虫中间件类、下载器中间件类、下载处理器类等等。</p>
+
+<p>在这里就能隐约发现，scrapy的架构是非常低耦合的，所有组件都是可替换的，什么是可替换呢？</p>
+
+<p>例如，你觉得默认的调度器功能不够用，那么你就可以按照它定义的接口标准，自己实现一个调度器，然后在自己的配置文件中，注册自己写的调度器模块，那么scrapy的运行时就会用上你新写的调度器模块了！</p>
+
+<p>只要在默认配置文件中配置的模块，都是可替换的。</p>
+
+<h4 id="检查环境是否在项目中">检查环境是否在项目中</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">inside_project</span><span class="p">():</span>
+    <span class="c1"># 检查此环境变量是否存在(上面已设置)
+</span>    <span class="n">scrapy_module</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'SCRAPY_SETTINGS_MODULE'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scrapy_module</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">import_module</span><span class="p">(</span><span class="n">scrapy_module</span><span class="p">)</span>
+        <span class="k">except</span> <span class="nb">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="p">.</span><span class="n">warn</span><span class="p">(</span><span class="s">"Cannot import scrapy settings module %s: %s"</span> <span class="o">%</span> <span class="p">(</span><span class="n">scrapy_module</span><span class="p">,</span> <span class="n">exc</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+	<span class="c1"># 如果环境变量没有，就近查找scrapy.cfg，找得到就认为是在项目环境中
+</span>    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">closest_scrapy_cfg</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>scrapy命令有的是依赖项目运行的，有的命令则是全局的，不依赖项目的。这里主要通过就近查找<code class="language-plaintext highlighter-rouge">scrapy.cfg</code>文件来确定是否在项目环境中。</p>
+
+<h4 id="获取可用命令并组装成名称与实例的字典">获取可用命令并组装成名称与实例的字典</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">_get_commands_dict</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">inproject</span><span class="p">):</span>
+    <span class="c1"># 导入commands文件夹下的所有模块，生成{cmd_name: cmd}的字典集合
+</span>    <span class="n">cmds</span> <span class="o">=</span> <span class="n">_get_commands_from_module</span><span class="p">(</span><span class="s">'scrapy.commands'</span><span class="p">,</span> <span class="n">inproject</span><span class="p">)</span>
+    <span class="n">cmds</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">_get_commands_from_entry_points</span><span class="p">(</span><span class="n">inproject</span><span class="p">))</span>
+    <span class="c1"># 如果用户自定义配置文件中有COMMANDS_MODULE配置，则加载自定义的命令类
+</span>    <span class="n">cmds_module</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s">'COMMANDS_MODULE'</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">cmds_module</span><span class="p">:</span>
+        <span class="n">cmds</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">_get_commands_from_module</span><span class="p">(</span><span class="n">cmds_module</span><span class="p">,</span> <span class="n">inproject</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">cmds</span>
+<span class="k">def</span> <span class="nf">_get_commands_from_module</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">inproject</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># 找到这个模块下所有的命令类(ScrapyCommand子类)
+</span>    <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">_iter_command_classes</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">inproject</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">cmd</span><span class="p">.</span><span class="n">requires_project</span><span class="p">:</span>
+            <span class="c1"># 生成{cmd_name: cmd}字典
+</span>            <span class="n">cmdname</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">.</span><span class="n">__module__</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">'.'</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">cmdname</span><span class="p">]</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">d</span>
+<span class="k">def</span> <span class="nf">_iter_command_classes</span><span class="p">(</span><span class="n">module_name</span><span class="p">):</span>
+    <span class="c1"># 迭代这个包下的所有模块，找到ScrapyCommand的子类
+</span>    <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">walk_modules</span><span class="p">(</span><span class="n">module_name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">module</span><span class="p">).</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">inspect</span><span class="p">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ScrapyCommand</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="n">obj</span><span class="p">.</span><span class="n">__module__</span> <span class="o">==</span> <span class="n">module</span><span class="p">.</span><span class="n">__name__</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">obj</span>
+</code></pre></div></div>
+
+<p>这个过程主要是，导入commands文件夹下的所有模块，生成<code class="language-plaintext highlighter-rouge">{cmd_name: cmd}</code>字典集合，如果用户在配置文件中配置了自定义的命令类，也追加进去。也就是说，自己也可以编写<code class="language-plaintext highlighter-rouge">自己的命令类</code>，然后追加到配置文件中，之后就可以使用自己自定义的命令了。</p>
+
+<h4 id="解析执行的命令并找到对应的命令实例">解析执行的命令并找到对应的命令实例</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">_pop_command_name</span><span class="p">(</span><span class="n">argv</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">arg</span><span class="p">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">'-'</span><span class="p">):</span>
+            <span class="k">del</span> <span class="n">argv</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">arg</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div></div>
+<p>这个过程就是解析命令行，例如<code class="language-plaintext highlighter-rouge">scrapy crawl &lt;spider_name&gt;</code>，解析出<code class="language-plaintext highlighter-rouge">crawl</code>，通过上面生成好的命令字典集合，就能找到<code class="language-plaintext highlighter-rouge">commands</code>模块下的<code class="language-plaintext highlighter-rouge">crawl.py</code>下的Command类的实例。</p>
+
+<h4 id="scrapy命令实例解析命令行参数">scrapy命令实例解析命令行参数</h4>
+
+<p>找到对应的命令实例后，调用<code class="language-plaintext highlighter-rouge">cmd.process_options</code>方法：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">process_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">opts</span><span class="p">):</span>
+    <span class="c1"># 首先调用了父类的process_options,解析统一固定的参数
+</span>    <span class="n">ScrapyCommand</span><span class="p">.</span><span class="n">process_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">opts</span><span class="p">.</span><span class="n">spargs</span> <span class="o">=</span> <span class="n">arglist_to_dict</span><span class="p">(</span><span class="n">opts</span><span class="p">.</span><span class="n">spargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">ValueError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s">"Invalid -a value, use -a NAME=VALUE"</span><span class="p">,</span> <span class="n">print_help</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">opts</span><span class="p">.</span><span class="n">output</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">opts</span><span class="p">.</span><span class="n">output</span> <span class="o">==</span> <span class="s">'-'</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="s">'FEED_URI'</span><span class="p">,</span> <span class="s">'stdout:'</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="s">'cmdline'</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="s">'FEED_URI'</span><span class="p">,</span> <span class="n">opts</span><span class="p">.</span><span class="n">output</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="s">'cmdline'</span><span class="p">)</span>
+        <span class="n">feed_exporters</span> <span class="o">=</span> <span class="n">without_none_values</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">.</span><span class="n">getwithbase</span><span class="p">(</span><span class="s">'FEED_EXPORTERS'</span><span class="p">))</span>
+        <span class="n">valid_output_formats</span> <span class="o">=</span> <span class="n">feed_exporters</span><span class="p">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">opts</span><span class="p">.</span><span class="n">output_format</span><span class="p">:</span>
+            <span class="n">opts</span><span class="p">.</span><span class="n">output_format</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">opts</span><span class="p">.</span><span class="n">output</span><span class="p">)[</span><span class="mi">1</span><span class="p">].</span><span class="n">replace</span><span class="p">(</span><span class="s">"."</span><span class="p">,</span> <span class="s">""</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">opts</span><span class="p">.</span><span class="n">output_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_output_formats</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s">"Unrecognized output format '%s', set one"</span>
+                             <span class="s">" using the '-t' switch or as a file extension"</span>
+                             <span class="s">" from the supported list %s"</span> <span class="o">%</span> <span class="p">(</span><span class="n">opts</span><span class="p">.</span><span class="n">output_format</span><span class="p">,</span>
+                                                              		<span class="nb">tuple</span><span class="p">(</span><span class="n">valid_output_formats</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="s">'FEED_FORMAT'</span><span class="p">,</span> <span class="n">opts</span><span class="p">.</span><span class="n">output_format</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="s">'cmdline'</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>这个过程就是解析命令行其余的参数，<code class="language-plaintext highlighter-rouge">固定参数</code>解析交给父类处理，例如输出位置等。其余不同的参数由不同的命令类解析。</p>
+
+<h4 id="初始化crawlerprocess">初始化CrawlerProcess</h4>
+
+<p>最后初始化<code class="language-plaintext highlighter-rouge">CrawlerProcess实例</code>，然后运行对应命令实例的<code class="language-plaintext highlighter-rouge">run</code>方法。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cmd</span><span class="p">.</span><span class="n">crawler_process</span> <span class="o">=</span> <span class="n">CrawlerProcess</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+<span class="n">_run_print_help</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">_run_command</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>如果运行命令是<code class="language-plaintext highlighter-rouge">scrapy crawl &lt;spider_name&gt;</code>，则运行的就是<code class="language-plaintext highlighter-rouge">commands/crawl.py的run：</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">opts</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">UsageError</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s">"running 'scrapy crawl' with more than one spider is no longer supported"</span><span class="p">)</span>
+    <span class="n">spname</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">crawler_process</span><span class="p">.</span><span class="n">crawl</span><span class="p">(</span><span class="n">spname</span><span class="p">,</span> <span class="o">**</span><span class="n">opts</span><span class="p">.</span><span class="n">spargs</span><span class="p">)</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">crawler_process</span><span class="p">.</span><span class="n">start</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>run方法中调用了<code class="language-plaintext highlighter-rouge">CrawlerProcess</code>实例的<code class="language-plaintext highlighter-rouge">crawl</code>和<code class="language-plaintext highlighter-rouge">start</code>，就这样整个爬虫程序就会运行起来了。</p>
+
+<p>先来看<code class="language-plaintext highlighter-rouge">CrawlerProcess</code>初始化：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">CrawlerProcess</span><span class="p">(</span><span class="n">CrawlerRunner</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c1"># 调用父类初始化
+</span>        <span class="nb">super</span><span class="p">(</span><span class="n">CrawlerProcess</span><span class="p">,</span> <span class="bp">self</span><span class="p">).</span><span class="n">__init__</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+        <span class="c1"># 信号和log初始化
+</span>        <span class="n">install_shutdown_handlers</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">_signal_shutdown</span><span class="p">)</span>
+        <span class="n">configure_logging</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="n">log_scrapy_info</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>构造方法中调用了父类<code class="language-plaintext highlighter-rouge">CrawlerRunner</code>的构造：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">class</span> <span class="nc">CrawlerRunner</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="n">settings</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">settings</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">settings</span>
+        <span class="c1"># 获取爬虫加载器
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">spider_loader</span> <span class="o">=</span> <span class="n">_get_spider_loader</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_crawlers</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_active</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>初始化时，调用了<code class="language-plaintext highlighter-rouge">_get_spider_loader方法</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">_get_spider_loader</span><span class="p">(</span><span class="n">settings</span><span class="p">):</span>
+    <span class="c1"># 读取配置文件中的SPIDER_MANAGER_CLASS配置项
+</span>    <span class="k">if</span> <span class="n">settings</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'SPIDER_MANAGER_CLASS'</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="p">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s">'SPIDER_MANAGER_CLASS option is deprecated. '</span>
+            <span class="s">'Please use SPIDER_LOADER_CLASS.'</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="n">ScrapyDeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span>
+        <span class="p">)</span>
+    <span class="n">cls_path</span> <span class="o">=</span> <span class="n">settings</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'SPIDER_MANAGER_CLASS'</span><span class="p">,</span>
+                            <span class="n">settings</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'SPIDER_LOADER_CLASS'</span><span class="p">))</span>
+    <span class="n">loader_cls</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">cls_path</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">verifyClass</span><span class="p">(</span><span class="n">ISpiderLoader</span><span class="p">,</span> <span class="n">loader_cls</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">DoesNotImplement</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="p">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s">'SPIDER_LOADER_CLASS (previously named SPIDER_MANAGER_CLASS) does '</span>
+            <span class="s">'not fully implement scrapy.interfaces.ISpiderLoader interface. '</span>
+            <span class="s">'Please add all missing methods to avoid unexpected runtime errors.'</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="n">ScrapyDeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">loader_cls</span><span class="p">.</span><span class="n">from_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">frozencopy</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>默认配置文件中的<code class="language-plaintext highlighter-rouge">spider_loader</code>配置是<code class="language-plaintext highlighter-rouge">spiderloader.SpiderLoader</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">implementer</span><span class="p">(</span><span class="n">ISpiderLoader</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">SpiderLoader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="c1"># 配置文件获取存放爬虫脚本的路径
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">spider_modules</span> <span class="o">=</span> <span class="n">settings</span><span class="p">.</span><span class="n">getlist</span><span class="p">(</span><span class="s">'SPIDER_MODULES'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_spiders</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># 加载所有爬虫
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">_load_all_spiders</span><span class="p">()</span>
+        
+    <span class="k">def</span> <span class="nf">_load_spiders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
+        <span class="c1"># 组装成{spider_name: spider_cls}的字典
+</span>        <span class="k">for</span> <span class="n">spcls</span> <span class="ow">in</span> <span class="n">iter_spider_classes</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">_spiders</span><span class="p">[</span><span class="n">spcls</span><span class="p">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">spcls</span>
+    <span class="k">def</span> <span class="nf">_load_all_spiders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">spider_modules</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">walk_modules</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+                <span class="bp">self</span><span class="p">.</span><span class="n">_load_spiders</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>爬虫加载器会加载所有的爬虫脚本，最后生成一个<code class="language-plaintext highlighter-rouge">{spider_name: spider_cls}</code>的字典。</p>
+
+<h4 id="执行crawl和start方法">执行crawl和start方法</h4>
+
+<p><code class="language-plaintext highlighter-rouge">CrawlerProcess</code>初始化完之后，调用<code class="language-plaintext highlighter-rouge">crawl</code>方法：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">crawl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crawler_or_spidercls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># 创建crawler
+</span>    <span class="n">crawler</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">create_crawler</span><span class="p">(</span><span class="n">crawler_or_spidercls</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_crawl</span><span class="p">(</span><span class="n">crawler</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_crawl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crawler</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">crawlers</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">crawler</span><span class="p">)</span>
+    <span class="c1"># 调用Crawler的crawl方法
+</span>    <span class="n">d</span> <span class="o">=</span> <span class="n">crawler</span><span class="p">.</span><span class="n">crawl</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">_active</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_done</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">crawlers</span><span class="p">.</span><span class="n">discard</span><span class="p">(</span><span class="n">crawler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_active</span><span class="p">.</span><span class="n">discard</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">d</span><span class="p">.</span><span class="n">addBoth</span><span class="p">(</span><span class="n">_done</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">create_crawler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crawler_or_spidercls</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">crawler_or_spidercls</span><span class="p">,</span> <span class="n">Crawler</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">crawler_or_spidercls</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_create_crawler</span><span class="p">(</span><span class="n">crawler_or_spidercls</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_create_crawler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spidercls</span><span class="p">):</span>
+    <span class="c1"># 如果是字符串,则从spider_loader中加载这个爬虫类
+</span>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spidercls</span><span class="p">,</span> <span class="n">six</span><span class="p">.</span><span class="n">string_types</span><span class="p">):</span>
+        <span class="n">spidercls</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">spider_loader</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="n">spidercls</span><span class="p">)</span>
+    <span class="c1"># 否则创建Crawler
+</span>    <span class="k">return</span> <span class="n">Crawler</span><span class="p">(</span><span class="n">spidercls</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>这个过程会创建<code class="language-plaintext highlighter-rouge">Cralwer</code>实例，然后调用它的crawl方法：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">defer</span><span class="p">.</span><span class="n">inlineCallbacks</span>
+<span class="k">def</span> <span class="nf">crawl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">.</span><span class="n">crawling</span><span class="p">,</span> <span class="s">"Crawling already taking place"</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">crawling</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># 到现在，才是实例化一个爬虫实例
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">spider</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_create_spider</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># 创建引擎
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">engine</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_create_engine</span><span class="p">()</span>
+        <span class="c1"># 调用爬虫类的start_requests方法
+</span>        <span class="n">start_requests</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">spider</span><span class="p">.</span><span class="n">start_requests</span><span class="p">())</span>
+        <span class="c1"># 执行引擎的open_spider，并传入爬虫实例和初始请求
+</span>        <span class="k">yield</span> <span class="bp">self</span><span class="p">.</span><span class="n">engine</span><span class="p">.</span><span class="n">open_spider</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">spider</span><span class="p">,</span> <span class="n">start_requests</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">defer</span><span class="p">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">engine</span><span class="p">.</span><span class="n">start</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">six</span><span class="p">.</span><span class="n">PY2</span><span class="p">:</span>
+            <span class="n">exc_info</span> <span class="o">=</span> <span class="n">sys</span><span class="p">.</span><span class="n">exc_info</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">crawling</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">engine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="p">.</span><span class="n">engine</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">six</span><span class="p">.</span><span class="n">PY2</span><span class="p">:</span>
+            <span class="n">six</span><span class="p">.</span><span class="n">reraise</span><span class="p">(</span><span class="o">*</span><span class="n">exc_info</span><span class="p">)</span>
+        <span class="k">raise</span>
+        
+<span class="k">def</span> <span class="nf">_create_spider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">spidercls</span><span class="p">.</span><span class="n">from_crawler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>最后调用<code class="language-plaintext highlighter-rouge">start</code>方法：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stop_after_crawl</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">stop_after_crawl</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">d</span><span class="p">.</span><span class="n">called</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">d</span><span class="p">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">_stop_reactor</span><span class="p">)</span>
+    <span class="n">reactor</span><span class="p">.</span><span class="n">installResolver</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">_get_dns_resolver</span><span class="p">())</span>
+    <span class="c1"># 配置reactor的池子大小(可修改REACTOR_THREADPOOL_MAXSIZE调整)
+</span>    <span class="n">tp</span> <span class="o">=</span> <span class="n">reactor</span><span class="p">.</span><span class="n">getThreadPool</span><span class="p">()</span>
+    <span class="n">tp</span><span class="p">.</span><span class="n">adjustPoolsize</span><span class="p">(</span><span class="n">maxthreads</span><span class="o">=</span><span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">.</span><span class="n">getint</span><span class="p">(</span><span class="s">'REACTOR_THREADPOOL_MAXSIZE'</span><span class="p">))</span>
+    <span class="n">reactor</span><span class="p">.</span><span class="n">addSystemEventTrigger</span><span class="p">(</span><span class="s">'before'</span><span class="p">,</span> <span class="s">'shutdown'</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">stop</span><span class="p">)</span>
+    <span class="c1"># 开始执行
+</span>    <span class="n">reactor</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">installSignalHandlers</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>reactor是个什么东西呢？它是Twisted模块的事件管理器，只要把需要执行的事件方法注册到reactor中，然后调用它的run方法，它就会帮你执行注册好的事件方法，如果遇到网络IO等待，它会自动帮你切换可执行的事件方法，非常高效。</p>
+
+<p>大家不用在意reactor是如何工作的，你可以把它想象成一个线程池，只是采用注册回调的方式来执行事件。</p>
+
+<p>到这里，爬虫的之后调度逻辑就交由引擎ExecuteEngine处理了。</p>
+
+<p>在每次执行scrapy命令时，主要经过环境、配置初始化，加载命令类和爬虫模块，最终实例化执行引擎，交给引擎调度处理的流程，下篇文章会讲解执行引擎是如何调度和管理各个组件工作的</p>
+
+:ET

@@ -1,0 +1,167 @@
+I"�C<p>抓取的主要目的是从非结构化源（通常是网页）中提取结构化数据。Scrapy Spider可以将提取的数据作为Python字典返回。Python字典虽然方便且熟悉，但缺乏结构：很容易在字段名称中输入错误或返回不一致的数据，尤其是在具有许多蜘蛛的大型项目中。</p>
+
+<p>为了定义常见的输出数据格式，Scrapy提供了Item类。item对象是用于收集抓取数据的简单容器。它们提供了类似于字典的API，具有方便的语法来声明其可用字段。</p>
+
+<h1 id="1声明item">1.声明Item</h1>
+
+<p>Item 使用简单的 class 定义语法以及 <code class="language-plaintext highlighter-rouge">Field</code> 对象来声明。例如:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">scrapy</span>
+
+<span class="k">class</span> <span class="nc">Product</span><span class="p">(</span><span class="n">scrapy</span><span class="p">.</span><span class="n">Item</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">scrapy</span><span class="p">.</span><span class="n">Field</span><span class="p">()</span>
+    <span class="n">price</span> <span class="o">=</span> <span class="n">scrapy</span><span class="p">.</span><span class="n">Field</span><span class="p">()</span>
+    <span class="n">stock</span> <span class="o">=</span> <span class="n">scrapy</span><span class="p">.</span><span class="n">Field</span><span class="p">()</span>
+    <span class="n">last_updated</span> <span class="o">=</span> <span class="n">scrapy</span><span class="p">.</span><span class="n">Field</span><span class="p">(</span><span class="n">serializer</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>熟悉 Django 的朋友一定会注意到 Scrapy Item 定义方式与 Django Models 很类似, 不过没有那么多不同的字段类型(Field type)，更为简单。</p>
+</blockquote>
+
+<h1 id="2item字段">2.Item字段</h1>
+
+<p><code class="language-plaintext highlighter-rouge">Field</code>对象指明了每个字段的元数据(metadata)。例如下面例子中<code class="language-plaintext highlighter-rouge">last_updated</code>中指明了该字段的序列化函数。</p>
+
+<p>您可以为每个字段指明任何类型的元数据。<code class="language-plaintext highlighter-rouge">Field</code>对象对接受的值没有任何限制。也正是因为这个原因，文档也无法提供所有可用的元数据的键(key)参考列表。<code class="language-plaintext highlighter-rouge">Field</code> 对象中保存的每个键可以由多个组件使用，并且只有这些组件知道这个键的存在。您可以根据自己的需求，定义使用其他的 Field 键。 设置 Field 对象的主要目的就是在一个地方定义好所有的元数据。一般来说，那些依赖某个字段的组件肯定使用了特定的键(key)。您必须查看组件相关的文档，查看其用了哪些元数据键(metadata key)。</p>
+
+<p>需要注意的是，用来声明<code class="language-plaintext highlighter-rouge">item</code>的<code class="language-plaintext highlighter-rouge">Field</code>对象并没有被赋值为<code class="language-plaintext highlighter-rouge">class</code>的属性。不过您可以通过 <code class="language-plaintext highlighter-rouge">Item.fields</code> 属性进行访问。</p>
+
+<h1 id="3item处理项目">3.Item处理项目</h1>
+
+<p>接下来以下边声明的 <code class="language-plaintext highlighter-rouge">Product item</code> 来演示一些 item 的操作。您会发现 API 和 dict API 非常相似。</p>
+
+<h4 id="创建-item">创建 item</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">product</span> <span class="o">=</span> <span class="n">Product</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">'Desktop PC'</span><span class="p">,</span> <span class="n">price</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">product</span>
+<span class="n">Product</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">'Desktop PC'</span><span class="p">,</span> <span class="n">price</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="获取字段的值">获取字段的值</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">product</span><span class="p">[</span><span class="s">'name'</span><span class="p">]</span>
+<span class="n">Desktop</span> <span class="n">PC</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">product</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'name'</span><span class="p">)</span>
+<span class="n">Desktop</span> <span class="n">PC</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">product</span><span class="p">[</span><span class="s">'price'</span><span class="p">]</span>
+<span class="mi">1000</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">product</span><span class="p">[</span><span class="s">'last_updated'</span><span class="p">]</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+    <span class="p">...</span>
+<span class="nb">KeyError</span><span class="p">:</span> <span class="s">'last_updated'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">product</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'last_updated'</span><span class="p">,</span> <span class="s">'not set'</span><span class="p">)</span>
+<span class="ow">not</span> <span class="nb">set</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">product</span><span class="p">[</span><span class="s">'lala'</span><span class="p">]</span> <span class="c1"># getting unknown field
+</span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+    <span class="p">...</span>
+<span class="nb">KeyError</span><span class="p">:</span> <span class="s">'lala'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">product</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'lala'</span><span class="p">,</span> <span class="s">'unknown field'</span><span class="p">)</span>
+<span class="s">'unknown field'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="s">'name'</span> <span class="ow">in</span> <span class="n">product</span>  <span class="c1"># is name field populated?
+</span><span class="bp">True</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="s">'last_updated'</span> <span class="ow">in</span> <span class="n">product</span>  <span class="c1"># is last_updated populated?
+</span><span class="bp">False</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="s">'last_updated'</span> <span class="ow">in</span> <span class="n">product</span><span class="p">.</span><span class="n">fields</span>  <span class="c1"># is last_updated a declared field?
+</span><span class="bp">True</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="s">'lala'</span> <span class="ow">in</span> <span class="n">product</span><span class="p">.</span><span class="n">fields</span>  <span class="c1"># is lala a declared field?
+</span><span class="bp">False</span>
+</code></pre></div></div>
+
+<h4 id="设置field值">设置field值</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">product</span><span class="p">[</span><span class="s">'last_updated'</span><span class="p">]</span> <span class="o">=</span> <span class="s">'today'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">product</span><span class="p">[</span><span class="s">'last_updated'</span><span class="p">]</span>
+<span class="n">today</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">product</span><span class="p">[</span><span class="s">'lala'</span><span class="p">]</span> <span class="o">=</span> <span class="s">'test'</span> <span class="c1"># setting unknown field
+</span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+    <span class="p">...</span>
+<span class="nb">KeyError</span><span class="p">:</span> <span class="s">'Product does not support field: lala'</span>
+</code></pre></div></div>
+
+<h4 id="获取所有获取到的值">获取所有获取到的值</h4>
+
+<p>您可以使用<code class="language-plaintext highlighter-rouge">dict API</code>来获取所有的值:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">product</span><span class="p">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="p">[</span><span class="s">'price'</span><span class="p">,</span> <span class="s">'name'</span><span class="p">]</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">product</span><span class="p">.</span><span class="n">items</span><span class="p">()</span>
+<span class="p">[(</span><span class="s">'price'</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span> <span class="p">(</span><span class="s">'name'</span><span class="p">,</span> <span class="s">'Desktop PC'</span><span class="p">)]</span>
+</code></pre></div></div>
+
+<h4 id="复制items">复制items</h4>
+
+<p>要复制<code class="language-plaintext highlighter-rouge">item</code>，您必须确定是要<code class="language-plaintext highlighter-rouge">浅拷贝</code>还是<code class="language-plaintext highlighter-rouge">深拷贝</code>。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#浅拷贝
+</span><span class="n">product2</span> <span class="o">=</span> <span class="n">product</span><span class="p">.</span><span class="n">copy</span><span class="p">()</span> <span class="ow">or</span> <span class="n">product2</span> <span class="o">=</span> <span class="n">Product</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
+
+<span class="c1">#深拷贝
+</span><span class="n">product2</span> <span class="o">=</span> <span class="n">product</span><span class="p">.</span><span class="n">deepcopy</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h1 id="4其他操作">4.其他操作</h1>
+
+<h4 id="item转化成dict">item转化成dict</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">dict</span><span class="p">(</span><span class="n">product</span><span class="p">)</span> <span class="c1"># create a dict from all populated values
+</span><span class="p">{</span><span class="s">'price'</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="s">'name'</span><span class="p">:</span> <span class="s">'Desktop PC'</span><span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="dict转化-item">dict转化 item</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">Product</span><span class="p">({</span><span class="s">'name'</span><span class="p">:</span> <span class="s">'Laptop PC'</span><span class="p">,</span> <span class="s">'price'</span><span class="p">:</span> <span class="mi">1500</span><span class="p">})</span>
+<span class="n">Product</span><span class="p">(</span><span class="n">price</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'Laptop PC'</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Product</span><span class="p">({</span><span class="s">'name'</span><span class="p">:</span> <span class="s">'Laptop PC'</span><span class="p">,</span> <span class="s">'lala'</span><span class="p">:</span> <span class="mi">1500</span><span class="p">})</span> <span class="c1"># warning: unknown field in dict
+</span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+    <span class="p">...</span>
+<span class="nb">KeyError</span><span class="p">:</span> <span class="s">'Product does not support field: lala'</span>
+</code></pre></div></div>
+
+<h1 id="5扩展item">5.扩展item</h1>
+
+<p>您可以通过继承原始的Item来扩展 item(添加更多的字段或者修改某些字段的元数据)。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DiscountedProduct</span><span class="p">(</span><span class="n">Product</span><span class="p">):</span>
+    <span class="n">discount_percent</span> <span class="o">=</span> <span class="n">scrapy</span><span class="p">.</span><span class="n">Field</span><span class="p">(</span><span class="n">serializer</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">discount_expiration_date</span> <span class="o">=</span> <span class="n">scrapy</span><span class="p">.</span><span class="n">Field</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>您也可以通过使用原字段的元数据，添加新的值或修改原来的值来扩展字段的元数据：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">SpecificProduct</span><span class="p">(</span><span class="n">Product</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">scrapy</span><span class="p">.</span><span class="n">Field</span><span class="p">(</span><span class="n">Product</span><span class="p">.</span><span class="n">fields</span><span class="p">[</span><span class="s">'name'</span><span class="p">],</span> <span class="n">serializer</span><span class="o">=</span><span class="n">my_serializer</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>这段代码在保留所有原来的元数据值的情况下添加(或者覆盖)了 <code class="language-plaintext highlighter-rouge">name</code>字段的 <code class="language-plaintext highlighter-rouge">serializer</code>。</p>
+
+<h1 id="6item对象">6.Item对象</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">scrapy</span><span class="p">.</span><span class="n">item</span><span class="p">.</span><span class="n">Item</span><span class="p">([</span><span class="n">arg</span><span class="p">])</span>
+</code></pre></div></div>
+<p>返回一个根据给定的参数可选初始化的<code class="language-plaintext highlighter-rouge">item</code>。</p>
+
+<p>Item复制了标准的 <code class="language-plaintext highlighter-rouge">dict API</code>。包括初始化函数也相同。Item 唯一额外添加的属性是：<code class="language-plaintext highlighter-rouge">fields</code></p>
+
+<p>一个包含了<code class="language-plaintext highlighter-rouge">item</code> 所有声明的字段的字典，而不仅仅是获取到的字段。该字典的 <code class="language-plaintext highlighter-rouge">key</code>是字段(field)的名字，值是Item声明中使用到的 <code class="language-plaintext highlighter-rouge">Field</code> 对象。</p>
+
+<h1 id="7field对象">7.Field对象</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">scrapy</span><span class="p">.</span><span class="n">item</span><span class="p">.</span><span class="n">Field</span><span class="p">([</span><span class="n">arg</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>Field 仅仅是内置的 <code class="language-plaintext highlighter-rouge">dict</code> 类的一个别名，并没有提供额外的方法或者属性。换句话说，<code class="language-plaintext highlighter-rouge">Field</code> 对象完完全全就是 Python 字典(dict)。被用来基于类属性<code class="language-plaintext highlighter-rouge">(class attribute)</code>的方法来支持 <code class="language-plaintext highlighter-rouge">item</code> 声明语法。</p>
+
+:ET

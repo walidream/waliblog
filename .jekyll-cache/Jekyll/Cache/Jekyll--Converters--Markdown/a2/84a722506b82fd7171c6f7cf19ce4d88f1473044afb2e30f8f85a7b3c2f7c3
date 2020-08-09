@@ -1,0 +1,126 @@
+I"s<p><code class="language-plaintext highlighter-rouge">分区表</code>在逻辑上为一个表，在物理上存储在多个文件中。</p>
+
+<h1 id="1hsah分区表">1.HSAH分区表</h1>
+
+<p>在使用分区表前，先检查先安装的mysql是否支持分区表</p>
+
+<pre><code class="language-mysql">mysql&gt; SHOW PLUGINS;
+</code></pre>
+<p>如果<code class="language-plaintext highlighter-rouge">partition</code>值为<code class="language-plaintext highlighter-rouge">ACTIVE</code>就表示当前mysql支持分区表</p>
+
+<p><img src="http://walidream.com:9999/blogImage/sql/sql_16.png" alt="ssl" /></p>
+
+<p>下面以<code class="language-plaintext highlighter-rouge">用户登录日志表</code>为例：</p>
+
+<pre><code class="language-mysql">CREATE TABLE customer_login_log(
+	customer_id INT(10) UNSIGNED NOT NULL COMMENT '用户登录ID',
+	login_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '用户登录时间',
+	login_ip INT(10) UNSIGNED NOT NULL COMMENT '登录IP',
+	login_type TINYINT(4) NOT NULL COMMENT '登录类型：0未成功 1成功'
+)ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT '用户登录日志表'
+PARTITION BY HASH(customer_id)
+	PARTITIONS 4;
+</code></pre>
+
+<p><code class="language-plaintext highlighter-rouge">分区表</code>和<code class="language-plaintext highlighter-rouge">非分区表</code>除了在建表语句上不同，在物理文件上也是不同的。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/sql/sql_17.png" alt="ssl" /></p>
+
+<h4 id="hash分区的特点">HASH分区的特点</h4>
+
+<p>根据MOD（分区键，分区数）的值把数据行存储到表的不同分区中，数据可以平均的分布在各个分区中。HASH分区的键值必须是一个INT类型的值，或是通过函数可以转为INT类型。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/sql/sql_18.png" alt="ssl" /></p>
+
+<p>第一个sql<code class="language-plaintext highlighter-rouge">分区键</code>是整型的，直接使用HASH函数进行建表。第二个sql由于使用<code class="language-plaintext highlighter-rouge">login_time</code>作为分区键，login_time不是整型，所以要用<code class="language-plaintext highlighter-rouge">UNIX_TIMESTAMP</code>函数将login_time转换成整型，然后在使用HASH函数建表。</p>
+
+<h4 id="将非整形转换整型函数">将非整形转换整型函数</h4>
+
+<p><img src="http://walidream.com:9999/blogImage/sql/sql_19.png" alt="ssl" /></p>
+
+<h1 id="2range分区">2.RANGE分区</h1>
+
+<p>RANGE分区：按范围进行分区</p>
+
+<p>特点：</p>
+<ul>
+  <li>根据分区键值的范围把数据行存储到表的不同分区中</li>
+  <li>多个分区的范围要连续，但是不能重叠</li>
+  <li>默认情况下使用VALUES LESS THAN属性，即每个分区不包含指定的那个范围值</li>
+</ul>
+
+<p>下面我们还是以用户登录表为例：</p>
+
+<pre><code class="language-mysql">CREATE TABLE customer_login_log(
+	customer_id INT(10) UNSIGNED NOT NULL COMMENT '用户登录ID',
+	login_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '用户登录时间',
+	login_ip INT(10) UNSIGNED NOT NULL COMMENT '登录IP',
+	login_type TINYINT(4) NOT NULL COMMENT '登录类型：0未成功 1成功'
+)ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT '用户登录日志表'
+PARTITION BY RANGE (customer_id)(
+	PARTITION p0 VALUES LESS THAN (10000),
+	PARTITION p1 VALUES LESS THAN (20000),
+	PARTITION p2 VALUES LESS THAN (30000),
+	PARTITION p3 VALUES LESS THAN MAXVALUE
+);
+</code></pre>
+<p><code class="language-plaintext highlighter-rouge">p0</code>分区存放<code class="language-plaintext highlighter-rouge">customer_id</code>小于10000(0-9999)，<code class="language-plaintext highlighter-rouge">p1</code>分区存放<code class="language-plaintext highlighter-rouge">customer_id</code>在(10000-19999)，<code class="language-plaintext highlighter-rouge">p2</code>分区存放<code class="language-plaintext highlighter-rouge">customer_id</code>在(20000-29999)范围内，<code class="language-plaintext highlighter-rouge">customer_id</code>大于30000都存放在<code class="language-plaintext highlighter-rouge">p3</code>分区。</p>
+
+<h4 id="range分区的适用场景">RANGE分区的适用场景</h4>
+
+<p>RANGE分区的适用场景：</p>
+<ul>
+  <li>分区键为日期类型或是时间类型</li>
+  <li>所有查询中都包括分区键</li>
+  <li>定期按分区范围清理历史数据</li>
+</ul>
+
+<h1 id="3list分区">3.LIST分区</h1>
+
+<p>LIST分区特点：</p>
+<ul>
+  <li>按分区键取值的列表进行分区</li>
+  <li>同范围分区一样，各分区的列表值不能重复</li>
+  <li>每一行数据必须找到对应的分区列表，否则数据插入失败</li>
+</ul>
+
+<p>下面还是以用户登录日志表为例：</p>
+
+<pre><code class="language-mysql">CREATE TABLE customer_login_log(
+	customer_id INT(10) UNSIGNED NOT NULL COMMENT '用户登录ID',
+	login_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '用户登录时间',
+	login_ip INT(10) UNSIGNED NOT NULL COMMENT '登录IP',
+	login_type TINYINT(4) NOT NULL COMMENT '登录类型'
+)ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT '用户登录日志表'
+PARTITION BY LIST (login_type)(
+	PARTITION p0 VALUES IN (1,3,5,7,9)
+	PARTITION p1 VALUES IN (2,4,6,8)
+);
+</code></pre>
+
+<p>这里指定<code class="language-plaintext highlighter-rouge">login_type</code>作为分区键，login_type取值为(1,3,5,7,9)放在<code class="language-plaintext highlighter-rouge">p0</code>分区,值为(2,4,6,8)放在<code class="language-plaintext highlighter-rouge">p1</code>分区。</p>
+
+<h1 id="4如果选择合适的分区表">4.如果选择合适的分区表</h1>
+
+<p>如何为<code class="language-plaintext highlighter-rouge">customer_login_log</code>选择合适的分区表？首先我们要分析<code class="language-plaintext highlighter-rouge">用户登录日志表</code>的业务场景，用户登录表主要记录用户每次登录的日志,即用户每登录一次，就会在<code class="language-plaintext highlighter-rouge">customer_login_log</code>中产生一条记录，由此可见，用户登录表中的数据增长是非常快的。假设公司要求<code class="language-plaintext highlighter-rouge">用户登录日志</code>保存一年，一年后可以删除。</p>
+
+<p>在这样的业务场景下，使用<code class="language-plaintext highlighter-rouge">RANGE</code>分区比较合适，我们可以很方便的根据分区的范围来删除分区数据，特别是在数据量非常大的时候。</p>
+
+<p>确定好分区类型之后，接下来还需要确定<code class="language-plaintext highlighter-rouge">分区键</code>,在用户登录表中只有<code class="language-plaintext highlighter-rouge">login_time</code>是时间字段，后面删除分区数据也是按照时间来删除的，所以就选<code class="language-plaintext highlighter-rouge">login_time</code>作为分区键</p>
+
+<p>下面sql是按照<code class="language-plaintext highlighter-rouge">login_time</code>来建立的分区表</p>
+
+<pre><code class="language-mysql">	CREATE TABLE customer_login_log(
+	customer_id INT(10) UNSINGED NO NULL,
+	login_time DATETIME NOT NULL,
+	login_ip INT(10) UNSIGNED NOT NULL,
+	login_type TINYINT(4) NOT NULL
+)ENGINE=INNODB
+PARTITION BY RANGE(YEAR(login_time))(
+	PARTITION p0 VALUES LESS THAN (2015),
+	PARTITION p1 VALUES LESS THAN (2016),
+	PARTITION p2 VALUES LESS THAN (2017)
+);
+</code></pre>
+
+:ET

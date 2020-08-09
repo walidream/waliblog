@@ -1,0 +1,101 @@
+I"<p>Vim可以在尾行模式下使用<code class="language-plaintext highlighter-rouge">:substitute</code>命令将指定的字符替换成其他目标字符，通常使用该命令的缩写格式<code class="language-plaintext highlighter-rouge">:s</code>进行操作</p>
+
+<h1 id="1vim替换命令语法">1.Vim替换命令语法</h1>
+
+<p>Vim替换命令的基本语法是 <code class="language-plaintext highlighter-rouge">:[range]s/源字符串/目标字符串/[option]</code>，其中range和option字段都可以缺省不填。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>字段</th>
+      <th>含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>range</td>
+      <td>表示搜索范围，默认表示当前行range字段值1,10表示从第1到第10行，%表示整个文件(相当于1,$)，而.,$代表从当前行到文件末尾</td>
+    </tr>
+    <tr>
+      <td>s</td>
+      <td>substitute的简写，表示替换</td>
+    </tr>
+    <tr>
+      <td>option</td>
+      <td>表示操作类型，默认只对第一个匹配的字符进行替换option字段值g(global)表示全局替换，c(comfirm)表示操作时需要确认，i(ignorecase)表示不区分大小写这些选项可以组合使用</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="2vim替换命令举例">2.Vim替换命令举例</h1>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_42.gif" alt="ssl" /></p>
+
+<p>执行命令<code class="language-plaintext highlighter-rouge">:1,$s/Vim/vim/gc</code>会出现提示”replace with foo(y/n/a/q/l/^E/^Y)?”，询问是否确认执行</p>
+
+<p>待选择操作的含义包括：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>选项</th>
+      <th>含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>y</td>
+      <td>确认执行这个替换</td>
+    </tr>
+    <tr>
+      <td>n</td>
+      <td>取消这个替换</td>
+    </tr>
+    <tr>
+      <td>a</td>
+      <td>执行所有替换且不再询问</td>
+    </tr>
+    <tr>
+      <td>q</td>
+      <td>退出而不做任何改动</td>
+    </tr>
+    <tr>
+      <td>l</td>
+      <td>替换完当前匹配点后退出(last)</td>
+    </tr>
+    <tr>
+      <td>Ctrl + E</td>
+      <td>向上翻滚一行</td>
+    </tr>
+    <tr>
+      <td>Ctrl + Y</td>
+      <td>向下翻滚一行</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="将光标所在行出现的所有包含line的字符串中line替换为lines">将光标所在行出现的所有包含line的字符串中line替换为lines</h4>
+
+<p><code class="language-plaintext highlighter-rouge">:s/line/lines/g</code> 表示将光标所在当前行的line全局替换为lines</p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_43.gif" alt="ssl" /></p>
+
+<h4 id="将从2行到3行中出现的所有包含line的字符串中的line替换为lines">将从2行到3行中出现的所有包含line的字符串中的line替换为lines</h4>
+
+<p><code class="language-plaintext highlighter-rouge">:2,3s/line/lines/g</code> 表示将2~3行的line全局替换为lines</p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_44.gif" alt="ssl" /></p>
+
+<h4 id="全文的行首加入字符批量注释时非常有用">全文的行首加入//字符，批量注释时非常有用</h4>
+
+<p><code class="language-plaintext highlighter-rouge">:%s/^/\/\//</code> 表示在全文范围行首替换插入<code class="language-plaintext highlighter-rouge">//</code>，/需要转义</p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_45.gif" alt="ssl" /></p>
+
+<h4 id="将所有行尾多余的空格删除">将所有行尾多余的空格删除</h4>
+
+<p><code class="language-plaintext highlighter-rouge">:%s= *$==</code>表示全局替换行尾的一个或多个空格，更多正则表达式的说明可以参考Vim正则表达式搜索</p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_46.gif" alt="ssl" /></p>
+
+:ET

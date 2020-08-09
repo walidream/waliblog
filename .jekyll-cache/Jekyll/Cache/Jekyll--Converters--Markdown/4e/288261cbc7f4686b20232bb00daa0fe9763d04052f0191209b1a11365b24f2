@@ -1,0 +1,122 @@
+I"�=<p>现在基本每个网站在<code class="language-plaintext highlighter-rouge">登录</code>或<code class="language-plaintext highlighter-rouge">注册</code>时都会要求输入验证码才能进行后续操作，在爬知乎时，小菜就遇到了这个问题，所以单独将云打码识别验证码记录一下。<code class="language-plaintext highlighter-rouge">云打码</code>属于第三方平台，所以识别需要收费,费用个人觉得还可以接受。</p>
+
+<ul>
+  <li><a href="http://www.yundama.com/" title="http://www.yundama.com/">云打码官方网站</a></li>
+  <li><a href="http://www.yundama.com/apidoc/YDM_SDK.html#DEMO" title="http://www.yundama.com/apidoc/YDM_SDK.html#DEMO">云打码 调用示例及最新DLL</a></li>
+</ul>
+
+<h1 id="1注册用户">1.注册用户</h1>
+
+<p>进入<a href="http://www.yundama.com/" title="http://www.yundama.com/">云打码官方网站</a>，进入<a href="http://www.yundama.com/index/reg" title="http://www.yundama.com/index/reg">用户注册</a>，后面注册请小伙伴自行完成。</p>
+
+<h1 id="2注册开发者账号">2.注册开发者账号</h1>
+
+<p>进入<a href="http://www.yundama.com/" title="http://www.yundama.com/">云打码官方网站</a>，进入<a href="http://www.yundama.com/index/reg/developer" title="http://www.yundama.com/index/reg/developer">开发者注册</a>，后面注册请小伙伴自行完成。</p>
+
+<p>完成后，点击<code class="language-plaintext highlighter-rouge">我的软件</code>，在右上角点击<code class="language-plaintext highlighter-rouge">添加软件</code>,给自己软件起个名字(随便起了),确定后会有一个<code class="language-plaintext highlighter-rouge">软件代码</code>，<code class="language-plaintext highlighter-rouge">通信密钥</code>,这个是我们后面要用到的</p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_59.png" alt="ssl" /></p>
+
+<h1 id="3开始测试">3.开始测试</h1>
+
+<h4 id="目录结构">目录结构</h4>
+
+<pre><code class="language-txt">test
+|-image
+   |-1.jpg
+   |-2.png
+|-main.py
+</code></pre>
+
+<h4 id="安装requests">安装requests</h4>
+
+<p>如果没有安装<code class="language-plaintext highlighter-rouge">anaconda</code>可以参考我之前的帖子<a href="/python/2019/05/13/anaconda.html" title="/python/2019/05/13/anaconda.html">anacoda 安装使用</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>conda install requests
+</code></pre></div></div>
+
+<h4 id="mainpy">main.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="k">class</span> <span class="nc">YDMHttp</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">apiurl</span> <span class="o">=</span> <span class="s">'http://api.yundama.com/api.php'</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="s">''</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="s">''</span>
+    <span class="n">appid</span> <span class="o">=</span> <span class="s">''</span>
+    <span class="n">appkey</span> <span class="o">=</span> <span class="s">''</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">appid</span><span class="p">,</span> <span class="n">appkey</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">appid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">appid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">appkey</span> <span class="o">=</span> <span class="n">appkey</span>
+
+    <span class="c1">#查询余额
+</span>    <span class="k">def</span> <span class="nf">balance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s">'method'</span><span class="p">:</span> <span class="s">'balance'</span><span class="p">,</span> <span class="s">'username'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">username</span><span class="p">,</span> <span class="s">'password'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">password</span><span class="p">,</span> <span class="s">'appid'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">appid</span><span class="p">,</span> <span class="s">'appkey'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">appkey</span><span class="p">}</span>
+        <span class="n">response_data</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">apiurl</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">ret_data</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response_data</span><span class="p">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret_data</span><span class="p">[</span><span class="s">"ret"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ret_data</span><span class="p">[</span><span class="s">"balance"</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="c1">#登录
+</span>    <span class="k">def</span> <span class="nf">login</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s">'method'</span><span class="p">:</span> <span class="s">'login'</span><span class="p">,</span> <span class="s">'username'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">username</span><span class="p">,</span> <span class="s">'password'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">password</span><span class="p">,</span> <span class="s">'appid'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">appid</span><span class="p">,</span> <span class="s">'appkey'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">appkey</span><span class="p">}</span>
+        <span class="n">response_data</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">apiurl</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">ret_data</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response_data</span><span class="p">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret_data</span><span class="p">[</span><span class="s">"ret"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ret_data</span><span class="p">[</span><span class="s">"uid"</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="c1">#识别验证码
+</span>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">codetype</span><span class="p">,</span> <span class="n">timeout</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s">'method'</span><span class="p">:</span> <span class="s">'upload'</span><span class="p">,</span> <span class="s">'username'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">username</span><span class="p">,</span> <span class="s">'password'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">password</span><span class="p">,</span> <span class="s">'appid'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">appid</span><span class="p">,</span> <span class="s">'appkey'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">appkey</span><span class="p">,</span> <span class="s">'codetype'</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">codetype</span><span class="p">),</span> <span class="s">'timeout'</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">timeout</span><span class="p">)}</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="p">{</span><span class="s">'file'</span><span class="p">:</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">'rb'</span><span class="p">)}</span>
+        <span class="n">response_data</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">apiurl</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">ret_data</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response_data</span><span class="p">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret_data</span><span class="p">[</span><span class="s">"ret"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ret_data</span><span class="p">[</span><span class="s">"text"</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+<span class="k">def</span> <span class="nf">ydm</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+    <span class="c1">#用户账号
+</span>    <span class="n">username</span> <span class="o">=</span> <span class="s">'******'</span>
+    <span class="c1">#用户密码
+</span>    <span class="n">password</span> <span class="o">=</span> <span class="s">'******'</span>
+    <span class="c1">#开发者 软件ＩＤ，开发者分成必要参数。登录开发者后台【我的软件】获得！
+</span>    <span class="n">appid</span> <span class="o">=</span> <span class="mi">9428</span>
+    <span class="c1">#开发者 软件密钥，开发者分成必要参数。登录开发者后台【我的软件】获得！
+</span>    <span class="n">appkey</span> <span class="o">=</span> <span class="s">'6a355daa67da003904ebf6f40c1f20c3'</span>
+    <span class="c1"># 图片文件
+</span>    <span class="n">filename</span> <span class="o">=</span> <span class="n">file_path</span>
+    <span class="c1"># 验证码类型，# 例：1004表示4位字母数字，不同类型收费不同。请准确填写，否则影响识别率。在此查询所有类型 http://www.yundama.com/price.html
+</span>    <span class="n">codetype</span> <span class="o">=</span> <span class="mi">5000</span>
+    <span class="c1"># 超时时间，秒
+</span>    <span class="n">timeout</span> <span class="o">=</span> <span class="mi">60</span>
+    <span class="c1"># 检查
+</span>
+    <span class="n">yundama</span> <span class="o">=</span> <span class="n">YDMHttp</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">appid</span><span class="p">,</span> <span class="n">appkey</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">username</span> <span class="o">==</span> <span class="s">'username'</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'请设置好相关参数再测试'</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># 开始识别，图片路径，验证码类型ID，超时时间（秒），识别结果
+</span>        <span class="k">return</span> <span class="n">yundama</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">codetype</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">img_path</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span>
+    <span class="n">dir_name</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">ydm</span><span class="p">(</span><span class="n">dir_name</span> <span class="o">+</span> <span class="s">'/image/1.jpg'</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>在代码中调试,运行<code class="language-plaintext highlighter-rouge">main.py</code>可以在控制台看到成功识别出验证码</p>
+
+:ET

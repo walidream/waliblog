@@ -1,0 +1,133 @@
+I"�<p>本文是小菜由下面帖子复制过来的，亲测安装成功。为了防止后面个人需要或帖子因为某些原因找不到，因此小菜将此贴收藏，建议大家还是阅读原贴，特此声明！</p>
+
+<ul>
+  <li><a href="https://www.jianshu.com/p/1dab9a4d0d5f" title="https://www.jianshu.com/p/1dab9a4d0d5f">此贴原文 博主lancely CentOS 7 下 MySQL 5.7 的安装与配置</a></li>
+</ul>
+
+<p>本文测试环境：</p>
+<ul>
+  <li>CentOS 7 64-bit Minimal</li>
+  <li>MySQL 5.7</li>
+</ul>
+
+<h1 id="1配置yum源">1.配置yum源</h1>
+
+<p>在 <a href="https://dev.mysql.com/downloads/repo/yum/" title="https://dev.mysql.com/downloads/repo/yum/">https://dev.mysql.com/downloads/repo/yum/</a> 找到 yum 源 rpm 安装包</p>
+
+<p><img src="http://walidream.com:9999/blogImage/sql/sql_8.png" alt="ssl" /></p>
+
+<h4 id="安装-mysql-源">安装 mysql 源</h4>
+
+<pre><code class="language-linux"># 下载
+wget https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+# 安装 mysql 源
+yum localinstall mysql57-community-release-el7-11.noarch.rpm
+</code></pre>
+
+<p>用下面的命令检查 mysql 源是否安装成功</p>
+
+<pre><code class="language-linux">yum repolist enabled | grep "mysql.*-community.*"
+</code></pre>
+
+<p><img src="http://walidream.com:9999/blogImage/sql/sql_9.png" alt="ssl" /></p>
+
+<h1 id="2安装mysql">2.安装MySQL</h1>
+
+<p>使用 yum install 命令安装</p>
+
+<pre><code class="language-linux">yum install -y mysql-community-server
+</code></pre>
+
+<h1 id="3启动mysql服务">3.启动MySQL服务</h1>
+
+<p>在 CentOS 7 下，新的启动/关闭服务的命令是 <code class="language-plaintext highlighter-rouge">systemctl start|stop</code></p>
+
+<pre><code class="language-linux">systemctl start mysqld
+</code></pre>
+
+<p>用 <code class="language-plaintext highlighter-rouge">systemctl status</code> 查看 MySQL 状态</p>
+
+<pre><code class="language-linux">systemctl status mysqld
+</code></pre>
+
+<p><img src="http://walidream.com:9999/blogImage/sql/sql_10.png" alt="ssl" /></p>
+
+<h1 id="4设置开机启动">4.设置开机启动</h1>
+
+<pre><code class="language-linux">systemctl enable mysqld
+# 重载所有修改过的配置文件
+systemctl daemon-reload
+</code></pre>
+
+<h4 id="修改-root-本地账户密码">修改 root 本地账户密码</h4>
+
+<p>mysql 安装完成之后，生成的默认密码在 <code class="language-plaintext highlighter-rouge">/var/log/mysqld.log</code> 文件中。使用 grep 命令找到日志中的密码。</p>
+
+<pre><code class="language-linux">grep 'temporary password' /var/log/mysqld.log
+</code></pre>
+
+<h4 id="首次通过初始密码登录后使用以下命令修改密码">首次通过初始密码登录后，使用以下命令修改密码</h4>
+
+<pre><code class="language-linux">mysql -uroot -p
+mysql&gt; ALTER USER 'root'@'localhost' IDENTIFIED BY 'MyNewPass4!'; 
+</code></pre>
+<p>或者</p>
+
+<pre><code class="language-linux">set password for 'root'@'localhost'=password('MyNewPass4!'); 
+</code></pre>
+
+<p>以后通过 <code class="language-plaintext highlighter-rouge">update set</code>语句修改密码</p>
+
+<pre><code class="language-mysql">mysql&gt; use mysql;
+mysql&gt; update user set password=PASSWORD('MyNewPass5!') where user='root';
+mysql&gt; flush privileges;
+</code></pre>
+
+<p><code class="language-plaintext highlighter-rouge">注意：mysql 5.7 默认安装了密码安全检查插件（validate_password），默认密码检查策略要求密码必须包含：大小写字母、数字和特殊符号，并且长度不能少于8位。否则会提示 ERROR 1819 (HY000): Your password does not satisfy the current policy requirements 错误。查看</code> <a href="https://links.jianshu.com/go?to=https%3A%2F%2Fdev.mysql.com%2Fdoc%2Frefman%2F5.7%2Fen%2Fvalidate-password-options-variables.html%23sysvar_validate_password_policy" title="https://links.jianshu.com/go?to=https%3A%2F%2Fdev.mysql.com%2Fdoc%2Frefman%2F5.7%2Fen%2Fvalidate-password-options-variables.html%23sysvar_validate_password_policy">MySQL官网密码详细策略</a></p>
+
+<h1 id="5添加远程登录用户">5.添加远程登录用户</h1>
+
+<p>默认只允许root帐户在本地登录，如果要在其它机器上连接mysql，必须添加一个允许远程连接的帐户。或者<del>修改 root 为允许远程连接（不推荐）</del></p>
+
+<h4 id="添加一个允许远程连接的帐户">添加一个允许远程连接的帐户</h4>
+
+<pre><code class="language-mysql">mysql&gt; GRANT ALL PRIVILEGES ON *.* TO 'zhangsan'@'%' IDENTIFIED BY 'Zhangsan2018!' WITH GRANT OPTION;
+</code></pre>
+
+<p><del>修改 root 为允许远程连接（不推荐）</del></p>
+
+<pre><code class="language-mysql">mysql&gt; use mysql;
+mysql&gt; UPDATE user SET Host='%' WHERE User='root';
+mysql&gt; flush privileges;
+</code></pre>
+
+<h1 id="6设置默认编码为utf8">6.设置默认编码为utf8</h1>
+
+<p>mysql 安装后默认不支持中文，需要修改编码。修改 <code class="language-plaintext highlighter-rouge">/etc/my.cnf </code>配置文件，在相关节点（没有则自行添加）下添加编码配置，如下：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[mysqld]
+character-set-server=utf8
+[client]
+default-character-set=utf8
+[mysql]
+default-character-set=utf8
+</code></pre></div></div>
+
+<p>重启mysql服务，查询编码。可以看到已经改过来了</p>
+
+<pre><code class="language-mysql">shell&gt; systemctl restart mysqld
+shell&gt; mysql -uroot -p
+mysql&gt; show variables like 'character%';
+</code></pre>
+
+<h1 id="7默认配置文件路径">7.默认配置文件路径</h1>
+
+<p>默认配置文件路径:</p>
+<ul>
+  <li>配置文件：<code class="language-plaintext highlighter-rouge">/etc/my.cnf</code></li>
+  <li>日志文件：<code class="language-plaintext highlighter-rouge">/var/log/mysqld.log</code></li>
+  <li>服务启动脚本：<code class="language-plaintext highlighter-rouge">/usr/lib/systemd/system/mysqld.service</code></li>
+  <li>socket文件：<code class="language-plaintext highlighter-rouge">/var/run/mysqld/mysqld.pid</code></li>
+</ul>
+
+:ET

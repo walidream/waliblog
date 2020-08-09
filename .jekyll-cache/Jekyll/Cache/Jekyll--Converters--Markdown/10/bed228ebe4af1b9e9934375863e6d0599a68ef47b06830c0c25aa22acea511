@@ -1,0 +1,38 @@
+I"	<p>在插入模式下，Vim可以不借助任何插件实现自动补全功能。介绍Vim自带的单词自动补全、行自动补全和基于用户自定义字典的自动补全。</p>
+
+<h1 id="1单词补全">1.单词补全</h1>
+
+<p><code class="language-plaintext highlighter-rouge">Ctrl + n</code>当输入完第一个字母后，再按<code class="language-plaintext highlighter-rouge">Ctrl + n</code>，Vim会自动出现下拉菜单，且默认选中第一个单词</p>
+
+<p>继续按 <code class="language-plaintext highlighter-rouge">Ctrl + n</code> 可以上下选择，但如果缓冲区没有可选单词，那么下拉列表不会有任何选项</p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_47.gif" alt="ssl" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">Ctrl + p</code>功能同上，只是默认选中的是列表最后一个单词</p>
+
+<h1 id="2行补全">2.行补全</h1>
+
+<p>在Vim插入模式下输入已经存在行的第一个单词，再按<code class="language-plaintext highlighter-rouge">Ctrl + x</code>、<code class="language-plaintext highlighter-rouge">Ctrl + l</code>命令，就会列出该整行出来实现Vim行自动补全</p>
+
+<h1 id="3字典补全">3.字典补全</h1>
+
+<p>假设有一个备选单词表，文件名为dict.txt，每行一个单词，里面包含以下内容：</p>
+
+<pre><code class="language-txt">https://vimjc.com
+Hello
+Vim
+editor
+best
+tool
+</code></pre>
+
+<p>若要实现基于该单词表的Vim自动补齐，需要设置以下步骤：</p>
+<ul>
+  <li>在<code class="language-plaintext highlighter-rouge">~/.vimrc</code>配置文件中加入代码：<code class="language-plaintext highlighter-rouge">set dictionary-=~/dict.txt dictionary+=~/dict.txt</code></li>
+  <li>打开Vim，在插入模式下输入<code class="language-plaintext highlighter-rouge">Ctrl + x</code>后再输入<code class="language-plaintext highlighter-rouge">Ctrl + k</code>，就能看到dict.txt文件中定义的单词</li>
+  <li>若想直接通过<code class="language-plaintext highlighter-rouge">Ctrl + n</code>命令就显示其中的列表，再配置.vimrc文件，加入<code class="language-plaintext highlighter-rouge">set complete-=k complete+=k</code></li>
+</ul>
+
+<h1 id="4使用自动补全插件">4.使用自动补全插件</h1>
+
+:ET
