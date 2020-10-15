@@ -1,0 +1,183 @@
+I"�%<p>Google Cloud Platform (以下简称GCP)是Google提供的云平台, 可以用来搭建加速服务, 网站和存储数据等等, 本文将介绍如何申请GCP一年的免费试用、Linux服务器环境搭建。</p>
+
+<ul>
+  <li><a href="https://www.wmsoho.com/google-cloud-platform-ssr-bbr-tutorial/" title="https://www.wmsoho.com/google-cloud-platform-ssr-bbr-tutorial/" target="_blank">Google Cloud Platform免费申请&amp;一键搭建SSR &amp; BBR加速教程</a></li>
+  <li><a href="https://elephantnose.github.io/2018/09/24/10%E5%88%86%E9%92%9F%E6%95%99%E4%BD%A0%E7%94%A8%20Google%20Cloud%20Platform%20%E6%90%AD%E5%BB%BA%E8%87%AA%E5%B7%B1%E7%9A%84VPN/" title="https://elephantnose.github.io/2018/09/24/10%E5%88%86%E9%92%9F%E6%95%99%E4%BD%A0%E7%94%A8%20Google%20Cloud%20Platform%20%E6%90%AD%E5%BB%BA%E8%87%AA%E5%B7%B1%E7%9A%84VPN/" target="_blank">10分钟教你用 Google Cloud Platform 搭建自己的VPN</a></li>
+</ul>
+
+<h1 id="1准备工作">1.准备工作</h1>
+
+<ul>
+  <li>能访问google</li>
+  <li>Gmail账号</li>
+  <li>双币信用卡 (淘宝购买的虚拟卡无法使用, 不要浪费钱)</li>
+  <li>Xshell:SSH客户端(也可用Google自带的在线SSH,以后比较方便)链接：<code class="language-plaintext highlighter-rouge">https://pan.baidu.com/s/1ia-Q5xKObLig37-MVUgovQ</code> 提取码：<code class="language-plaintext highlighter-rouge">brav</code></li>
+</ul>
+
+<h1 id="2申请">2.申请</h1>
+
+<p>登陆 <a href="https://console.cloud.google.com/getting-started?hl=zh-CN&amp;pli=1" title="https://console.cloud.google.com/getting-started?hl=zh-CN&amp;pli=1" target="_blank">Google Cloud Platform</a> 并填写相关信息。
+如果想免费获取$300美金，需要添加一个支付账户。小菜在网页上没有添加成功过，尽管账号和信息填写正确。最后是用手机下载google pay在手机端完成的。希望
+对大家有帮助。</p>
+
+<h1 id="3创建vm实例">3.创建VM实例</h1>
+
+<h3 id="创建vm实例">创建VM实例</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_6.png" alt="ssl" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">导航菜单</code> → <code class="language-plaintext highlighter-rouge">Compute Engine</code> → <code class="language-plaintext highlighter-rouge">VM实例</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_7.png" alt="ssl" /></p>
+
+<p>点击 <code class="language-plaintext highlighter-rouge">创建</code>（项目名称选填）</p>
+
+<h3 id="试用-cloud-platform">试用 Cloud Platform</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_8.png" alt="ssl" /></p>
+
+<p>点击 <code class="language-plaintext highlighter-rouge">同意并继续</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_9.png" alt="ssl" /></p>
+
+<p>按空填写信息，完成后点击 <code class="language-plaintext highlighter-rouge">开始免费试用</code>, 信用卡用于人机校验，注册时会暂扣$1，会自动退回至账户</p>
+
+<h3 id="创建虚拟机实例">创建虚拟机实例</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_10.png" alt="ssl" /></p>
+
+<p>点击 <code class="language-plaintext highlighter-rouge">创建</code></p>
+
+<h3 id="自定义实例配置">自定义实例配置</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_11.png" alt="ssl" /></p>
+
+<p>填写实例 <code class="language-plaintext highlighter-rouge">名称</code></p>
+
+<p>选择 <code class="language-plaintext highlighter-rouge">区域</code> 及 <code class="language-plaintext highlighter-rouge">地区</code>（日本站点距离近，响应速度快）</p>
+
+<p>内核 及 内存 选择最低配置（如还需其他服务可自行定义参数）</p>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_12.png" alt="ssl" /></p>
+
+<p>更改 启动磁盘 系统为 centos7</p>
+
+<p>勾选 <code class="language-plaintext highlighter-rouge">允许 HTTP</code> 流量 允许 <code class="language-plaintext highlighter-rouge">HTTPS</code> 流量</p>
+
+<p>点击 <code class="language-plaintext highlighter-rouge">创建</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_13.png" alt="ssl" /></p>
+
+<h1 id="4防火墙规则">4.防火墙规则</h1>
+
+<h3 id="新建防火墙规则">新建防火墙规则</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_14.png" alt="ssl" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">导航菜单</code> → <code class="language-plaintext highlighter-rouge">VPC 网络</code> → <code class="language-plaintext highlighter-rouge">防火墙规则</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_15.png" alt="ssl" /></p>
+
+<p>点击 <code class="language-plaintext highlighter-rouge">创建防火墙规则</code></p>
+
+<h3 id="自定义规则配置">自定义规则配置</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_16.png" alt="ssl" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">名称</code> <code class="language-plaintext highlighter-rouge">按规则自定义</code>`</p>
+
+<p><code class="language-plaintext highlighter-rouge">目标</code> <code class="language-plaintext highlighter-rouge">网络中的所有实例</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_17.png" alt="ssl" /></p>
+
+<p>来源ip地址范围 <code class="language-plaintext highlighter-rouge">0.0.0.0/0</code></p>
+
+<p>协议和端口 勾选 UDP 填写 <code class="language-plaintext highlighter-rouge">500,4500</code>，勾选 其他协议 填写 <code class="language-plaintext highlighter-rouge">esp</code></p>
+
+<p>点击 <code class="language-plaintext highlighter-rouge">创建</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_18.png" alt="ssl" /></p>
+
+<p>刚刚定义好的防火墙规则</p>
+
+<h1 id="5vpc网络">5.VPC网络</h1>
+
+<h3 id="配置vpc网络">配置VPC网络</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_19.png" alt="ssl" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">导航菜单</code> → <code class="language-plaintext highlighter-rouge">VPC 网络</code> → <code class="language-plaintext highlighter-rouge">VPC 网络</code> → <code class="language-plaintext highlighter-rouge">default</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_20.png" alt="ssl" /></p>
+
+<p>点击 <code class="language-plaintext highlighter-rouge">修改</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_21.png" alt="ssl" /></p>
+
+<p>勾选 <code class="language-plaintext highlighter-rouge">自动</code> 及 全局 <code class="language-plaintext highlighter-rouge">复选框</code></p>
+
+<p>点击 <code class="language-plaintext highlighter-rouge">保存</code></p>
+
+<h1 id="6负载平衡">6.负载平衡</h1>
+
+<h3 id="负载平衡">负载平衡</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_22.png" alt="ssl" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">导航菜单</code> → <code class="language-plaintext highlighter-rouge">网络服务</code> → <code class="language-plaintext highlighter-rouge">负载均衡</code></p>
+
+<h3 id="创建负载平衡器">创建负载平衡器</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_23.png" alt="ssl" /></p>
+
+<h3 id="udp负载平衡">UDP负载平衡</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_24.png" alt="ssl" /></p>
+
+<p>点击 开始配置</p>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_25.png" alt="ssl" /></p>
+
+<p>勾选 <code class="language-plaintext highlighter-rouge">从互联网到我的VM</code>（默认）</p>
+
+<p>点击 <code class="language-plaintext highlighter-rouge">继续</code></p>
+
+<h3 id="后端配置">后端配置</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_26.png" alt="ssl" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">名称</code> 按规则自定义填写</p>
+
+<p>选择 <code class="language-plaintext highlighter-rouge">区域</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">选择现有实例</code></p>
+
+<h3 id="前端配置">前端配置</h3>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_27.png" alt="ssl" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">名称</code> 按规则自定义填写</p>
+
+<p>端口 <code class="language-plaintext highlighter-rouge">填写500-4500</code></p>
+
+<p>点击 <code class="language-plaintext highlighter-rouge">完成</code></p>
+
+<p>点击 <code class="language-plaintext highlighter-rouge">创建</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_28.png" alt="ssl" /></p>
+
+<h1 id="7登陆服务器">7.登陆服务器</h1>
+
+<p>如果需要用第三方工具登录google服务器，请查看小菜的这篇博客<a href="/server/2019/04/18/connectionGoogleCloud.html" title="server/2019/04/18/connectionGoogleCloud.html" target="_blank">用ssh工具xShell连接google云服务器</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_29.png" alt="ssl" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">导航菜单</code> → <code class="language-plaintext highlighter-rouge">Compute Engine</code> → <code class="language-plaintext highlighter-rouge">VM实例</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_30.png" alt="ssl" /></p>
+
+<p>点击 <code class="language-plaintext highlighter-rouge">SSH</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/server/server_31.png" alt="ssl" /></p>
+
+:ET

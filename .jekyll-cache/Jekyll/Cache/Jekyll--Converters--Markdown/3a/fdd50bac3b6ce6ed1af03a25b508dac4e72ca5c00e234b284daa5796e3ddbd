@@ -1,0 +1,269 @@
+I"�f<p>本小节主要给大家介绍如何提高代码的性能?我们从打包工具入手，然后到预提模块(Preloading)，预加载模块(Prefetching)。</p>
+
+<h1 id="1打包分析">1.打包分析</h1>
+
+<ul>
+  <li><a href="https://github.com/webpack/analyse" title="https://github.com/webpack/analyse" target="_blank">官方提供的分析工具</a></li>
+  <li><a href="https://alexkuz.github.io/webpack-chart/" title="https://alexkuz.github.io/webpack-chart/" target="_blank">webpack-chart</a>：webpack stats 可交互饼图</li>
+  <li><a href="https://chrisbateman.github.io/webpack-visualizer/" title="https://chrisbateman.github.io/webpack-visualizer/" target="_blank">webpack-visualizer</a> :可视化并分析你的 bundle，检查哪些模块占用空间，哪些可能是重复使用的</li>
+  <li><a href="https://github.com/webpack-contrib/webpack-bundle-analyzer" title="https://github.com/webpack-contrib/webpack-bundle-analyzer" target="_blank">webpack-bundle-analyzer</a> :一个 plugin 和 CLI 工具，它将 bundle 内容展示为便捷的、交互式、可缩放的树状图形式</li>
+  <li><a href="https://webpack.jakoblind.no/optimize/" title="https://webpack.jakoblind.no/optimize/" target="_blank">webpack bundle optimize helper</a> :此工具会分析你的 bundle，并为你提供可操作的改进措施建议，以减少 bundle 体积大小。</li>
+</ul>
+
+<p>打包分析是指当webpack对我们的代码打包过后，我们使用分析工具对打包后的文件进行一定的分析，帮助我们看打包后的代码有没有继续提升的空间。</p>
+
+<h4 id="生成statsjson">生成stats.json</h4>
+
+<p>您可以通过运行<code class="language-plaintext highlighter-rouge">webpack --profile --json&gt; stats.json</code>为此工具生成所需的JSON文件</p>
+
+<h4 id="packagejson">package.json</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">{</span>
+ "scripts": {
+    "dev": "npx webpack-dev-server --config webpack.config.js --mode=development --colors",
+    "prod": "npx webpack --config webpack.config.js --mode=production",
+    "build": "npx webpack --config webpack.config.js --mode=development --colors"
+<span class="gi">+    "analyse": "npx webpack --profile --json&gt; stats.json --config webpack.config.js --mode=development --colors"
+</span>  },
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run analyse
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_25.png" alt="ssl" /></p>
+
+<p>在我们的项目下面生成了一个<code class="language-plaintext highlighter-rouge">stats.json</code>文件，将<code class="language-plaintext highlighter-rouge">stats.json</code>文件上传到官方分析工具中就可以了。</p>
+
+<h1 id="2使用webpackbundleanalyzer">2.使用webpackBundleAnalyzer</h1>
+
+<h4 id="安装webpack-bundle-analyzer">安装webpack-bundle-analyzer</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add -D webpack-bundle-analyzer
+</code></pre></div></div>
+
+<h4 id="webpackconfigjs">webpack.config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+</span>
+module.exports = {
+  plugins: [
+    new BundleAnalyzerPlugin()
+  ]
+<span class="err">}</span>
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_26.png" alt="ssl" /></p>
+
+<h1 id="3prefetch">3.prefetch</h1>
+
+<ul>
+  <li><a href="https://webpack.docschina.org/guides/code-splitting/#%E9%A2%84%E5%8F%96-%E9%A2%84%E5%8A%A0%E8%BD%BD%E6%A8%A1%E5%9D%97-prefetch-preload-module-" title="https://webpack.docschina.org/guides/code-splitting/#%E9%A2%84%E5%8F%96-%E9%A2%84%E5%8A%A0%E8%BD%BD%E6%A8%A1%E5%9D%97-prefetch-preload-module-" target="_blank">Preloading官方</a></li>
+</ul>
+
+<p>在声明import时，使用下面这些内置指令，可以让webpack输出<code class="language-plaintext highlighter-rouge">resource hint（资源提示）</code>来告知浏览器：</p>
+
+<ul>
+  <li>prefetch(预获取): 将来某些导航下可能需要的资源</li>
+  <li>preload(预加载)：当前导航下可能需要资源</li>
+</ul>
+
+<p>上面我是看中文的文档，有英文能力的小伙伴可以看英文，这样理解比较准确。小菜本想在这里说说个人理解，但是写出来后，感觉语言描述的不是很清楚，那还是用代码来演示吧。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">splitChunks</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">chunks</span><span class="p">:</span> <span class="dl">'</span><span class="s1">all</span><span class="dl">'</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>webpack官方默认<code class="language-plaintext highlighter-rouge">chunks:async</code>，官方为什么要默认<code class="language-plaintext highlighter-rouge">chunks:async</code>呢？当我们在引入loadsh，jquery库时，如果配置<code class="language-plaintext highlighter-rouge">chunks: 'all'</code>，那么肯定会帮助我们把<code class="language-plaintext highlighter-rouge">loadsh</code>、<code class="language-plaintext highlighter-rouge">jquery</code>单独拆分开来，但是这样做并不能提升首页的代码性能，原因是在浏览器第一次加载时，还是需要我们加载<code class="language-plaintext highlighter-rouge">loadsh</code>、<code class="language-plaintext highlighter-rouge">jquery</code>库，只有当我们的代码第二次加载时，浏览器才会从缓存中去找，提高我们第二次页面加载访问速度。webpack是想让我们第一次加载时，访问速度就是最快。举个列子</p>
+
+<h3 id="未优化的代码">未优化的代码</h3>
+
+<h4 id="srcindexjs">src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,()</span><span class="o">=&gt;</span><span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">element</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">'</span><span class="s1">div</span><span class="dl">'</span><span class="p">);</span>
+
+    <span class="kd">let</span> <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">element</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span>  <span class="s2">`0~100的和为</span><span class="p">${</span><span class="nx">sum</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+    <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">element</span><span class="p">)</span>
+<span class="p">})</span>
+
+</code></pre></div></div>
+
+<h4 id="编译webpack">编译webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+
+<p>打开<code class="language-plaintext highlighter-rouge">dist/index.html</code>,找到coverage。或者快捷方式<code class="language-plaintext highlighter-rouge">Ctrl + Shift + P</code>，输入<code class="language-plaintext highlighter-rouge">coverage</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_27.png" alt="ssl" /></p>
+
+<p>打开后刷新页面，然后点击<code class="language-plaintext highlighter-rouge">index.js</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_28.png" alt="ssl" /></p>
+
+<p>可以看到<code class="language-plaintext highlighter-rouge">index.js</code>未使用利用率<code class="language-plaintext highlighter-rouge">27.9%</code>，我们可以优化一下<code class="language-plaintext highlighter-rouge">index.js</code>代码</p>
+
+<h3 id="优化后">优化后</h3>
+
+<h4 id="新建srcutilclickjs">新建src/util/click.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">handleClick</span><span class="p">(){</span>
+    <span class="kd">const</span> <span class="nx">element</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">'</span><span class="s1">div</span><span class="dl">'</span><span class="p">);</span>
+
+    <span class="kd">let</span> <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="nx">sum</span> <span class="o">+=</span><span class="nx">i</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">element</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span>  <span class="s2">`0~100的和为</span><span class="p">${</span><span class="nx">sum</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+    <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">element</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="nx">handleClick</span>
+</code></pre></div></div>
+
+<h4 id="srcindexjs-1">src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,()</span><span class="o">=&gt;</span><span class="p">{</span>
+    <span class="k">import</span><span class="p">(</span><span class="dl">'</span><span class="s1">./util/click</span><span class="dl">'</span><span class="p">).</span><span class="nx">then</span><span class="p">(({</span><span class="na">default</span><span class="p">:</span><span class="nx">func</span><span class="p">})</span> <span class="o">=&gt;</span><span class="p">{</span>
+        <span class="nx">func</span><span class="p">();</span>
+    <span class="p">})</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack-1">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_29.png" alt="ssl" /></p>
+
+<p>从上面的截图可以了解到，<code class="language-plaintext highlighter-rouge">index.js</code>未使用率降低到了<code class="language-plaintext highlighter-rouge">24.3%</code>，小菜这里有个疑惑就是mian.js的未使用率上升了，按道理应该是要下降的。小菜也只能在这里猜测下，虽然<code class="language-plaintext highlighter-rouge">index.js</code>里面的代码被移到<code class="language-plaintext highlighter-rouge">click.js</code>里面，估计demo写的太简单，代码太少，webpack打包后，mian.js的代码代码量增加了，从而导致未使用的代码率上升。如果后面有机会的话，小菜会专门写一小节分析下，感兴趣的小伙伴也可以自己研究下，然后在评论区留言分享也行。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_30.png" alt="ssl" /></p>
+
+<p>webpack打包后，会有一个1.js文件被分割出来(大家如果想改名字，请查看上一节)那么就会带来一个问题，比如在首页上有一个登陆按钮，首页加载好后，用户点击<code class="language-plaintext highlighter-rouge">登陆</code>，然后才会加载登陆程序，这样会不会影响用户体验，如果按照上面那种方式确实会有这个问题。我们希望当主程序加载完成后再去加载子程序，还是上面那个例子，当首页加载完成后，在浏览器空闲的时候去加载登陆程序，这样一来就解决上面那个问题。</p>
+
+<h1 id="4使用prefetch优化">4.使用prefetch优化</h1>
+
+<p>继上面demo我们做点小修改</p>
+
+<h4 id="srcindexjs-2">src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,()</span><span class="o">=&gt;</span><span class="p">{</span>
+    <span class="k">import</span><span class="p">(</span><span class="cm">/* webpackPrefetch: true */</span><span class="dl">'</span><span class="s1">./util/click</span><span class="dl">'</span><span class="p">).</span><span class="nx">then</span><span class="p">(({</span><span class="na">default</span><span class="p">:</span><span class="nx">func</span><span class="p">})</span> <span class="o">=&gt;</span><span class="p">{</span>
+        <span class="nx">func</span><span class="p">();</span>
+    <span class="p">})</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack-2">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_31.png" alt="ssl" /></p>
+
+<p>打开浏览器的控制台，刷新页面，可以看到<code class="language-plaintext highlighter-rouge">0.js</code>文件被加载了。大家可以把魔法注释去掉，在刷新浏览器看看。</p>
+
+<h1 id="5使用preload优化">5.使用preload优化</h1>
+
+<h4 id="srcindexjs-3">src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,()</span><span class="o">=&gt;</span><span class="p">{</span>
+    <span class="k">import</span><span class="p">(</span><span class="cm">/* webpackPreload: true */</span><span class="dl">'</span><span class="s1">./util/click</span><span class="dl">'</span><span class="p">).</span><span class="nx">then</span><span class="p">(({</span><span class="na">default</span><span class="p">:</span><span class="nx">func</span><span class="p">})</span> <span class="o">=&gt;</span><span class="p">{</span>
+        <span class="nx">func</span><span class="p">();</span>
+    <span class="p">})</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_31.png" alt="ssl" /></p>
+
+<p>打开浏览器的控制台，刷新页面，可以看到<code class="language-plaintext highlighter-rouge">0.js</code>文件也被加载了。</p>
+
+<h1 id="6prefetch和preload区别">6.prefetch和preload区别</h1>
+
+<blockquote>
+  <p>不正确地使用 webpackPreload 会有损性能，请谨慎使用</p>
+</blockquote>
+
+<p>preload和 prefetch 指令相比，preload 指令有许多不同之处：</p>
+
+<ul>
+  <li>preload chunk 会在父 chunk 加载时，以并行方式开始加载。prefetch chunk 会在父 chunk 加载结束后开始加载</li>
+  <li>preload chunk 具有中等优先级，并立即下载。prefetch chunk 在浏览器闲置时下载</li>
+  <li>preload chunk 会在父 chunk 中立即请求，用于当下时刻。prefetch chunk 会用于未来的某个时刻</li>
+  <li>浏览器支持程度不同</li>
+</ul>
+
+<h1 id="7总结">7.总结</h1>
+
+<p>webpack官方在配置中<code class="language-plaintext highlighter-rouge">chunks: 'async'</code>写的是异步，是想让我们编写异步程序来提高代码的性能，缓存能够带来的代码提升非常有限，我们后面写代码程序应该重点关注代码利用率，提高代码利用率才是真正提高代码性能，如果页面代码暂时不用，就采用异步懒加载的形势，主代码加载完成后利用空闲时间来加载其他子代码。</p>
+
+:ET

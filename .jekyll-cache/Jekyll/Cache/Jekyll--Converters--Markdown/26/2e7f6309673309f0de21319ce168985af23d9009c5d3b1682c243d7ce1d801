@@ -1,0 +1,161 @@
+I"e0<p>Vi/Vim手工自行安装配色方案的主要步骤包括：</p>
+
+<ul>
+  <li>确认当前用户目录下存在<code class="language-plaintext highlighter-rouge">~/.vim/colors</code>目录，没有则新建，安装的Vim配色方案对应.vim文件需放在该目录下</li>
+  <li>下载或编辑某个配色方案的<code class="language-plaintext highlighter-rouge">.vim文件</code>，保存到<code class="language-plaintext highlighter-rouge">~/.vim/colors</code>目录下</li>
+  <li>修改Vim配置文件<code class="language-plaintext highlighter-rouge">~/.vimrc</code>，增加配置项colorscheme molokai并保存 (假设下载了一个叫molokai的配色方案文件molokai.vim)</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">注意</code>：配置项中的 molokai 为配色方案文件的文件名，Vim通过该文件名加载对应.vim文件</p>
+
+<h1 id="1acme-colors">1.acme-colors</h1>
+
+<p>acme-colors配色方案支持256种颜色，对应.vim文件下载地址为：<a href="https://github.com/plan9-for-vimspace/acme-colors/blob/master/colors/acme.vim" target="_blank">https://github.com/plan9-for-vimspace/acme-colors/blob/master/colors/acme.vim</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_10.png" alt="ssl" /></p>
+
+<h1 id="2base16">2.base16</h1>
+
+<p>base16配色方案包含一系列配色，还提供了一些额外的插件供安装，具体使用可参考github上的说明:<a href="https://github.com/chriskempson/base16-vim" title="https://github.com/chriskempson/base16-vim" target="_blank">https://github.com/chriskempson/base16-vim</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_11.png" alt="ssl" /></p>
+
+<h1 id="3gotham">3.gotham</h1>
+
+<p>Gotham自称是一个非常dark的配色方案，包含 gotham和gotham256以及一些其他插件配置，github地址为：<a href="https://github.com/whatyouhide/vim-gotham" title="https://github.com/whatyouhide/vim-gotham" target="_blank">https://github.com/whatyouhide/vim-gotham</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_12.png" alt="ssl" /></p>
+
+<h1 id="4gruvbox">4.gruvbox</h1>
+
+<p>gruvbox配色方案在github上的评价较高，据说对人眼非常pleasant，Vim教程网就是用的这个配色方案，下面是github地址及配色截图:<a href="https://github.com/morhetz/gruvbox" title="https://github.com/morhetz/gruvbox" target="_blank">https://github.com/morhetz/gruvbox</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_13.png" alt="ssl" /></p>
+
+<h1 id="5janah">5.janah</h1>
+
+<p>janah也是一个dark型的配色方案，github地址为：<a href="https://github.com/mhinz/vim-janah" title="https://github.com/mhinz/vim-janah" target="_blank">https://github.com/mhinz/vim-janah</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_14.png" alt="ssl" /></p>
+
+<h1 id="6jellybeans">6.jellybeans</h1>
+
+<p>jellybeans在github上也较流行，github地址：<a href="https://github.com/nanotech/jellybeans.vim" title="https://github.com/nanotech/jellybeans.vim" target="_blank">https://github.com/nanotech/jellybeans.vim</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_15.png" alt="ssl" /></p>
+
+<h1 id="7lucius">7.lucius</h1>
+
+<p>lucius配色方案的github地址：<a href="https://github.com/jonathanfilip/vim-lucius" title="https://github.com/jonathanfilip/vim-lucius" target="_blank">https://github.com/jonathanfilip/vim-lucius</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_16.png" alt="ssl" /></p>
+
+<h1 id="8molokai">8.molokai</h1>
+
+<p>molokai配色方案非常出名，知乎上有个问题你认为最好看的 Vim 配色方案是哪款，molokai的呼声非常高<a href="https://github.com/tomasr/molokai" title="https://github.com/tomasr/molokai" target="_blank">https://github.com/tomasr/molokai</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_17.png" alt="ssl" /></p>
+
+<h1 id="9oceanic-next">9.oceanic-next</h1>
+
+<p>oceanic-next是一个neovim配色方案，依赖其他几个插件和配色方案<a href="https://github.com/mhartington/oceanic-next" title="https://github.com/mhartington/oceanic-next" target="_blank">https://github.com/mhartington/oceanic-next</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_18.png" alt="ssl" /></p>
+
+<h1 id="10paramount">10.paramount</h1>
+
+<p>paramount是一个比较简单的Vim配色方案，只关注一些关键配置<a href="https://github.com/owickstrom/vim-colors-paramount" title="https://github.com/owickstrom/vim-colors-paramount" target="_blank">https://github.com/owickstrom/vim-colors-paramount</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_19.png" alt="ssl" /></p>
+
+<h1 id="11flattened">11.flattened</h1>
+
+<p>flattened也是一个很简介但不简单的配色方案，官方说法是没有废话“without the bullshit”<a href="https://github.com/romainl/flattened" title="https://github.com/romainl/flattened" target="_blank">https://github.com/romainl/flattened</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_20.png" alt="ssl" /></p>
+
+<h1 id="12railscasts">12.railscasts</h1>
+
+<p>railscasts同时支持GUI和终端方式，github地址为：<a href="https://github.com/jpo/vim-railscasts-theme" title="https://github.com/jpo/vim-railscasts-theme" target="_blank">https://github.com/jpo/vim-railscasts-theme</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_21.png" alt="ssl" /></p>
+
+<h1 id="13seoul256">13.seoul256</h1>
+
+<p>seoul256是一个低对比度(low-contrast)的配色方案，github地址：<a href="https://github.com/junegunn/seoul256.vim" title="https://github.com/junegunn/seoul256.vim" target="_blank">https://github.com/junegunn/seoul256.vim</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_22.png" alt="ssl" /></p>
+
+<h1 id="14solarized">14.solarized</h1>
+
+<p>solarized配色方案在github上的star非常多<a href="https://github.com/altercation/vim-colors-solarized" title="https://github.com/altercation/vim-colors-solarized" target="_blank">https://github.com/altercation/vim-colors-solarized</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_23.png" alt="ssl" /></p>
+
+<h1 id="15yowish">15.yowish</h1>
+
+<p>yowish配色方案同时支持GUI和256色终端，也是一个 dark 主题<a href="https://github.com/kabbamine/yowish.vim" title="https://github.com/kabbamine/yowish.vim" target="_blank">https://github.com/kabbamine/yowish.vim</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_24.png" alt="ssl" /></p>
+
+<h1 id="16solarized">16.Solarized</h1>
+
+<p>Solarized可以称得上是Vim配色方案中最为流行和推崇的方案 (几乎可以说是没有之一)，所以不管这篇文章的主题是什么，最先推荐给大家的主题，我首选Solarized。其下载地址为：<a href="https://github.com/altercation/vim-colors-solarized" title="https://github.com/altercation/vim-colors-solarized" target="_blank">https://github.com/altercation/vim-colors-solarized</a>，star数已经超过5000了。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_25.png" alt="ssl" /></p>
+
+<h1 id="17grb256">17.GRB256</h1>
+
+<p>GRB256是基于ir_black方案而设计的一款Vim配色方案，作者同为Gary Bernhard。对于Ruby on Rails和Python开发者来说，是一款非常友好的简约型配色，推荐使用。其github地址为：<a href="https://github.com/garybernhardt/dotfiles/blob/master/.vim/colors/grb256.vim" title="https://github.com/garybernhardt/dotfiles/blob/master/.vim/colors/grb256.vim" target="_blank">https://github.com/garybernhardt/dotfiles/blob/master/.vim/colors/grb256.vim</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_26.png" alt="ssl" /></p>
+
+<h1 id="18distinguished">18.Distinguished</h1>
+
+<p>Distinguished是一个面向256-color终端的暗黑型配色方案，对于JavaScript语言来说，是一个非常值得推荐的主题，当然，这款Vim配色对于Ruby和Python开发者来说，也是一个非常不错的选择。其github下载地址为：<a href="https://github.com/Lokaltog/vim-distinguished" title="https://github.com/Lokaltog/vim-distinguished" target="_blank">https://github.com/Lokaltog/vim-distinguished</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_27.png" alt="ssl" /></p>
+
+<h1 id="19guardian">19.Guardian</h1>
+
+<p>Guardian是面向XHTML和CSS文件而设计的一款Vim配色方案，但是对于Ruby和Javascript开发者来说，也是一个非常不错的选择。其官方下载地址为：<a href="http://www.vim.org/scripts/script.php?script_id=1240" title="http://www.vim.org/scripts/script.php?script_id=1240。" target="_blank">http://www.vim.org/scripts/script.php?script_id=1240</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_28.png" alt="ssl" /></p>
+
+<h1 id="20railscasts">20.Railscasts</h1>
+
+<p>Railscasts配色方案是由Ryan Bates通过移植其在TextMate (Mac下的著名的文本编辑器软件，与BBedit一起并称Mac上的emacs和vim) 所使用的配色到Vim而产生的，如果你是一位Ruby或ptyhon语言的使用者，那么你一定要尝试下这个Vim配色。其github地址为：<a href="https://github.com/ryanb/dotfiles/blob/master/vim/colors/railscasts.vim" title="https://github.com/ryanb/dotfiles/blob/master/vim/colors/railscasts.vim" target="_blank">https://github.com/ryanb/dotfiles/blob/master/vim/colors/railscasts.vim</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_29.png" alt="ssl" /></p>
+
+<h1 id="21twilight">21.Twilight</h1>
+
+<p>Twilight也是一款从TextMate移植过来的Vim配色方案，但是青出于蓝，在一些场景下甚至比TextMate上的twilight配色更加完美。如果你曾经是TextMate编辑器的使用者，那么强烈建议你尝试下这款名叫Twilight的Vim配色方案。其官网下载地址为：<a href="http://www.vim.org/scripts/script.php?script_id=1677" title="http://www.vim.org/scripts/script.php?script_id=1677" target="_blank">http://www.vim.org/scripts/script.php?script_id=1677</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_30.png" alt="ssl" /></p>
+
+<h1 id="22jellybeans">22.Jellybeans</h1>
+
+<p>Jellybeans是一个色彩鲜明但不花哨的Vim配色方案，据说是基于 ir_black 和 twilight 主题而进行设计实现。虽然官方称其主要是为了给gVim和MacVim所实现，但是其对256-color终端也是非常友好的。配色下载地址为：<a href="https://github.com/nanotech/jellybeans.vim" title="https://github.com/nanotech/jellybeans.vim" target="_blank">https://github.com/nanotech/jellybeans.vim</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_31.png" alt="ssl" /></p>
+
+<h1 id="23vividchalk">23.Vividchalk</h1>
+
+<p>Vividchalk也是一款从TextMate移植过来的Vim配色方案，它基于TextMae上一个叫做Vibrant Ink的主题而设计和开发。不管是GUI，还是256-color、88-color 或者是 16-color 终端，都能很好地进行支持。下载地址为：<a href="https://github.com/tpope/vim-vividchalk" title="https://github.com/tpope/vim-vividchalk" target="_blank">https://github.com/tpope/vim-vividchalk</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_32.png" alt="ssl" /></p>
+
+<h1 id="24candy">24.Candy</h1>
+
+<p>Candy是一款隐藏色系的Vim配色方案 (hidden color schemes)，色彩鲜明、关键词突出，是我自己非常喜欢的一款Vim配色，其下载地址为：<a href="http://www.vim.org/scripts/script.php?script_id=282" title="http://www.vim.org/scripts/script.php?script_id=282">http://www.vim.org/scripts/script.php?script_id=282</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_33.png" alt="ssl" /></p>
+
+<h1 id="25github">25.GitHub</h1>
+
+<p>这是一款基于GitHub的 light-background 语法高亮而实现的一款Vim配色方案，对于completion menus、diffsplit、STL highlighting 等十分友好。其官方下载地址为：<a href="http://www.vim.org/scripts/script.php?script_id=2855" title="http://www.vim.org/scripts/script.php?script_id=2855" target="_blank">http://www.vim.org/scripts/script.php?script_id=2855</a></p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_34.png" alt="ssl" /></p>
+
+:ET

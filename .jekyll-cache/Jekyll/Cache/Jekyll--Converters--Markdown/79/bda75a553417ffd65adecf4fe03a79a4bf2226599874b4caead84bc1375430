@@ -1,4 +1,4 @@
-I"6]<p>这篇贴子会收录个人觉得有用的方法。如果大家也有一些非常不错的封装，那么还请不吝赐教，谢谢。</p>
+I"Re<p>这篇贴子会收录个人觉得有用的方法。如果大家也有一些非常不错的封装，那么还请不吝赐教，谢谢。</p>
 
 <h1 id="1判断浏览环境">1.判断浏览环境</h1>
 
@@ -170,6 +170,22 @@
 <span class="p">}</span>
 
 <span class="nx">formatFloat</span><span class="p">(</span><span class="mf">0.11231231</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h1 id="9替换指定的字符串">9.替换指定的字符串</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">strReplace</span> <span class="o">=</span> <span class="p">(</span><span class="nx">str</span><span class="p">,</span> <span class="p">...</span><span class="nx">params</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+  <span class="k">return</span> <span class="nx">str</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">\$</span><span class="sr">{</span><span class="se">(\w</span><span class="sr">+</span><span class="se">)?</span><span class="sr">}/g</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">params</span><span class="p">[</span><span class="nx">i</span><span class="o">++</span><span class="p">]</span> <span class="o">||</span> <span class="dl">'</span><span class="s1">${}</span><span class="dl">'</span>
+  <span class="p">})</span>
+<span class="p">}</span>
+
+<span class="nx">str</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">Hello, ${How} are ${} you? ${}</span><span class="dl">'</span>
+<span class="nx">strReplace</span><span class="p">(</span><span class="nx">str</span><span class="p">,</span><span class="dl">'</span><span class="s1">**</span><span class="dl">'</span><span class="p">,</span><span class="dl">'</span><span class="s1">&amp;&amp;</span><span class="dl">'</span><span class="p">)</span>
+<span class="c1">//输出</span>
+<span class="nx">Hello</span><span class="p">,</span> <span class="o">**</span> <span class="nx">are</span> <span class="o">&amp;&amp;</span> <span class="nx">you</span><span class="p">?</span> <span class="nx">$</span><span class="p">{}</span>
 </code></pre></div></div>
 
 :ET

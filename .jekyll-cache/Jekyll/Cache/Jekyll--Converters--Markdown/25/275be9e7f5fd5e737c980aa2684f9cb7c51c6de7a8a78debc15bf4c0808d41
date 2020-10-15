@@ -1,0 +1,505 @@
+I"b<p>代码分割是一个概念，和webpack无关，在没有webpack的时候，代码分割这个概念也存在。通过合理的代码分割会让我们程序运行的性能更高，在没有webpack的时候，我们需要思考手动做代码分割怎么样合适。但是在有webpack后，我们只需在webpack配置中使用几个配置项，webpack就会知道我们的代码怎么样做代码分割合适，就会自动做代码分割，不在需要我们去考虑这个事情。</p>
+
+<h1 id="1手动代码分割演示">1.手动代码分割演示</h1>
+
+<h4 id="安装loadsh">安装loadsh</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add loadsh
+</code></pre></div></div>
+
+<h4 id="srcindexjs">src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">_</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">loadsh</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="kd">let</span> <span class="nx">str</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">join</span><span class="p">([</span><span class="dl">'</span><span class="s1">hello</span><span class="dl">'</span><span class="p">,</span><span class="dl">'</span><span class="s1">world</span><span class="dl">'</span><span class="p">],</span><span class="dl">'</span><span class="s1">-</span><span class="dl">'</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_16.png" alt="ssl" /></p>
+
+<p>webpack打包输出的信息，main.js文件是1.38M。main.js文件之所以这么大，是因为将整个loadsh库全部打包进main.js文件中。当我们的业务代码非常长，引用的库文件也比较多时，main文件会非常大，这会导致用户体验非常差。接下来手动拆分一下</p>
+
+<h4 id="文件结构">文件结构</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">myProject
+</span> |-dist
+ |-node_modules
+ |-src
+     |-util
+        |-math.js
+<span class="gi">+        |-loadsh.js
+</span>     |-assets
+        |-css
+            |-index.css
+        |-less
+            |-index.less     
+        |-sass
+            |-index.scss
+        |-images
+            |-wali_logo.png
+     |-index.html
+     |-index.js
+ |-package.json
+ |-webpack.config.js
+ |-postcss.config.js
+ |-.babelrc
+</code></pre></div></div>
+
+<h4 id="srcutilloadshjs">src/util/loadsh.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">_</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">loadsh</span><span class="dl">"</span>
+
+<span class="nb">window</span><span class="p">.</span><span class="nx">_</span> <span class="o">=</span> <span class="nx">_</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h4 id="srcindexjs-1">src/index.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gd">- import _ from "loadsh";
+</span>  let str = _.join(['hello','world'],'-');
+  console.log(str)
+</code></pre></div></div>
+
+<h4 id="webpackconfigjs">webpack.config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">module.exports = {
+</span>    ...
+    entry:{
+<span class="gi">+       loadsh:'./src/util/loadsh.js'
+</span>        main:'./src/index.js'
+    },
+    ...
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack-1">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_17.png" alt="ssl" /></p>
+
+<p>webpack打包看到main.js文件29.1KB，并没有将loadsh打包进main.js文件，而是单独打包成一个文件。我们测试下打包后能不能运行，打开<code class="language-plaintext highlighter-rouge">dist/index.html</code>，打开chrom控制台，看到控制台输出<code class="language-plaintext highlighter-rouge">hello-world</code>。其实webpack可以自动帮我们进行代码分割，不需要我们从架构上区分，减轻了开发者的工作。</p>
+
+<p><code class="language-plaintext highlighter-rouge">注意：</code>不知道大家在写entry时，有没有将<code class="language-plaintext highlighter-rouge">loadsh</code>和<code class="language-plaintext highlighter-rouge">main</code>顺序写反，小菜第一次就他们顺序写反了。导致打完包后，浏览器包了一个<code class="language-plaintext highlighter-rouge">_ is not defined</code>。看index.html源码中也将<code class="language-plaintext highlighter-rouge">loadsh</code>库加载进来了。</p>
+
+<p>为什么会出现这个问题？</p>
+
+<p>是因为在index.html中先加载<code class="language-plaintext highlighter-rouge">main.js</code>然后在加载<code class="language-plaintext highlighter-rouge">loadsh</code>但是在执行顺序上main.js文件需要依赖loadsh库文件。虽然浏览器是并行加载js文件的。但是在有依赖关系js代码中，我们并不能保证loadsh一定加载在main文件前。</p>
+
+<h1 id="2webpack配置代码分割">2.webpack配置代码分割</h1>
+
+<p>在配置webpack之前，我们将上面的代码进行回滚</p>
+
+<h4 id="回滚webpackconfigjs">回滚webpack.config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">module.exports = {
+</span>    ...
+    entry:{
+<span class="gd">-       loadsh:'./src/util/loadsh.js'
+</span>        main:'./src/index.js'
+    },
+    ...
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="回滚文件">回滚文件</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">myProject
+</span> |-dist
+ |-node_modules
+ |-src
+     |-util
+        |-math.js
+<span class="gd">-        |-loadsh.js
+</span>     |-assets
+        |-css
+            |-index.css
+        |-less
+            |-index.less     
+        |-sass
+            |-index.scss
+        |-images
+            |-wali_logo.png
+     |-index.html
+     |-index.js
+ |-package.json
+ |-webpack.config.js
+ |-postcss.config.js
+ |-.babelrc
+</code></pre></div></div>
+
+<p>代码回滚完成后，我们在webpack参数中配置下，让webpack帮助我们做代码分割。</p>
+
+<h4 id="修改srcindexjs">修改src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">_</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">loadsh</span><span class="dl">"</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">str</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">join</span><span class="p">([</span><span class="dl">'</span><span class="s1">hello</span><span class="dl">'</span><span class="p">,</span><span class="dl">'</span><span class="s1">world</span><span class="dl">'</span><span class="p">],</span><span class="dl">'</span><span class="s1">-</span><span class="dl">'</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="webpackconfigjs-1">webpack.config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">module.exports = {
+</span>    ...
+    optimization:{
+        usedExports: true,
+<span class="gi">+        splitChunks:{
++            chunks:'all'
++        }
+</span>    },
+    ...
+<span class="err">}</span>
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_18.png" alt="ssl" /></p>
+
+<p>从小菜截图中可以看到，webpack将公共的类库提取出来，打包成一个文件。</p>
+
+<h1 id="3异步代码分割">3.异步代码分割</h1>
+
+<p>在上面我们已经将loadsh进行了代码分割，不过在<code class="language-plaintext highlighter-rouge">src/index.js</code>中的代码是同步的，那webpack能不能将我们的代码做异步分割呢？</p>
+
+<h4 id="srcindexjs-2">src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">getComponent</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="k">import</span><span class="p">(</span><span class="dl">'</span><span class="s1">loadsh</span><span class="dl">'</span><span class="p">).</span><span class="nx">then</span><span class="p">(({</span> <span class="na">default</span><span class="p">:</span><span class="nx">_</span> <span class="p">})</span> <span class="o">=&gt;</span><span class="p">{</span>
+        <span class="kd">let</span> <span class="nx">element</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">'</span><span class="s1">div</span><span class="dl">'</span><span class="p">);</span>
+        <span class="nx">element</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">join</span><span class="p">([</span><span class="dl">'</span><span class="s1">hello</span><span class="dl">'</span><span class="p">,</span><span class="dl">'</span><span class="s1">world</span><span class="dl">'</span><span class="p">],</span><span class="dl">'</span><span class="s1">**</span><span class="dl">'</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nx">element</span><span class="p">;</span>
+    <span class="p">})</span>
+<span class="p">}</span>
+
+<span class="nx">getComponent</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">ele</span><span class="o">=&gt;</span><span class="p">{</span>
+    <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">ele</span><span class="p">);</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h4 id="安装">安装</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add @babel/plugin-syntax-dynamic-import
+</code></pre></div></div>
+
+<h4 id="修改babelrc">修改.babelrc</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">{</span>
+	"presets": [
+		[
+			"@babel/preset-env",
+			{
+				"targets": {
+					"chrome": "67"
+				},
+				"useBuiltIns": "usage"
+			}
+		]
+	],
+	"plugins": [
+    [
+      "@babel/plugin-transform-runtime",
+      {
+        "absoluteRuntime": false,
+        "corejs": 2,
+        "helpers": true,
+        "regenerator": true,
+        "useESModules": false
+      }
+    ]
+<span class="gi">+	  "@babel/plugin-syntax-dynamic-import"    
+</span>  ]
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="然后在运行webpack">然后在运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_19.png" alt="ssl" />
+<img src="http://walidream.com:9999/blogImage/webpack/webpack_20.png" alt="ssl" /></p>
+
+<p>发现webpack将异步引入的库文件也打包成了一个文件。</p>
+
+<h1 id="4代码分割修改文件名">4.代码分割修改文件名</h1>
+
+<p>上面webpack将loadsh库文件做代码分割后，文件名称变成了0.js，不在是我们熟悉的loadsh.js如果想要修改文件名称，那就跟小菜继续往下走。</p>
+
+<h4 id="scrindexjs">scr/index.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">function getComponent(){
+</span><span class="gi">+    return import(/*webpackChunkName:"loadsh"*/ 'loadsh').then(({ default:_ }) =&gt;{
+</span>        let element = document.createElement('div');
+        element.innerHTML = _.join(['hello','world'],'**');
+
+        return element;
+    })
+<span class="err">}</span>
+
+<span class="p">getComponent().then(ele=&gt;{
+</span>    document.body.appendChild(ele);
+<span class="err">})</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack-2">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_21.png" alt="ssl" /></p>
+
+<h1 id="5详解spiltchunksplugin参数">5.详解SpiltChunksPlugin参数</h1>
+
+<ul>
+  <li><a href="https://webpack.docschina.org/plugins/split-chunks-plugin/" title="https://webpack.docschina.org/plugins/split-chunks-plugin/" target="_blank">SpiltChunksPlugin官方文档</a></li>
+</ul>
+
+<h4 id="spiltchunksplugin默认参数">SpiltChunksPlugin默认参数</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="c1">//...</span>
+  <span class="na">optimization</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">splitChunks</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">chunks</span><span class="p">:</span> <span class="dl">'</span><span class="s1">async</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">minSize</span><span class="p">:</span> <span class="mi">30000</span><span class="p">,</span>
+      <span class="na">maxSize</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="na">minChunks</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="na">maxAsyncRequests</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+      <span class="na">maxInitialRequests</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+      <span class="na">automaticNameDelimiter</span><span class="p">:</span> <span class="dl">'</span><span class="s1">~</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">name</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="na">cacheGroups</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">vendors</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">[\\/]</span><span class="sr">node_modules</span><span class="se">[\\/]</span><span class="sr">/</span><span class="p">,</span>
+          <span class="na">priority</span><span class="p">:</span> <span class="o">-</span><span class="mi">10</span>
+        <span class="p">},</span>
+        <span class="na">default</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">minChunks</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+          <span class="na">priority</span><span class="p">:</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span>
+          <span class="na">reuseExistingChunk</span><span class="p">:</span> <span class="kc">true</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>　　　　　　</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>默认</th>
+      <th>说明</th>
+      <th>值</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>chunks</td>
+      <td>async</td>
+      <td>设置代码分割类型,和<code class="language-plaintext highlighter-rouge">cacheGroups</code>配置配合使用</td>
+      <td><code class="language-plaintext highlighter-rouge">async</code> 对异步代码分割<br /><code class="language-plaintext highlighter-rouge">all</code> 对同步和异步代码分割</td>
+    </tr>
+    <tr>
+      <td>minSize</td>
+      <td>30000(30kb)</td>
+      <td>当引入的模块大于30kb才会做代码分割</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>maxSize</td>
+      <td>0</td>
+      <td>当引入的模块大于<code class="language-plaintext highlighter-rouge">maxSize</code>时，会尝试对引入的模块进行二次拆分，一般不用配置</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>minChunks</td>
+      <td>1</td>
+      <td>当一个模块被至少引入1次，才会做代码分割</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>maxAsyncRequests</td>
+      <td>5</td>
+      <td>当引入模块10个时，只会将前5个模块进行打包</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>maxInitialRequests</td>
+      <td>3</td>
+      <td>入口文件引入的模块如果超过3个，只会将前3个模块做代码分割</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>automaticNameDelimiter</td>
+      <td><code class="language-plaintext highlighter-rouge">~</code></td>
+      <td>文件连接符</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>name</td>
+      <td>true</td>
+      <td>拆分块的名称，让<code class="language-plaintext highlighter-rouge">cacheGroups</code>里面的名字有效</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>cacheGroups</td>
+      <td>{}</td>
+      <td>对符合代码拆分的模块进行一个分类</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="cachegroups参数">cacheGroups参数</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>类型</th>
+      <th>说明</th>
+      <th>值</th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>priority</td>
+      <td>number</td>
+      <td>有限权，当一个模块都符合cacheGroups分组条件，将按照优先权进行分组，priority值越大，优先权越高</td>
+      <td>-10</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>filename</td>
+      <td>String|Function</td>
+      <td>拆分的名称，一般不设置，默认生成<code class="language-plaintext highlighter-rouge">vendors~mian</code>。<code class="language-plaintext highlighter-rouge">vendors</code>分组名称，<code class="language-plaintext highlighter-rouge">~</code>连接符，<code class="language-plaintext highlighter-rouge">main</code>引入模块的入口文件</td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>reuseExistingChunk</td>
+      <td>boolean</td>
+      <td>如果当前块包含已从主束拆分的模块，则将重用它而不是生成新的块。比如<br /> import a from ‘A’<br />import b from ‘B’在打包时候，按照打包顺序也会将<code class="language-plaintext highlighter-rouge">b</code>打包进<code class="language-plaintext highlighter-rouge">a</code>模块，但是在<code class="language-plaintext highlighter-rouge">a</code>打包之前，如果已经将<code class="language-plaintext highlighter-rouge">b</code>模块进行过打包,那么就不会将<code class="language-plaintext highlighter-rouge">b</code>模块在打包到<code class="language-plaintext highlighter-rouge">a</code>模块中</td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>test</td>
+      <td>function (module, chunk) | RegExp | string</td>
+      <td>控制此缓存组选择的模块。<code class="language-plaintext highlighter-rouge">test:/[\\/]node_modules[\\/]/</code>必须要在node_modules模块在才可以</td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>enforce</td>
+      <td>boolean</td>
+      <td>将对<br />splitChunks.minSize<br />splitChunks.minChunks<br />splitChunks.maxAsyncRequests <br />splitChunks.maxInitialRequests<br />配置忽略</td>
+      <td> </td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="webpackconfigjs-2">webpack.config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">module.exports = {
+</span>  ...
+  optimization: {
+<span class="gi">+    splitChunks: {
++      chunks: 'all',
++      minSize: 30000,
++      maxSize: 0,
++      minChunks: 1,
++      maxAsyncRequests: 5,
++      maxInitialRequests: 3,
++      automaticNameDelimiter: '~',
++      name: true,
++      cacheGroups: {
++        vendors: {
++          test: /[\\/]node_modules[\\/]/,
++          priority: -10
++        },
++        default: {
++          minChunks: 2,
++          priority: -20,
++          reuseExistingChunk: true
++        }
++      }
++    }
+</span>  }
+<span class="err">};</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack-3">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run build
+</code></pre></div></div>
+
+<h1 id="6示例1说明">6.示例1说明</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// index.js</span>
+
+<span class="k">import</span><span class="p">(</span><span class="dl">'</span><span class="s1">./a</span><span class="dl">'</span><span class="p">);</span> <span class="c1">// dynamic import</span>
+</code></pre></div></div>
+<p>　　　　　　　　　　　　</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// a.js</span>
+<span class="k">import</span> <span class="dl">'</span><span class="s1">react</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="c1">//...</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">结果：创建包含react的单独块，在导入调用时，react块和./a的原始块并行加载</code></p>
+
+<p>原因：</p>
+<ul>
+  <li>react块来自node_modules的模块</li>
+  <li>react大于30kb</li>
+  <li>导入调用时的并行请求数为2</li>
+  <li>不影响初始页面加载时的请求</li>
+</ul>
+
+<h1 id="7示例2说明">7.示例2说明</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// entry.js</span>
+
+<span class="c1">// dynamic imports</span>
+<span class="k">import</span><span class="p">(</span><span class="dl">'</span><span class="s1">./a</span><span class="dl">'</span><span class="p">);</span>
+<span class="k">import</span><span class="p">(</span><span class="dl">'</span><span class="s1">./b</span><span class="dl">'</span><span class="p">);</span>
+</code></pre></div></div>
+<p>　　　　　　</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// a.js</span>
+<span class="k">import</span> <span class="dl">'</span><span class="s1">./helpers</span><span class="dl">'</span><span class="p">;</span> <span class="c1">// helpers is 40kb in size</span>
+
+<span class="c1">//...</span>
+</code></pre></div></div>
+
+<p>　　　　　　</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// b.js</span>
+<span class="k">import</span> <span class="dl">'</span><span class="s1">./helpers</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="dl">'</span><span class="s1">./more-helpers</span><span class="dl">'</span><span class="p">;</span> <span class="c1">// more-helpers is also 40kb in size</span>
+
+<span class="c1">//...</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">结果：将创建一个./helpers单独的块及其所有依赖项。在导入调用时，此块与原始块并行加载</code></p>
+
+<p>原因：</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">./helpers</code>块在两个导入调用之间共享</li>
+  <li><code class="language-plaintext highlighter-rouge">helpers</code>大于30kb</li>
+  <li>导入调用的并行请求数为2</li>
+  <li>不影响初始页面加载时的请求</li>
+</ul>
+
+:ET

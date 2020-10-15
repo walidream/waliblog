@@ -1,0 +1,2 @@
+I"Y<p>虽然<code class="language-plaintext highlighter-rouge">chromedriver</code>已经可以可以使用浏览器登录了，但是由于浏览器还是被<code class="language-plaintext highlighter-rouge">chromedriver</code>控制的，chromedriver有一些特性可以被js感知到，所以很多网站可以在网站中加入js逻辑来判断当前的浏览器是否是由driver控制，比如检测是否存在特有标识<code class="language-plaintext highlighter-rouge">$cdc_lasutopfhvcZLmcfl</code>、<code class="language-plaintext highlighter-rouge">window.navigator.webdriver</code>：</p>
+:ET

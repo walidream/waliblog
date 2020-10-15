@@ -1,0 +1,76 @@
+I"�<p>本小节收集记录有关于<code class="language-plaintext highlighter-rouge">python</code>的学习资料</p>
+
+<h1 id="1python资料">1.python资料</h1>
+
+<h4 id="python资料">python资料</h4>
+
+<ol>
+  <li><a href="https://docs.python.org/zh-cn/3/" title="https://docs.python.org/zh-cn/3/">python 官方文档  </a></li>
+  <li><a href="https://pythonprogramming.net" title="https://pythonprogramming.net">python 在线demo pythonprogramming</a></li>
+  <li><a href="https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/python_style_rules/" title="https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/python_style_rules/">python 代码风格指南</a></li>
+  <li><a href="https://docs.python.org/zh-cn/3/library/re.html" title="https://docs.python.org/zh-cn/3/library/re.html">python 正则表达式官方文档</a></li>
+</ol>
+
+<h4 id="python环境搭建">python环境搭建</h4>
+
+<h3 id="anaconda-构建python虚拟环境建议">anaconda 构建python虚拟环境(建议)</h3>
+<ol>
+  <li><a href="https://www.anaconda.com/" title="https://www.anaconda.com/">anaconda 官方网站</a></li>
+  <li><a href="https://waliblog.com/python/2019/05/13/anaconda.html" title="https://waliblog.com/python/2019/05/13/anaconda.html">anaconda 安装使用教程</a></li>
+</ol>
+
+<h3 id="pipenv-构建python虚拟环境">pipenv 构建python虚拟环境</h3>
+<ol>
+  <li><a href="https://waliblog.com/python/2019/07/08/flask-1.html" title="https://waliblog.com/python/2019/07/08/flask-1.html">pipenv 安装使用</a></li>
+</ol>
+
+<h1 id="2flask资料">2.flask资料</h1>
+
+<h4 id="flask资料">flask资料</h4>
+
+<ol>
+  <li><a href="https://palletsprojects.com/p/flask/" title="https://palletsprojects.com/p/flask/">flask 官方文档 英文</a></li>
+  <li><a href="http://docs.jinkan.org/docs/flask/" title="http://docs.jinkan.org/docs/flask/">flask 官方文档 翻译版</a></li>
+</ol>
+
+<h1 id="3scrapy资料">3.scrapy资料</h1>
+
+<h4 id="scrapy资料">scrapy资料</h4>
+
+<ol>
+  <li><a href="https://doc.scrapy.org/en/latest/" title="https://doc.scrapy.org/en/latest/">scrapy 官方文档 英文</a></li>
+  <li><a href="https://doc.yonyoucloud.com/doc/wiki/project/scrapy/items.html" title="https://doc.yonyoucloud.com/doc/wiki/project/scrapy/items.html">scrapy 官方文档 翻译版</a></li>
+  <li><a href="https://waliblog.com/python/2019/08/12/scrapy-error-1.html" title="https://waliblog.com/python/2019/08/12/scrapy-error-1.html">scrapy 错误处理</a></li>
+</ol>
+
+<h4 id="自动化操作">自动化操作</h4>
+
+<ol>
+  <li>selenium 安装 <code class="language-plaintext highlighter-rouge">conda install selenium</code></li>
+  <li><a href="https://selenium-python-zh.readthedocs.io/en/latest/locating-elements.html#" title="https://selenium-python-zh.readthedocs.io/en/latest/locating-elements.html#">Selenium-Python中文文档</a></li>
+  <li><a href="https://chromedriver.chromium.org/downloads" title="https://chromedriver.chromium.org/downloads">chromedriver 驱动chrom浏览器</a></li>
+</ol>
+
+<h4 id="操作鼠标">操作鼠标</h4>
+
+<ol>
+  <li><a href="https://github.com/boppreh/mouse" title="https://github.com/boppreh/mouse">python mouse 操作鼠标</a></li>
+</ol>
+
+<h4 id="验证码识别">验证码识别</h4>
+
+<ol>
+  <li><a href="https://github.com/muchrooms/zheye" title="https://github.com/muchrooms/zheye">知乎 中文倒立 验证码识别</a></li>
+  <li><a href="http://www.yundama.com/" title="http://www.yundama.com/">云打码平台</a></li>
+  <li><a href="http://littlebigluo.qicp.net:47720" title="http://littlebigluo.qicp.net:47720">12306 验证码识别 在线demo</a></li>
+</ol>
+
+<h4 id="user_agent">USER_AGENT</h4>
+
+<p>1.<a href="https://github.com/hellysmile/fake-useragent" title="https://github.com/hellysmile/fake-useragent">fake-useragent</a></p>
+
+<h4 id="ip池">IP池</h4>
+
+<p>1.<a href="https://www.xicidaili.com/?_id=015448211445" title="https://www.xicidaili.com/?_id=015448211445">西刺代理</a></p>
+
+:ET

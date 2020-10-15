@@ -1,0 +1,479 @@
+I"�t<p>Scrapy带有自己的数据提取机制，称为选择器。scrapy有<code class="language-plaintext highlighter-rouge">xpath</code>和<code class="language-plaintext highlighter-rouge">css</code>两种选择器。XPath 是一种在XML文档中选择节点的语言，也可以与HTML一起使用。 CSS 是用于将样式应用于HTML文档的语言。它定义选择器，将这些样式与特定的HTML元素相关联。</p>
+
+<h1 id="1构造选择器">1.构造选择器</h1>
+
+<p>响应对象<code class="language-plaintext highlighter-rouge">(response)</code>公开 <code class="language-plaintext highlighter-rouge">Selector</code> 实例对 <code class="language-plaintext highlighter-rouge">.selector</code> 属性</p>
+
+<p>在response中还包含两个方法： <code class="language-plaintext highlighter-rouge">response.xpath()</code> 和 <code class="language-plaintext highlighter-rouge">response.css()</code></p>
+
+<p>使用Selector构造直接从文本构造</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">scrapy.selector</span> <span class="kn">import</span> <span class="n">Selector</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">body</span> <span class="o">=</span> <span class="s">'&lt;html&gt;&lt;body&gt;&lt;span&gt;good&lt;/span&gt;&lt;/body&gt;&lt;/html&gt;'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Selector</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">body</span><span class="p">).</span><span class="n">xpath</span><span class="p">(</span><span class="s">'//span/text()'</span><span class="p">).</span><span class="n">get</span><span class="p">()</span>
+<span class="s">'good'</span>
+</code></pre></div></div>
+
+<h1 id="2使用选择器">2.使用选择器</h1>
+
+<p>为了解释如何使用选择器，我们使用 Scrapy shell 来测试</p>
+
+<p>为了完整起见，下面是完整的HTML代码</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;html&gt;</span>
+ <span class="nt">&lt;head&gt;</span>
+  <span class="nt">&lt;base</span> <span class="na">href=</span><span class="s">'http://example.com/'</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;title&gt;</span>Example website<span class="nt">&lt;/title&gt;</span>
+ <span class="nt">&lt;/head&gt;</span>
+ <span class="nt">&lt;body&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">'images'</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">'image1.html'</span><span class="nt">&gt;</span>Name: My image 1 <span class="nt">&lt;br</span> <span class="nt">/&gt;&lt;img</span> <span class="na">src=</span><span class="s">'image1_thumb.jpg'</span> <span class="nt">/&gt;&lt;/a&gt;</span>
+   <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">'image2.html'</span><span class="nt">&gt;</span>Name: My image 2 <span class="nt">&lt;br</span> <span class="nt">/&gt;&lt;img</span> <span class="na">src=</span><span class="s">'image2_thumb.jpg'</span> <span class="nt">/&gt;&lt;/a&gt;</span>
+   <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">'image3.html'</span><span class="nt">&gt;</span>Name: My image 3 <span class="nt">&lt;br</span> <span class="nt">/&gt;&lt;img</span> <span class="na">src=</span><span class="s">'image3_thumb.jpg'</span> <span class="nt">/&gt;&lt;/a&gt;</span>
+   <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">'image4.html'</span><span class="nt">&gt;</span>Name: My image 4 <span class="nt">&lt;br</span> <span class="nt">/&gt;&lt;img</span> <span class="na">src=</span><span class="s">'image4_thumb.jpg'</span> <span class="nt">/&gt;&lt;/a&gt;</span>
+   <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">'image5.html'</span><span class="nt">&gt;</span>Name: My image 5 <span class="nt">&lt;br</span> <span class="nt">/&gt;&lt;img</span> <span class="na">src=</span><span class="s">'image5_thumb.jpg'</span> <span class="nt">/&gt;&lt;/a&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+ <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>  
+</code></pre></div></div>
+
+<p>打开虚拟环境，执行</p>
+
+<pre><code class="language-txt">scrapy shell https://docs.scrapy.org/en/latest/_static/selectors-sample1.html
+</code></pre>
+
+<h1 id="3提取文本数据">3.提取文本数据</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>方法</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>.get()</td>
+      <td>始终返回单个结果；如果有多个匹配项，则返回第一个匹配项的内容；如果没有匹配项，则不返回任何匹配项</td>
+    </tr>
+    <tr>
+      <td>.getall()</td>
+      <td>返回包含所有结果的列表</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>如果您是Scrapy的长期用户，则可能熟悉<code class="language-plaintext highlighter-rouge">.extract()</code>和<code class="language-plaintext highlighter-rouge">.extract_first()</code>选择器方法. 许多博客文章和教程也正在使用它们. Scrapy仍支持这些方法， 没有计划弃用它们.</p>
+
+<p>但是，现在使用<code class="language-plaintext highlighter-rouge">.get()</code>和<code class="language-plaintext highlighter-rouge">.getall()</code>方法编写Scrapy用法文档. 我们认为这些新方法可以使代码更简洁易读.</p>
+
+<p>以下示例显示了这些方法如何相互映射:</p>
+
+<p>1.<code class="language-plaintext highlighter-rouge">SelectorList.get()</code>与<code class="language-plaintext highlighter-rouge">SelectorList.extract_first()</code>相同：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">response</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">'a::attr(href)'</span><span class="p">).</span><span class="n">get</span><span class="p">()</span>
+<span class="s">'image1.html'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">response</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">'a::attr(href)'</span><span class="p">).</span><span class="n">extract_first</span><span class="p">()</span>
+<span class="s">'image1.html'</span>
+</code></pre></div></div>
+
+<p>2.<code class="language-plaintext highlighter-rouge">SelectorList.getall()</code>与<code class="language-plaintext highlighter-rouge">SelectorList.extract()</code>相同：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">response</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">'a::attr(href)'</span><span class="p">).</span><span class="n">getall</span><span class="p">()</span>
+<span class="p">[</span><span class="s">'image1.html'</span><span class="p">,</span> <span class="s">'image2.html'</span><span class="p">,</span> <span class="s">'image3.html'</span><span class="p">,</span> <span class="s">'image4.html'</span><span class="p">,</span> <span class="s">'image5.html'</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">response</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">'a::attr(href)'</span><span class="p">).</span><span class="n">extract</span><span class="p">()</span>
+<span class="p">[</span><span class="s">'image1.html'</span><span class="p">,</span> <span class="s">'image2.html'</span><span class="p">,</span> <span class="s">'image3.html'</span><span class="p">,</span> <span class="s">'image4.html'</span><span class="p">,</span> <span class="s">'image5.html'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>3.<code class="language-plaintext highlighter-rouge">Selector.get()</code>与<code class="language-plaintext highlighter-rouge">Selector.extract()</code>相同</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">response</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">'a::attr(href)'</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="n">get</span><span class="p">()</span>
+<span class="s">'image1.html'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">response</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">'a::attr(href)'</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="n">extract</span><span class="p">()</span>
+<span class="s">'image1.html'</span>
+</code></pre></div></div>
+
+<p>4.为了保持一致性，还有<code class="language-plaintext highlighter-rouge">Selector.getall() </code>，它返回一个列表：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">response</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">'a::attr(href)'</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="n">getall</span><span class="p">()</span>
+<span class="p">[</span><span class="s">'image1.html'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<h1 id="4css选择器">4.css选择器</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>css选择器</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>css(‘title::text’).get()</td>
+      <td>提取<title>标签的文本节点</title></td>
+    </tr>
+    <tr>
+      <td>css(‘*::text’).getall()</td>
+      <td>选择当前选择器上下文的所有子代文本节点</td>
+    </tr>
+    <tr>
+      <td>css(‘foo::text’).get()</td>
+      <td>获取<foo>标签的文本节点</foo></td>
+    </tr>
+    <tr>
+      <td>css(‘foo::text’).get(default=’’)</td>
+      <td>获取<foo>标签的文本节点，如果没有返回 ''</foo></td>
+    </tr>
+    <tr>
+      <td>css(‘a::attr(href)’).getall()</td>
+      <td>获取全部标签的href属性</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">response</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">'title::text'</span><span class="p">).</span><span class="n">get</span><span class="p">()</span>
+<span class="s">'Example website'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">response</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">'#images *::text'</span><span class="p">).</span><span class="n">getall</span><span class="p">()</span>
+<span class="p">[</span><span class="s">'</span><span class="se">\n</span><span class="s">   '</span><span class="p">,</span>
+ <span class="s">'Name: My image 1 '</span><span class="p">,</span>
+ <span class="s">'</span><span class="se">\n</span><span class="s">   '</span><span class="p">,</span>
+ <span class="s">'Name: My image 2 '</span><span class="p">,</span>
+ <span class="s">'</span><span class="se">\n</span><span class="s">   '</span><span class="p">,</span>
+ <span class="s">'Name: My image 3 '</span><span class="p">,</span>
+ <span class="s">'</span><span class="se">\n</span><span class="s">   '</span><span class="p">,</span>
+ <span class="s">'Name: My image 4 '</span><span class="p">,</span>
+ <span class="s">'</span><span class="se">\n</span><span class="s">   '</span><span class="p">,</span>
+ <span class="s">'Name: My image 5 '</span><span class="p">,</span>
+ <span class="s">'</span><span class="se">\n</span><span class="s">  '</span><span class="p">]</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="n">img</span><span class="p">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">'src'</span><span class="p">]</span> <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">response</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">'img'</span><span class="p">)]</span>
+<span class="p">[</span><span class="s">'image1_thumb.jpg'</span><span class="p">,</span>
+ <span class="s">'image2_thumb.jpg'</span><span class="p">,</span>
+ <span class="s">'image3_thumb.jpg'</span><span class="p">,</span>
+ <span class="s">'image4_thumb.jpg'</span><span class="p">,</span>
+ <span class="s">'image5_thumb.jpg'</span><span class="p">]</span>
+ 
+ 
+<span class="c1"># 嵌套使用
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">response</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">'img'</span><span class="p">).</span><span class="n">xpath</span><span class="p">(</span><span class="s">'@src'</span><span class="p">).</span><span class="n">getall</span><span class="p">()</span>
+<span class="p">[</span><span class="s">'image1_thumb.jpg'</span><span class="p">,</span>
+ <span class="s">'image2_thumb.jpg'</span><span class="p">,</span>
+ <span class="s">'image3_thumb.jpg'</span><span class="p">,</span>
+ <span class="s">'image4_thumb.jpg'</span><span class="p">,</span>
+ <span class="s">'image5_thumb.jpg'</span><span class="p">]</span>
+
+<span class="c1">#.attrib 也可以直接在selectorlist上使用；它返回第一个匹配元素的属性：
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">response</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">'img'</span><span class="p">).</span><span class="n">attrib</span><span class="p">[</span><span class="s">'src'</span><span class="p">]</span>
+<span class="s">'image1_thumb.jpg'</span>
+</code></pre></div></div>
+
+<h1 id="5xpath选择器">5.xpath选择器</h1>
+
+<p>xpath 使用路径表达式在xml和html中进行导航</p>
+
+<h4 id="选取节点">选取节点</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>表达式</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>nodename</td>
+      <td>选取此节点的所有子节点</td>
+    </tr>
+    <tr>
+      <td>/</td>
+      <td>从根节点选取</td>
+    </tr>
+    <tr>
+      <td>//</td>
+      <td>选取匹配所有的元素，而不考虑它们的位置</td>
+    </tr>
+    <tr>
+      <td>.</td>
+      <td>选取当前节点</td>
+    </tr>
+    <tr>
+      <td>..</td>
+      <td>选取当前节点的父节点</td>
+    </tr>
+    <tr>
+      <td>@</td>
+      <td>选取属性</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="谓语">谓语</h4>
+
+<p>谓语用来查找某个特定的节点或者包含某个指定的值的节点。谓语被嵌在方括号中<code class="language-plaintext highlighter-rouge">[]</code></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>表达式</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>//body/div[1]</td>
+      <td>选取body元素下的第一个div元素</td>
+    </tr>
+    <tr>
+      <td>//body/div[last()]</td>
+      <td>选取body元素的最后一个div元素</td>
+    </tr>
+    <tr>
+      <td>//body/div[last() - 1]</td>
+      <td>选取body元素的倒数第二个元素</td>
+    </tr>
+    <tr>
+      <td>//body/div[position() &lt; 3]</td>
+      <td>选取body元素下 前两个div元素</td>
+    </tr>
+    <tr>
+      <td>//title[@lang]</td>
+      <td>选取所有拥有名为lang的属性的title元素</td>
+    </tr>
+    <tr>
+      <td>//title[@lang=’eng’]</td>
+      <td>选取所有拥有名为lang的属性的title元素</td>
+    </tr>
+    <tr>
+      <td>//body/div[price&gt;35.00]</td>
+      <td>选取所有body元素下的div元素，并且price元素的值大于 35.00</td>
+    </tr>
+    <tr>
+      <td>//body/div[contains(@class, ‘bbbb’)]</td>
+      <td>匹配body下 div中class属性包含’bbbb’</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="通配符">通配符</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>通配符</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>*</td>
+      <td>匹配任何元素</td>
+    </tr>
+    <tr>
+      <td>@*</td>
+      <td>匹配任何属性的元素</td>
+    </tr>
+    <tr>
+      <td>node()</td>
+      <td>匹配任何类型的元素</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="运算符">运算符</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>运算符</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>|</td>
+      <td>或</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="xpath方法">xpath方法</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>方法</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>text()</td>
+      <td>提取元素文本节点</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="6xpath表达式中的变量">6.xpath表达式中的变量</h1>
+<p>xpath允许您引用xpath表达式中的变量，使用 <code class="language-plaintext highlighter-rouge">$somevariable</code> 语法。</p>
+
+<p>下面是一个根据元素的“id”属性值匹配元素的示例，不需要对其进行硬编码（前面已显示）</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="c1"># `$val` used in the expression, a `val` argument needs to be passed
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">response</span><span class="p">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">'//div[@id=$val]/a/text()'</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="s">'images'</span><span class="p">).</span><span class="n">get</span><span class="p">()</span>
+<span class="s">'Name: My image 1 '</span>
+</code></pre></div></div>
+
+<p>下面是另一个示例，用于查找 &lt;div&gt; 包含五个的标签 <a> 孩子们（在这里我们传递价值 5 作为整数）</a></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">response</span><span class="p">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">'//div[count(a)=$cnt]/@id'</span><span class="p">,</span> <span class="n">cnt</span><span class="o">=</span><span class="mi">5</span><span class="p">).</span><span class="n">get</span><span class="p">()</span>
+<span class="s">'images'</span>
+</code></pre></div></div>
+
+<h1 id="7选择器与正则一起使用">7.选择器与正则一起使用</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">response</span><span class="p">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">'//a[contains(@href, "image")]/text()'</span><span class="p">).</span><span class="n">re</span><span class="p">(</span><span class="s">r'Name:\s*(.*)'</span><span class="p">)</span>
+<span class="p">[</span><span class="s">'My image 1'</span><span class="p">,</span>
+ <span class="s">'My image 2'</span><span class="p">,</span>
+ <span class="s">'My image 3'</span><span class="p">,</span>
+ <span class="s">'My image 4'</span><span class="p">,</span>
+ <span class="s">'My image 5'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<h1 id="8selector-objects">8.Selector Objects</h1>
+
+<h4 id="classscrapyselectorselectorresponsenone-textnone-typenone-rootnone-kwargs">classscrapy.selector.Selector(response=None, text=None, type=None, root=None, **kwargs)</h4>
+
+<p><code class="language-plaintext highlighter-rouge">Selector</code>实例是对选择其内容某些部分的响应的包装.</p>
+
+<p><code class="language-plaintext highlighter-rouge">response</code>是一个<code class="language-plaintext highlighter-rouge">HtmlResponse</code>或<code class="language-plaintext highlighter-rouge">XmlResponse</code>对象，将用于选择和提取数据.</p>
+
+<p><code class="language-plaintext highlighter-rouge">text</code>是设置编码的变量</p>
+
+<p><code class="language-plaintext highlighter-rouge">tpye</code>定义选择器类型，可以是<code class="language-plaintext highlighter-rouge">html</code>， <code class="language-plaintext highlighter-rouge">xml</code>或<code class="language-plaintext highlighter-rouge">None</code> （默认）</p>
+
+<p>如果<code class="language-plaintext highlighter-rouge">type</code>为<code class="language-plaintext highlighter-rouge">None</code> ，则选择器会根据response类型自动选择最佳类型（请参见下文），如果与text一起使用，则默认为”html” .</p>
+
+<p>如果<code class="language-plaintext highlighter-rouge">type</code>为<code class="language-plaintext highlighter-rouge">None</code>且传递了<code class="language-plaintext highlighter-rouge">response</code> ，则从响应类型推断出选择器类型，如下所示：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">html</code> 返回 <code class="language-plaintext highlighter-rouge">HtmlResponse</code>类型</li>
+  <li><code class="language-plaintext highlighter-rouge">xml</code> 返回 <code class="language-plaintext highlighter-rouge">XmlResponse</code>类型</li>
+  <li><code class="language-plaintext highlighter-rouge">html</code> 代表其他</li>
+</ul>
+
+<p>如果type被设置，则选择类型将被迫并且不会发生检测</p>
+
+<h4 id="xpathquery-namespacesnone-kwargs">xpath(query, namespaces=None, **kwargs)</h4>
+
+<blockquote>
+  <p>为了方便起见，此方法可以称为response.xpath()</p>
+</blockquote>
+
+<p>查找与xpath query匹配的节点，并以所有元素展平的SelectorList实例的形式返回结果. 列表元素也实现Selector接口.</p>
+
+<p><code class="language-plaintext highlighter-rouge">query</code>是一个包含要应用的XPATH查询的字符串.</p>
+
+<p><code class="language-plaintext highlighter-rouge">namespaces</code>是一个可选的<code class="language-plaintext highlighter-rouge">prefix: namespace-uri</code>映射（dict），用于向那些在<code class="language-plaintext highlighter-rouge">register_namespace(prefix, uri)</code>提供附加前缀. 与<code class="language-plaintext highlighter-rouge">register_namespace()</code>相反，这些前缀不会保存供以后调用.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">selector</span><span class="p">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">'//a[href=$url]'</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s">"http://www.example.com"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="cssquery">css(query)</h4>
+
+<blockquote>
+  <p>为了方便起见，此方法可以称为response.css()</p>
+</blockquote>
+
+<p>应用给定的CSS选择器并返回<code class="language-plaintext highlighter-rouge">SelectorList</code>实例.</p>
+
+<p><code class="language-plaintext highlighter-rouge">query</code>是一个包含要应用的CSS选择器的字符串.</p>
+
+<h4 id="get">get()</h4>
+
+<p>序列化并以单个unicode字符串返回匹配的节点. 编码内容的百分比未引用.</p>
+
+<h4 id="attrib">attrib</h4>
+
+<p>返回基础元素的属性字典.</p>
+
+<h4 id="reregex-replace_entitiestrue">re(regex, replace_entities=True)</h4>
+
+<p>应用给定的正则表达式，并返回具有匹配项的unicode字符串列表.</p>
+
+<p><code class="language-plaintext highlighter-rouge">regex</code>可以是已编译的正regex也可以是将使用<code class="language-plaintext highlighter-rouge">re.compile(regex)</code>编译为正则表达式的字符串.</p>
+
+<p>默认情况下，字符实体引用由其对应的字符替换（ <code class="language-plaintext highlighter-rouge">&amp;amp;</code>和<code class="language-plaintext highlighter-rouge">&amp;lt;</code>除外）. 传递<code class="language-plaintext highlighter-rouge">replace_entities</code>为<code class="language-plaintext highlighter-rouge">False</code>关闭这些替换.</p>
+
+<h4 id="re_firstregex-defaultnone-replace_entitiestrue">re_first(regex, default=None, replace_entities=True)</h4>
+
+<p>应用给定的正则表达式并返回匹配的第一个unicode字符串. 如果不匹配，则返回默认值（如果未提供参数，则返回<code class="language-plaintext highlighter-rouge">None</code> ）.</p>
+
+<p>默认情况下，字符实体引用由其对应的字符替换（ <code class="language-plaintext highlighter-rouge">&amp;amp;</code>和<code class="language-plaintext highlighter-rouge">&amp;lt;</code>除外）. 传递<code class="language-plaintext highlighter-rouge">replace_entities</code>为<code class="language-plaintext highlighter-rouge">False</code>关闭这些替换.</p>
+
+<h4 id="register_namespaceprefix-uri">register_namespace(prefix, uri)</h4>
+
+<p>注册要在此Selector使用的给定名称空间. 如果不注册名称空间，则无法从非标准名称空间选择或提取数据</p>
+
+<h4 id="remove_namespaces">remove_namespaces()</h4>
+
+<p>删除所有名称空间，允许使用无名称空间的xpath遍历文档</p>
+
+<h4 id="bool"><strong>bool</strong>()</h4>
+
+<p>如果选择了任何实际内容，则返回True否则返回False . 换句话说， Selector的布尔值由其选择的内容给出.</p>
+
+<h4 id="getall">getall()</h4>
+
+<p>序列化并以1元素的unicode字符串列表返回匹配的节点</p>
+
+<h1 id="9selectorlist-objects">9.SelectorList objects</h1>
+
+<h4 id="classscrapyselectorselectorlist">classscrapy.selector.SelectorList</h4>
+
+<p><code class="language-plaintext highlighter-rouge">SelectorList</code>类是内置list类的子类，它提供了一些其他方法.</p>
+
+<h4 id="xpathxpath-namespacesnone-kwargs">xpath(xpath, namespaces=None, **kwargs)</h4>
+
+<p>对该列表中的每个元素调用<code class="language-plaintext highlighter-rouge">.xpath()</code>方法，并将其结果展平为另一个<code class="language-plaintext highlighter-rouge">SelectorList</code> .</p>
+
+<p><code class="language-plaintext highlighter-rouge">query</code>与<code class="language-plaintext highlighter-rouge">Selector.xpath()</code>参数相同</p>
+
+<p><code class="language-plaintext highlighter-rouge">namespaces</code>是一个可选的<code class="language-plaintext highlighter-rouge">prefix: namespace-uri</code>映射（dict），用于向那些在<code class="language-plaintext highlighter-rouge">register_namespace(prefix, uri)</code>提供附加前缀. 与<code class="language-plaintext highlighter-rouge">register_namespace()</code>相反，这些前缀不会保存供以后调用.</p>
+
+<p>任何其他命名参数都可以用于在XPath表达式中传递XPath变量的值，例如：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">selector</span><span class="p">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">'//a[href=$url]'</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s">"http://www.example.com"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="cssquery-1">css(query)</h4>
+
+<p>对该列表中的每个元素调用<code class="language-plaintext highlighter-rouge">.css()</code>方法，并将其结果展平为另一个<code class="language-plaintext highlighter-rouge">SelectorList</code> .</p>
+
+<h4 id="getall-1">getall()</h4>
+
+<p>调用此列表的每个元素的<code class="language-plaintext highlighter-rouge">.get()</code>方法，并将其结果展平，作为Unicode字符串列表返回</p>
+
+<h4 id="getdefaultnone">get(default=None)</h4>
+
+<p>返回此列表中第一个元素的<code class="language-plaintext highlighter-rouge">.get()</code>结果. 如果列表为空，则返回默认值</p>
+
+<h4 id="reregex-replace_entitiestrue-1">re(regex, replace_entities=True)</h4>
+
+<p>对该列表中的每个元素调用<code class="language-plaintext highlighter-rouge">.re()</code>方法，并将其结果展平，作为Unicode字符串列表返回.</p>
+
+<p>默认情况下，字符实体引用将替换为其对应的字符（ <code class="language-plaintext highlighter-rouge">&amp;amp;</code>和<code class="language-plaintext highlighter-rouge">&amp;lt;</code>除外.如果<code class="language-plaintext highlighter-rouge">False</code>传递<code class="language-plaintext highlighter-rouge">replace_entities</code>关闭这些替换.</p>
+
+<h4 id="re_firstregex-defaultnone-replace_entitiestrue-1">re_first(regex, default=None, replace_entities=True)</h4>
+
+<p>对该列表中的第一个元素调用<code class="language-plaintext highlighter-rouge">.re()</code>方法，并以Unicode字符串返回结果. 如果列表为空或正则表达式不匹配任何内容，则返回默认值（如果未提供参数，则返回None ）.</p>
+
+<p>默认情况下，字符实体引用将替换为其对应的字符（<code class="language-plaintext highlighter-rouge">&amp;amp;</code>和<code class="language-plaintext highlighter-rouge">&amp;lt;</code>除外.如果<code class="language-plaintext highlighter-rouge">False</code>传递<code class="language-plaintext highlighter-rouge">replace_entities</code>关闭这些替换.</p>
+
+<h4 id="attrib-1">attrib</h4>
+
+<p>返回第一个元素的属性字典. 如果列表为空，则返回空dict</p>
+
+:ET

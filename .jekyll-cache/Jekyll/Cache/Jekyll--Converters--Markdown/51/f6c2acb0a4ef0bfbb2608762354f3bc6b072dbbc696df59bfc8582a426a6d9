@@ -1,0 +1,3 @@
+I"�<p>nginx常见的访问控制第一个基于ip的访问控制<code class="language-plaintext highlighter-rouge">http_access_module</code>模块，第二个基于用户的信任登录<code class="language-plaintext highlighter-rouge">http_auth_basic_module</code>模块，下面小菜就简单说明这两个模块如何进行nginx的访问控制。在此之前
+小菜先放上这两个模块的文档地址。</p>
+:ET

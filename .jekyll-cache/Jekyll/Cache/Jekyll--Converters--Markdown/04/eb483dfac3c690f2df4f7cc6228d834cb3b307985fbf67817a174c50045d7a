@@ -1,0 +1,86 @@
+I"Q<p>视图函数返回与普通函数的返回不同，视图函数返回的是一个<code class="language-plaintext highlighter-rouge">response</code>对象。</p>
+
+<h4 id="fisherpy">fisher.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">app</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">from_object</span><span class="p">(</span><span class="s">'config'</span><span class="p">)</span>
+
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s">'&lt;div&gt;&lt;/div&gt;'</span>
+
+
+<span class="k">def</span> <span class="nf">hello_world</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s">'&lt;div&gt;&lt;/div&gt;'</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s">'0.0.0.0'</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="s">'5000'</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span> <span class="n">app</span><span class="p">.</span><span class="n">config</span><span class="p">[</span><span class="s">'DEBUG'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>上面定义了两个方法，index是一个视图函数，hello_world是一个普通函数。虽然他们两个返回的<code class="language-plaintext highlighter-rouge">&lt;div&gt;&lt;/div&gt;</code>，但是在<code class="language-plaintext highlighter-rouge">index</code>视图返回不是一个字符串，而是一个respones对象。通过运行上面代码</p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_11.png" alt="ssl" /></p>
+
+<p>我们在index视图函数中明明返回了<code class="language-plaintext highlighter-rouge">&lt;div&gt;&lt;/div&gt;</code>字符串，但是访问index视图函数中没有输出<code class="language-plaintext highlighter-rouge">&lt;div&gt;&lt;/div&gt;</code>字符串？这是因为在index视图函数中，return时将<code class="language-plaintext highlighter-rouge">&lt;div&gt;&lt;/div&gt;</code>封装成了一个<code class="language-plaintext highlighter-rouge">response</code>对象，response对象headers中<code class="language-plaintext highlighter-rouge">Content-Type</code>默认值是<code class="language-plaintext highlighter-rouge">text/html;</code>所以浏览器解析时，就不按字符串来解析内容，而按html来解析，所以不会显示<code class="language-plaintext highlighter-rouge">&lt;div&gt;&lt;/div&gt;</code>内容。</p>
+
+<p>如果想让浏览器以文本方式来解析，而不是以html来解析，修改下面代码</p>
+
+<h4 id="修改fisherpy">修改fisher.py</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gi">+ from flask import Flask, make_response
+</span>
+app = Flask(__name__)
+<span class="p">app.config.from_object('config')
+</span>
+
+<span class="err">@app.route('/')</span>
+def index():
+<span class="gi">+    headers = {
++        'content-type': 'text/plain'
++    }
++
++    response = make_response('&lt;div&gt;&lt;/div&gt;', 404)
++    response.headers = headers
++    return response
++
++    # 简化写法
++    # return ('&lt;div&gt;&lt;/div&gt;', 404, headers)
+</span>
+
+<span class="p">def hello_world():
+</span>    return '&lt;div&gt;&lt;/div&gt;'
+
+
+<span class="p">if __name__ == '__main__':
+</span>    app.run(host='0.0.0.0', port='5000', debug= app.config['DEBUG'])
+</code></pre></div></div>
+
+<p>启动一下服务(在虚拟环境)</p>
+
+<pre><code class="language-txt">python fisher.py
+</code></pre>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_12.png" alt="ssl" /></p>
+
+<p>通过返回内容，我们看到<code class="language-plaintext highlighter-rouge">&lt;div&gt;&lt;/div&gt;</code>显示出来，headers的content-type发生改变，在上面代码中，我们不仅仅改变了headers头部信息，还修改了了返回的状态码404</p>
+
+<p>在写API中，其实返回的是JSON数据格式.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'content-type'</span><span class="p">:</span> <span class="s">'application/json;charset=utf-8'</span>
+<span class="p">}</span>
+
+<span class="n">json</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'name'</span><span class="p">:</span><span class="s">'张三'</span><span class="p">,</span>
+    <span class="s">'sex'</span><span class="p">:</span><span class="s">'男'</span>
+<span class="p">}</span>
+
+<span class="k">return</span> <span class="p">(</span><span class="n">json</span><span class="p">,</span> <span class="mi">200</span> <span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+:ET

@@ -1,0 +1,187 @@
+I"�<<p><code class="language-plaintext highlighter-rouge">enum</code>模块定义了一个具备可迭代性和可比较性的枚举类型。 它可以为值创建具有良好定义的标识符，而不是直接使用字面上的字符串或者整数</p>
+
+<h1 id="1创建枚举">1.创建枚举</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+
+<span class="k">class</span> <span class="nc">VIP</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+   <span class="n">YELLOW</span> <span class="o">=</span> <span class="mi">1</span>
+   <span class="n">GREEN</span> <span class="o">=</span> <span class="mi">2</span>
+   <span class="n">BLANK</span> <span class="o">=</span> <span class="mi">3</span>
+   <span class="n">RED</span>  <span class="o">=</span> <span class="mi">4</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">VIP</span><span class="p">.</span><span class="n">YELLOW</span><span class="p">)</span>
+<span class="n">VIP</span><span class="p">.</span><span class="n">YELLOW</span>
+</code></pre></div></div>
+
+<h1 id="2枚举类和普通类比较">2.枚举类和普通类比较</h1>
+
+<p>枚举类型是一个特殊的类：</p>
+<ul>
+  <li>枚举key不能重复</li>
+  <li>枚举值不可变</li>
+</ul>
+
+<h4 id="枚举值不可变性">枚举值不可变性</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="c1"># 普通类
+</span><span class="k">class</span> <span class="nc">Diamond</span><span class="p">():</span>
+    <span class="n">YELLOW</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">BLANK</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1"># 枚举类
+</span><span class="k">class</span> <span class="nc">VIP</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">YELLOW</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">BLANK</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="c1">## 枚举值不可变性
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">Diamond</span><span class="p">.</span><span class="n">GREEN</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">VIP</span><span class="p">.</span><span class="n">GREEN</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">Diamond</span><span class="p">.</span><span class="n">GREEN</span><span class="p">)</span>
+<span class="mi">2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">VIP</span><span class="p">.</span><span class="n">GREEN</span><span class="p">)</span>
+<span class="s">'报错'</span>
+</code></pre></div></div>
+<p>枚举类一旦赋值，枚举中的值将不能再被重新赋值</p>
+
+<h4 id="枚举标签不可重复">枚举标签不可重复</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="c1"># 普通类
+</span><span class="k">class</span> <span class="nc">Diamond</span><span class="p">():</span>
+    <span class="n">YELLOW</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">YELLOW</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">BLANK</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1"># 枚举类
+</span><span class="k">class</span> <span class="nc">VIP</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">YELLOW</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">YELLOW</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">BLANK</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="s">'枚举类，编译时就会报错'</span>
+</code></pre></div></div>
+
+<h1 id="3枚举别名">3.枚举别名</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="c1"># 普通类
+</span><span class="k">class</span> <span class="nc">Diamond</span><span class="p">():</span>
+    <span class="n">YELLOW</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">BLANK</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1"># 枚举类
+</span><span class="k">class</span> <span class="nc">VIP</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">YELLOW</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">BLANK</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1">## 枚举不允许有相同值
+</span><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">Diamond</span><span class="p">.</span><span class="n">GREEN</span><span class="p">)</span>
+<span class="mi">1</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">VIP</span><span class="p">.</span><span class="n">GREEN</span><span class="p">)</span>
+<span class="n">VIP</span><span class="p">.</span><span class="n">YELLOW</span>
+</code></pre></div></div>
+<p>当我们在枚举中定义了<code class="language-plaintext highlighter-rouge">YELLOW</code>和<code class="language-plaintext highlighter-rouge">GREEN</code>赋值为相同值时，打印<code class="language-plaintext highlighter-rouge">VIP.GREEN</code>，普通类输出1，但是枚举类输出<code class="language-plaintext highlighter-rouge">VIP.YELLOW</code>，这是因为<code class="language-plaintext highlighter-rouge">YELLOW</code>赋值为1后，在对<code class="language-plaintext highlighter-rouge">GREEN</code>赋值为1，此时GREEN就不是一个变量，而是<code class="language-plaintext highlighter-rouge">YELLOW</code>的一个别名，表示相同的枚举类型</p>
+
+<h1 id="4获取值名称类型">4.获取值、名称、类型</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="k">class</span> <span class="nc">VIP</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">YELLOW</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">BLANK</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="c1"># 获取值
+</span><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">VIP</span><span class="p">.</span><span class="n">YELLOW</span><span class="p">.</span><span class="n">value</span><span class="p">)</span>
+<span class="mi">1</span>
+<span class="c1"># 获取名称
+</span><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">VIP</span><span class="p">.</span><span class="n">YELLOW</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+<span class="s">'YELLOW'</span>
+<span class="c1"># 获取类型
+</span><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">VIP</span><span class="p">.</span><span class="n">YELLOW</span><span class="p">)</span>
+<span class="n">VIP</span><span class="p">.</span><span class="n">YELLOW</span> <span class="c1">#这个是枚举类型
+</span></code></pre></div></div>
+
+<h1 id="5枚举遍历">5.枚举遍历</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="k">class</span> <span class="nc">VIP</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">YELLOW</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">BLANK</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">VIP</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+<span class="n">VIP</span><span class="p">.</span><span class="n">YELLOW</span>
+<span class="n">VIP</span><span class="p">.</span><span class="n">BLANK</span>
+<span class="n">VIP</span><span class="p">.</span><span class="n">RED</span>
+</code></pre></div></div>
+
+<p>如果尝试遍历枚举类型，则后面重复的不会被打印出来。但是，如果想要获取别名，我们可以使用属性“<strong>members</strong>”，它是一个OrderedDict，包括所有定义的枚举名称，包括别名。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">VIP</span><span class="p">.</span><span class="n">__members__</span><span class="p">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h1 id="6枚举的比较运算">6.枚举的比较运算</h1>
+
+<p>枚举类型不能做大小比较，但是可以做身份比较和等值比较。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="k">class</span> <span class="nc">VIP</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">YELLOW</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">BLANK</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">VIP</span><span class="p">.</span><span class="n">YELLOW</span> <span class="o">==</span> <span class="n">VIP</span><span class="p">.</span><span class="n">GREEN</span><span class="p">)</span>
+<span class="n">Flase</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">VIP</span><span class="p">.</span><span class="n">YELLOW</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">Flase</span>
+<span class="c1"># 身份比较
+</span><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">VIP</span><span class="p">.</span><span class="n">YELLOW</span> <span class="ow">is</span> <span class="n">VIP</span><span class="p">.</span><span class="n">YELLOW</span><span class="p">)</span>
+<span class="bp">True</span>
+<span class="c1"># 不支持大小比较
+</span><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">VIP</span><span class="p">.</span><span class="n">GREEN</span> <span class="o">&gt;</span> <span class="n">VIP</span><span class="p">.</span><span class="n">YELLOW</span><span class="p">)</span>
+<span class="n">Flase</span>
+</code></pre></div></div>
+
+<h1 id="7枚举转换">7.枚举转换</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="k">class</span> <span class="nc">VIP</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">YELLOW</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">BLANK</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">VIP</span><span class="p">(</span><span class="n">num</span><span class="p">))</span>
+<span class="n">VIP</span><span class="p">.</span><span class="n">YELLOW</span>
+</code></pre></div></div>
+
+<h1 id="8限制枚举数据类型">8.限制枚举数据类型</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span><span class="p">,</span><span class="n">unique</span>
+
+<span class="o">@</span><span class="n">unique</span>  <span class="c1">#限制VIP枚举不能有重复值
+</span><span class="k">class</span> <span class="nc">VIP</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span> <span class="c1">#限制枚举类只能是数值
+</span>    <span class="n">YELLOW</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">BLANK</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="mi">4</span>
+</code></pre></div></div>
+
+:ET

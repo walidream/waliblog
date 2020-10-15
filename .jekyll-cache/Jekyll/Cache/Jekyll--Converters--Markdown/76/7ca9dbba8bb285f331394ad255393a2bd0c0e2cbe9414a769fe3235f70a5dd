@@ -1,0 +1,2 @@
+I"I<p>Vim8.0是近十年来的一次大更新，支持任务、异步I/O、Channels和JSON以及异步计时器、Lambdas 和 Closures等，还包括对GTK + 3的支持。由于ubuntu默认安装的Vim版本一般都是7.4.52，该版本不满足许多vim插件的需求(如YouCompleteMe)，因此需要升级Vim到新版本。</p>
+:ET

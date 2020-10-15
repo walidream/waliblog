@@ -1,0 +1,26 @@
+I"ë
+<div id="disqus">
+	<div id="disqus_thread"></div>
+</div>
+<script>
+	/*var disqus_cofig = function(){
+		this.page.url = 'http://waliblog-com/message';
+		this.page.identifier = 'http://waliblog-com/message';
+	}*/
+	(function() { 
+		var d = document, s = d.createElement('script');
+		s.src = 'https://waliblog-com.disqus.com/embed.js';
+		s.setAttribute('data-timestamp', +new Date());
+		(d.head || d.body).appendChild(s);
+	})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<script src="/assets/lib/av-mini-0.6.10.js?v="></script>
+
+<script src="/assets/lib/hit-kounter-lc-0.2.0.js?v= "></script>
+
+<script src="/assets/js/post.bundle.js?v="></script>
+
+:ET

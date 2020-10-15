@@ -1,0 +1,2 @@
+I"�<p>Scrapy带有自己的数据提取机制，称为选择器。scrapy有<code class="language-plaintext highlighter-rouge">xpath</code>和<code class="language-plaintext highlighter-rouge">css</code>两种选择器。XPath 是一种在XML文档中选择节点的语言，也可以与HTML一起使用。 CSS 是用于将样式应用于HTML文档的语言。它定义选择器，将这些样式与特定的HTML元素相关联。</p>
+:ET

@@ -1,0 +1,67 @@
+I"�%<p>本帖主要记录小菜在爬虫学习过程中常用的技巧。</p>
+
+<h1 id="1api数据解析">1.API数据解析</h1>
+<p>scrapy爬虫一般爬取的是网页，返回的是<code class="language-plaintext highlighter-rouge">html</code>。但有时候需要调<code class="language-plaintext highlighter-rouge">API</code>,API接口返回的是<code class="language-plaintext highlighter-rouge">json</code>。需要对返回来的数据解析</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">res</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="n">body_as_unicode</span><span class="p">())</span>
+</code></pre></div></div>
+
+<h1 id="2chromedirver查找元素">2.chromeDirver查找元素</h1>
+
+<p>当我们爬取的页面时动态页面时，需要运行<code class="language-plaintext highlighter-rouge">js</code>。一般我们使用<code class="language-plaintext highlighter-rouge">selenium</code>来控制<code class="language-plaintext highlighter-rouge">chromeDirver</code>。在获取页面元素时比较麻烦，不如<code class="language-plaintext highlighter-rouge">scrapy</code>中的<code class="language-plaintext highlighter-rouge">选择器</code>那么方便。</p>
+
+<ul>
+  <li><a href="https://selenium-python-zh.readthedocs.io/en/latest/locating-elements.html" title="https://selenium-python-zh.readthedocs.io/en/latest/locating-elements.html">selenium 查找元素</a></li>
+  <li><a href="https://huilansame.github.io/huilansame.github.io/archivers/father-brother-locate" title="https://huilansame.github.io/huilansame.github.io/archivers/father-brother-locate">selenium —— 父子、兄弟、相邻节点定位方式详解</a></li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">urls</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">browser</span><span class="p">.</span><span class="n">find_elements_by_css_selector</span><span class="p">(</span><span class="s">'.shop_list.shop_list_4 dd h4 a'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">:</span>
+    <span class="n">href</span> <span class="o">=</span> <span class="n">url</span><span class="p">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s">'href'</span><span class="p">)</span>
+    <span class="n">unitprice</span> <span class="o">=</span> <span class="n">url</span><span class="p">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s">'../../../dd[2]/span[2]'</span><span class="p">).</span><span class="n">text</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="n">url</span><span class="p">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s">'../../p[@class="add_shop"]/a'</span><span class="p">).</span><span class="n">get_attribute</span><span class="p">(</span><span class="s">'title'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h1 id="3scrapy状态错误码">3.scrapy状态错误码</h1>
+<p>scrapy 默认只有<code class="language-plaintext highlighter-rouge">200</code>状态码才会进入<code class="language-plaintext highlighter-rouge">parse</code>方法解析，想要指定错误码也进入<code class="language-plaintext highlighter-rouge">parse</code>方法，在<code class="language-plaintext highlighter-rouge">spider</code>中设置</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">handle_httpstatus_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">404</span><span class="p">,</span> <span class="mi">500</span><span class="p">]</span>
+</code></pre></div></div>
+
+<h1 id="4item一次返回多条数据">4.item一次返回多条数据</h1>
+
+<p>有时一个页面有我们要的所有数据，结构需要我们整理, 数据整理后，每个<code class="language-plaintext highlighter-rouge">it</code>在流到<code class="language-plaintext highlighter-rouge">pipeline</code>中处理。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+
+    <span class="n">city</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">"#logo-input a.city.J-city span:nth-child(2)::text"</span><span class="p">).</span><span class="n">get</span><span class="p">()</span>
+    <span class="n">quxians</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">'//div[@class="content_b"]/div[@class="box shopallCate"][2]/dl[@class="list"]'</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">quxians</span><span class="p">:</span>
+        <span class="n">quxian</span> <span class="o">=</span> <span class="n">item</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">"dt .Bravia::text"</span><span class="p">).</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">subtanames</span> <span class="o">=</span> <span class="n">item</span><span class="p">.</span><span class="n">css</span><span class="p">(</span><span class="s">"dd li a::text"</span><span class="p">).</span><span class="n">getall</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">subtanames</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">WzItemLoader</span><span class="p">(</span><span class="n">item</span> <span class="o">=</span> <span class="n">WzSubtanameItem</span><span class="p">(),</span> <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">)</span>
+            <span class="n">l</span><span class="p">.</span><span class="n">add_value</span><span class="p">(</span><span class="s">'city'</span><span class="p">,</span> <span class="n">city</span><span class="p">)</span>
+            <span class="n">l</span><span class="p">.</span><span class="n">add_value</span><span class="p">(</span><span class="s">'quxian'</span><span class="p">,</span> <span class="n">quxian</span><span class="p">)</span>
+            <span class="n">l</span><span class="p">.</span><span class="n">add_value</span><span class="p">(</span><span class="s">'subtaname'</span><span class="p">,</span> <span class="n">sub</span><span class="p">)</span>
+            <span class="n">it</span> <span class="o">=</span> <span class="n">l</span><span class="p">.</span><span class="n">load_item</span><span class="p">()</span>
+            <span class="k">yield</span> <span class="n">it</span>
+</code></pre></div></div>
+
+<h1 id="5scrapy-get传参">5.scrapy Get传参</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">city</span> <span class="o">=</span> <span class="s">'温州'</span><span class="p">,</span>
+    <span class="n">citylimit</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span>
+    <span class="n">keywords</span> <span class="o">=</span> <span class="n">brand</span><span class="p">,</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">[</span><span class="s">"GD_KEY"</span><span class="p">],</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">offset</span>
+<span class="p">)</span>
+<span class="n">encodedParams</span> <span class="o">=</span> <span class="n">urllib</span><span class="p">.</span><span class="n">parse</span><span class="p">.</span><span class="n">urlencode</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="k">yield</span> <span class="n">scrapy</span><span class="p">.</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="p">.</span><span class="n">start_urls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s">'?'</span> <span class="o">+</span> <span class="n">encodedParams</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span> <span class="n">params</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">parse_detail</span><span class="p">)</span>
+</code></pre></div></div>
+
+:ET

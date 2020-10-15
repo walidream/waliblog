@@ -1,0 +1,2 @@
+I"�<p>最近想在服务器上运行下自己写的代码，代码中用到了<code class="language-plaintext highlighter-rouge">postgresql</code>,但是在安装psycopg2的时候发现报错了，错误如下</p>
+:ET

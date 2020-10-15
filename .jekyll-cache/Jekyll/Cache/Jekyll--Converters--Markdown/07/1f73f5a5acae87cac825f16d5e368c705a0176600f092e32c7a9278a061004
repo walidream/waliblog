@@ -1,0 +1,97 @@
+I"�&<p>介绍Vim搜索命令<code class="language-plaintext highlighter-rouge">/</code>、<code class="language-plaintext highlighter-rouge">?</code> 、<code class="language-plaintext highlighter-rouge">*</code> 和 <code class="language-plaintext highlighter-rouge">#</code>，以及Vim正向搜索和反向搜索，Vim正则表达式搜索特定字符和特定行。</p>
+
+<h1 id="1vim基本搜索命令">1.Vim基本搜索命令</h1>
+
+<p>在Vim命令模式下，输入 <code class="language-plaintext highlighter-rouge">/</code> 或 <code class="language-plaintext highlighter-rouge">?</code> 符号就进入了搜索模式，<code class="language-plaintext highlighter-rouge">/</code> 用于正向往下搜索，<code class="language-plaintext highlighter-rouge">?</code> 用于反向往上搜索。</p>
+
+<p>在搜索模式下可以对Vim打开的整个文本内容进行搜索，当按下 <code class="language-plaintext highlighter-rouge">n</code> 时可以继续正向查找下一个相匹配的目前单词。<code class="language-plaintext highlighter-rouge">N</code> 的作用与 <code class="language-plaintext highlighter-rouge">n</code> 相反，是往上反向搜索目标单词。</p>
+
+<p>在Vim命令模式下，如果要搜索当前光标下的单词，除了可以使用<code class="language-plaintext highlighter-rouge">/</code> 和 <code class="language-plaintext highlighter-rouge">?</code>外，还可以使用特殊命令<code class="language-plaintext highlighter-rouge">*</code> 和 <code class="language-plaintext highlighter-rouge">#</code>。</p>
+
+<p>假设光标当前所有单词为the，那么在当前光标位置执行命令 <code class="language-plaintext highlighter-rouge">*</code> 相当于搜索命令 <code class="language-plaintext highlighter-rouge">/\&lt;the\&gt;</code>，命令 <code class="language-plaintext highlighter-rouge">#</code> 等同于命令<code class="language-plaintext highlighter-rouge">?\&lt;the\&gt;</code>。<code class="language-plaintext highlighter-rouge">\&lt;</code> 是一个单词定界符，表示只匹配单词的开头，<code class="language-plaintext highlighter-rouge">\&gt;</code> 也是单词定界符，表示只匹配单词末尾。</p>
+
+<p>大家可仔细观看下图的Vim动画教程示意</p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_36.gif" alt="ssl" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">注意:</code> 搜索一些特殊的字符，例如：<code class="language-plaintext highlighter-rouge">*</code>、<code class="language-plaintext highlighter-rouge">[、]</code>、<code class="language-plaintext highlighter-rouge">^</code>、<code class="language-plaintext highlighter-rouge">%</code>、<code class="language-plaintext highlighter-rouge">/</code>、<code class="language-plaintext highlighter-rouge">?</code>、<code class="language-plaintext highlighter-rouge">~</code>、$等，需要在它们的前面加上转义符号\。</p>
+
+<h1 id="2vim高亮搜索">2.Vim高亮搜索</h1>
+
+<p>为了在Vim中高亮显示被搜索的字符，可以使用命令 <code class="language-plaintext highlighter-rouge">set hlsearch</code>，可以在Vim命令行模式执行命令或者在配置文件 <code class="language-plaintext highlighter-rouge">.vimrc</code> 中进行永久设置。</p>
+
+<h1 id="3清除上次的高亮搜索">3.清除上次的高亮搜索</h1>
+
+<p>Vim尾行模式下使用 <code class="language-plaintext highlighter-rouge">:noh</code> 或 <code class="language-plaintext highlighter-rouge">:nohlsearch</code> 来关闭当前的高亮结果，但是在下次进行Vim搜索时仍然会有高亮显示效果</p>
+
+<p>为了方便，可以使用Vim教程网介绍的Vim快捷键来简化操作。</p>
+
+<p>定义在vim命令模式(normal)下非递归键盘映射: <code class="language-plaintext highlighter-rouge">nnoremap &lt;esc&gt; :noh&lt;return&gt;&lt;esc&gt;</code> 来关闭当前高亮搜索结果</p>
+
+<p>这样，在Vim搜索结束后可以按下快捷键 <code class="language-plaintext highlighter-rouge">Esc</code> 来清除上次的搜索高亮效果。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_37.gif" alt="ssl" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">注意：</code>上面的动态Vim教程结尾处是直接按下 <code class="language-plaintext highlighter-rouge">Esc</code> 键来取消高亮的</p>
+
+<h1 id="4搜索大小写敏感">4.搜索大小写敏感</h1>
+
+<p>默认Vim搜索命令是大小写敏感的，因此，搜索 the 不会查找到 The。使用命令 <code class="language-plaintext highlighter-rouge">:set ignorecase</code> 会使得Vim搜索变得不区分大小写。</p>
+
+<p>不管 <code class="language-plaintext highlighter-rouge">ignorecase</code> 选项的值是什么，都可以在搜索命令中使用 <code class="language-plaintext highlighter-rouge">\c</code> 来强制使得当前搜索模式不区分大小写，而命令 <code class="language-plaintext highlighter-rouge">\C</code> 则会强制当前搜索模式大小写敏感。</p>
+
+<p>因此，<code class="language-plaintext highlighter-rouge">/the\c</code> 既会查找 <code class="language-plaintext highlighter-rouge">the</code>，也会查找到 <code class="language-plaintext highlighter-rouge">The</code>。</p>
+
+<p>如果打开了 <code class="language-plaintext highlighter-rouge">ignorecase</code> 选项，那么你也应该设置 <code class="language-plaintext highlighter-rouge">:set smartcase</code>。</p>
+
+<p>当 <code class="language-plaintext highlighter-rouge">ignorecase</code> 和 <code class="language-plaintext highlighter-rouge">smartcase</code> 选项均打开时，只要你的搜索模式中包含大写字母，那Vim会认为你当前的搜索是区分大小写的，如果搜索模式中不包含任何大写字母，Vim则会认为搜索应该不区分大小写。这是个比较”智能的”推测你搜索意图的机制。</p>
+
+<p>例如，在打开上述两个选项的条件下，<code class="language-plaintext highlighter-rouge">/The</code> 只会查找到 <code class="language-plaintext highlighter-rouge">The</code>，而 <code class="language-plaintext highlighter-rouge">/the</code> 既会查找 <code class="language-plaintext highlighter-rouge">the</code>，也会查找到 <code class="language-plaintext highlighter-rouge">The</code>等。</p>
+
+<p><code class="language-plaintext highlighter-rouge">注意</code>：<code class="language-plaintext highlighter-rouge">smartcase</code> 选项只对你手工输入的搜索模式有效，对于 <code class="language-plaintext highlighter-rouge">*</code>、<code class="language-plaintext highlighter-rouge">#</code> 或 <code class="language-plaintext highlighter-rouge">gd</code> 等是不起作用的。</p>
+
+<h1 id="5vim搜索进阶">5.Vim搜索进阶</h1>
+
+<p>如果想搜索当前光标所在位置的单词，可以先输入 <code class="language-plaintext highlighter-rouge">/</code> 进入搜索模式，然后依次输入命令<code class="language-plaintext highlighter-rouge">&lt;Ctrl-r&gt;&lt;Ctrl-w&gt;</code> 来复制光标下的单词并将其插入命令行中。</p>
+
+<p>如果想插入光标下的字串，可以使用命令 <code class="language-plaintext highlighter-rouge">&lt;Ctrl-r&gt;&lt;Ctrl-a&gt;</code>。</p>
+
+<p>完成搜索后，使用 <code class="language-plaintext highlighter-rouge">Ctrl-o</code> 会跳转到开始进行搜索的位置，然后使用命令 <code class="language-plaintext highlighter-rouge">Ctrl-i</code> 将会往前跳转。</p>
+
+<p>进行过Vim搜索后，当 <code class="language-plaintext highlighter-rouge">/</code>、<code class="language-plaintext highlighter-rouge">?</code>、<code class="language-plaintext highlighter-rouge">:s</code>、<code class="language-plaintext highlighter-rouge">:g</code> 命令使用空的搜索模式时会沿用最近一次的搜索模式。所以，在搜索完某个单词后，使用Vim替换命令 <code class="language-plaintext highlighter-rouge">:%s//new/g</code> 会将之前搜索的单词全部替换为 new。</p>
+
+<p>在搜索命令前还可以增加一个整数，用于表示搜索目标出现的位置。例如，<code class="language-plaintext highlighter-rouge">3/pattern</code> 将会搜索模式 <code class="language-plaintext highlighter-rouge">pattern</code> 第三次出现的位置，而 3* 会搜索当前光标所在位置单词第三次出现的位置。</p>
+
+<p>搜索还可以包含一个相对于光标的偏移量</p>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_38.gif" alt="ssl" /></p>
+
+<h1 id="6vim正则表达式搜索">6.Vim正则表达式搜索</h1>
+
+<p>为了更好的进行搜索，Vim支持正则表达式，最基本的正则表达式规则包括：</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">^</code>   表示一行的开头</li>
+  <li><code class="language-plaintext highlighter-rouge">$</code>   表示一行的结尾</li>
+  <li><code class="language-plaintext highlighter-rouge">.</code>   表示任意一个字符</li>
+  <li><code class="language-plaintext highlighter-rouge">*</code>    匹配0次或n次</li>
+</ul>
+
+<h4 id="查找在行首的特定字符">查找在行首的特定字符</h4>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_39.gif" alt="ssl" /></p>
+
+<p>上图中用^来匹配行首</p>
+
+<h4 id="查找在行尾的特定字符">查找在行尾的特定字符</h4>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_40.gif" alt="ssl" /></p>
+
+<p>上图中用$来匹配行尾</p>
+
+<h4 id="匹配特定行行首匹配">匹配特定行(行首匹配)</h4>
+
+<p><img src="http://walidream.com:9999/blogImage/linux/linux_41.gif" alt="ssl" /></p>
+
+<p>上图中使用了/^test.<em>$，其中^表示匹配行首、.</em>表示匹配任意字符、$表示匹配行尾，合起来表示搜索任意以test开头的行</p>
+
+:ET

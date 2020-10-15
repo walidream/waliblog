@@ -1,0 +1,37 @@
+I"j<p>json是一种轻量级的数据交换格式。在python中使用json需要先导入<code class="language-plaintext highlighter-rouge">json包</code>。</p>
+
+<p><code class="language-plaintext highlighter-rouge">json字符串</code>:符合json格式的字符串叫做json字符串</p>
+
+<ul>
+  <li><a href="https://docs.python.org/zh-cn/3/library/json.html" title="https://docs.python.org/zh-cn/3/library/json.html" target="_blank">json 官方文档</a></li>
+</ul>
+
+<p>json的优点：</p>
+<ul>
+  <li>易于阅读</li>
+  <li>易于解析</li>
+  <li>网络传输效率高</li>
+</ul>
+
+<h1 id="1json序列化">1.json序列化</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">di</span> <span class="o">=</span> <span class="p">{</span><span class="s">"name"</span><span class="p">:</span><span class="s">"xiaosan"</span><span class="p">,</span><span class="s">"age"</span><span class="p">:</span><span class="mi">19</span><span class="p">,</span><span class="s">"sex"</span><span class="p">:</span><span class="mi">1</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">di</span><span class="p">)</span>
+<span class="s">'{"name": "xiaosan", "age": 19, "sex": 1}'</span>
+</code></pre></div></div>
+
+<h4 id="紧凑一点">紧凑一点</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,{</span><span class="s">'4'</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s">'6'</span><span class="p">:</span> <span class="mi">7</span><span class="p">}],</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s">','</span><span class="p">,</span><span class="s">':'</span><span class="p">))</span>
+<span class="s">'[1,2,3,{"4":5,"6":7}]'</span>
+</code></pre></div></div>
+
+<h1 id="2json反序列化">2.json反序列化</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">json</span><span class="p">.</span><span class="n">loads</span><span class="p">(</span><span class="s">'["foo", {"bar":["baz", null, 1.0, 2]}]'</span><span class="p">)</span>
+<span class="p">[</span><span class="s">'foo'</span><span class="p">,</span> <span class="p">{</span><span class="s">'bar'</span><span class="p">:</span> <span class="p">[</span><span class="s">'baz'</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]}]</span>
+</code></pre></div></div>
+
+:ET

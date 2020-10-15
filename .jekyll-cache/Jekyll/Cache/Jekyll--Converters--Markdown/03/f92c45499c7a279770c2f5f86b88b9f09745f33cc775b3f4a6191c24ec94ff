@@ -1,0 +1,540 @@
+I"�<p>在小菜初学<code class="language-plaintext highlighter-rouge">scrapy</code>时，从google上发现了几篇非常不错的文章，未经博主同意擅自将博主的文章收藏，主要怕日后看时，找不到此文章。小菜在这里向博主致敬，希望看到这篇帖子的小伙伴能够阅读原贴。</p>
+
+<ul>
+  <li><a href="http://kaito-kidd.com/2016/11/01/scrapy-code-analyze-architecture/" title="http://kaito-kidd.com/2016/11/01/scrapy-code-analyze-architecture/">Kaito 博主</a></li>
+</ul>
+
+<p>在上一篇文章：<a href="http://kaito-kidd.com/2016/11/09/scrapy-code-analyze-entrance/" title="http://kaito-kidd.com/2016/11/09/scrapy-code-analyze-entrance/">Scrapy源码分析（二）运行入口</a>，主要讲解了scrapy是如何运行起来的，运行初期都执行了哪些工作和流程。</p>
+
+<p>这次来分析一下，scrapy中最核心的组件，它们之间是如何协同工作的。不过由于代码量较多，现分为2部分讲解：</p>
+<ul>
+  <li>核心组件初始化</li>
+  <li>核心组件交互流程</li>
+</ul>
+
+<p>这次先来讲解这些核心组件初始化都做了哪些工作。</p>
+
+<h1 id="1爬虫类">1.爬虫类</h1>
+
+<p>接着上次代码讲，上次的运行入口执行到最后是执行了<code class="language-plaintext highlighter-rouge">Crawler</code>的crawl方法：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">defer</span><span class="p">.</span><span class="n">inlineCallbacks</span>
+<span class="k">def</span> <span class="nf">crawl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">.</span><span class="n">crawling</span><span class="p">,</span> <span class="s">"Crawling already taking place"</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">crawling</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># 从spiderloader中找到爬虫类，并实例化爬虫实例
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">spider</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_create_spider</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># 创建引擎
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">engine</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_create_engine</span><span class="p">()</span>
+        <span class="c1"># 调用爬虫类的start_requests方法
+</span>        <span class="n">start_requests</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">spider</span><span class="p">.</span><span class="n">start_requests</span><span class="p">())</span>
+        <span class="c1"># 执行引擎的open_spider，并传入爬虫实例和初始请求
+</span>        <span class="k">yield</span> <span class="bp">self</span><span class="p">.</span><span class="n">engine</span><span class="p">.</span><span class="n">open_spider</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">spider</span><span class="p">,</span> <span class="n">start_requests</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">defer</span><span class="p">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">engine</span><span class="p">.</span><span class="n">start</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">six</span><span class="p">.</span><span class="n">PY2</span><span class="p">:</span>
+            <span class="n">exc_info</span> <span class="o">=</span> <span class="n">sys</span><span class="p">.</span><span class="n">exc_info</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">crawling</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">engine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="p">.</span><span class="n">engine</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">six</span><span class="p">.</span><span class="n">PY2</span><span class="p">:</span>
+            <span class="n">six</span><span class="p">.</span><span class="n">reraise</span><span class="p">(</span><span class="o">*</span><span class="n">exc_info</span><span class="p">)</span>
+        <span class="k">raise</span>
+</code></pre></div></div>
+
+<p>在这里，就交由<code class="language-plaintext highlighter-rouge">scrapy</code>的引擎来处理了。</p>
+
+<p>依次来看，爬虫类是如何实例化的？上文已讲解过，在<code class="language-plaintext highlighter-rouge">Crawler</code>实例化时，会创建<code class="language-plaintext highlighter-rouge">SpiderLoader</code>，它会根据用户的配置文件<code class="language-plaintext highlighter-rouge">settings.py</code>找到存放爬虫的位置，我们写的爬虫都会放在这里。</p>
+
+<p>然后<code class="language-plaintext highlighter-rouge">SpiderLoader</code>会扫描这里的所有文件，并找到父类是<code class="language-plaintext highlighter-rouge">scrapy.Spider</code>爬虫类，然后根据爬虫类中的name属性（在编写爬虫时，这个属性是必填的），最后生成一个<code class="language-plaintext highlighter-rouge">{spider_name: spider_cls}</code>的字典，然后根据<code class="language-plaintext highlighter-rouge">scrapy crawl &lt;spider_name&gt;</code>命令，根据spider_name找到对应的爬虫类，然后实例化它，在这里就是调用了_create_spider方法：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">_create_spider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># 调用类方法from_crawler实例化
+</span>    <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">spidercls</span><span class="p">.</span><span class="n">from_crawler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>实例化爬虫比较有意思，它不是通过普通的构造方法进行初始化，而是调用了类方法<code class="language-plaintext highlighter-rouge">from_crawler</code>进行的初始化，找到<code class="language-plaintext highlighter-rouge">scrapy.Spider</code>类：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="nb">classmethod</span>
+<span class="k">def</span> <span class="nf">from_crawler</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">crawler</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">spider</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">spider</span><span class="p">.</span><span class="n">_set_crawler</span><span class="p">(</span><span class="n">crawler</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">spider</span>
+<span class="k">def</span> <span class="nf">_set_crawler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crawler</span><span class="p">):</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">crawler</span> <span class="o">=</span> <span class="n">crawler</span>
+    <span class="c1"># 把settings对象赋给spider实例
+</span>    <span class="bp">self</span><span class="p">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">crawler</span><span class="p">.</span><span class="n">settings</span>
+    <span class="n">crawler</span><span class="p">.</span><span class="n">signals</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">close</span><span class="p">,</span> <span class="n">signals</span><span class="p">.</span><span class="n">spider_closed</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>在这里可以看到，这个类方法其实也是调用了构造方法，进行实例化，同时也拿到了<code class="language-plaintext highlighter-rouge">settings</code>配置，来看构造方法干了些什么？</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Spider</span><span class="p">(</span><span class="n">object_ref</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">custom_settings</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># name必填
+</span>        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">'name'</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="nb">ValueError</span><span class="p">(</span><span class="s">"%s must have a name"</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">).</span><span class="n">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">__dict__</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># 如果没有设置start_urls，默认是[]
+</span>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">'start_urls'</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">start_urls</span> <span class="o">=</span> <span class="p">[]</span>
+</code></pre></div></div>
+
+<p>看到这里是不是很熟悉？这里就是我们平时编写爬虫类时，最常用的几个属性：<code class="language-plaintext highlighter-rouge">name</code>、<code class="language-plaintext highlighter-rouge">start_urls</code>、<code class="language-plaintext highlighter-rouge">custom_settings</code>。</p>
+<ul>
+  <li>name：在运行爬虫时通过它找到对应的爬虫脚本而使用；</li>
+  <li>start_urls：定义种子URL；</li>
+  <li>custom_settings：从字面意思可以看出，爬虫自定义配置，会覆盖配置文件的配置项；</li>
+</ul>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_27.png" alt="ssl" /></p>
+
+<h1 id="2引擎">2.引擎</h1>
+
+<p>分析完爬虫类的初始化后，还是回到Crawler的crawl方法，紧接着就是创建引擎对象，也就是<code class="language-plaintext highlighter-rouge">_create_engine</code>方法，这里直接进行了引擎初始化操作，看看都发生了什么？</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ExecutionEngine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="s">"""引擎"""</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crawler</span><span class="p">,</span> <span class="n">spider_closed_callback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">crawler</span> <span class="o">=</span> <span class="n">crawler</span>
+        <span class="c1"># 这里也把settings配置保存到引擎中
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">crawler</span><span class="p">.</span><span class="n">settings</span>
+        <span class="c1"># 信号
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">crawler</span><span class="p">.</span><span class="n">signals</span>
+        <span class="c1"># 日志格式
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">logformatter</span> <span class="o">=</span> <span class="n">crawler</span><span class="p">.</span><span class="n">logformatter</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">slot</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">spider</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">running</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">paused</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c1"># 从settings中找到Scheduler调度器，找到Scheduler类
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">scheduler_cls</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">[</span><span class="s">'SCHEDULER'</span><span class="p">])</span>
+        <span class="c1"># 同样，找到Downloader下载器类
+</span>        <span class="n">downloader_cls</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">[</span><span class="s">'DOWNLOADER'</span><span class="p">])</span>
+        <span class="c1"># 实例化Downloader
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">downloader</span> <span class="o">=</span> <span class="n">downloader_cls</span><span class="p">(</span><span class="n">crawler</span><span class="p">)</span>
+        <span class="c1"># 实例化Scraper，它是引擎连接爬虫类的桥梁
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">scraper</span> <span class="o">=</span> <span class="n">Scraper</span><span class="p">(</span><span class="n">crawler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_spider_closed_callback</span> <span class="o">=</span> <span class="n">spider_closed_callback</span>
+
+</code></pre></div></div>
+
+<p>在这里能看到，进行了核心组件的定义和初始化，包括：<code class="language-plaintext highlighter-rouge">Scheduler</code>、<code class="language-plaintext highlighter-rouge">Downloader</code>、<code class="language-plaintext highlighter-rouge">Scrapyer</code>，其中Scheduler只进行了类定义，没有实例化。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_28.png" alt="ssl" /></p>
+
+<h1 id="3调度器">3.调度器</h1>
+
+<p>调度器初始化发生在引擎的<code class="language-plaintext highlighter-rouge">open_spider</code>方法中，我们提前来看一下调度器的初始化完成了哪些工作？</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Scheduler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="s">"""调度器"""</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dupefilter</span><span class="p">,</span> <span class="n">jobdir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">dqclass</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">mqclass</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">logunser</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pqclass</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c1"># 指纹过滤器
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">dupefilter</span>
+        <span class="c1"># 任务队列文件夹
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">dqdir</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_dqdir</span><span class="p">(</span><span class="n">jobdir</span><span class="p">)</span>
+        <span class="c1"># 优先级任务队列类
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">pqclass</span> <span class="o">=</span> <span class="n">pqclass</span>
+        <span class="c1"># 磁盘任务队列类
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">dqclass</span> <span class="o">=</span> <span class="n">dqclass</span>
+        <span class="c1"># 内存任务队列类
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">mqclass</span> <span class="o">=</span> <span class="n">mqclass</span>
+        <span class="c1"># 日志是否序列化
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">logunser</span> <span class="o">=</span> <span class="n">logunser</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">stats</span>
+        
+    <span class="o">@</span><span class="nb">classmethod</span>
+    <span class="k">def</span> <span class="nf">from_crawler</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">crawler</span><span class="p">):</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="n">crawler</span><span class="p">.</span><span class="n">settings</span>
+        <span class="c1"># 从配置文件中获取指纹过滤器类
+</span>        <span class="n">dupefilter_cls</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s">'DUPEFILTER_CLASS'</span><span class="p">])</span>
+        <span class="c1"># 实例化指纹过滤器
+</span>        <span class="n">dupefilter</span> <span class="o">=</span> <span class="n">dupefilter_cls</span><span class="p">.</span><span class="n">from_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+        <span class="c1"># 从配置文件中依次获取优先级任务队列类、磁盘队列类、内存队列类
+</span>        <span class="n">pqclass</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s">'SCHEDULER_PRIORITY_QUEUE'</span><span class="p">])</span>
+        <span class="n">dqclass</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s">'SCHEDULER_DISK_QUEUE'</span><span class="p">])</span>
+        <span class="n">mqclass</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s">'SCHEDULER_MEMORY_QUEUE'</span><span class="p">])</span>
+        <span class="c1"># 请求日志序列化开关
+</span>        <span class="n">logunser</span> <span class="o">=</span> <span class="n">settings</span><span class="p">.</span><span class="n">getbool</span><span class="p">(</span><span class="s">'LOG_UNSERIALIZABLE_REQUESTS'</span><span class="p">,</span> <span class="n">settings</span><span class="p">.</span><span class="n">getbool</span><span class="p">(</span><span class="s">'SCHEDULER_DEBUG'</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">dupefilter</span><span class="p">,</span> <span class="n">jobdir</span><span class="o">=</span><span class="n">job_dir</span><span class="p">(</span><span class="n">settings</span><span class="p">),</span> <span class="n">logunser</span><span class="o">=</span><span class="n">logunser</span><span class="p">,</span>
+                   <span class="n">stats</span><span class="o">=</span><span class="n">crawler</span><span class="p">.</span><span class="n">stats</span><span class="p">,</span> <span class="n">pqclass</span><span class="o">=</span><span class="n">pqclass</span><span class="p">,</span> <span class="n">dqclass</span><span class="o">=</span><span class="n">dqclass</span><span class="p">,</span> <span class="n">mqclass</span><span class="o">=</span><span class="n">mqclass</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>调度器的初始化主要做了2件事：</p>
+<ul>
+  <li>实例化请求指纹过滤器：用来过滤重复请求，可自己重写替换之；</li>
+  <li>定义各种不同类型的任务队列：优先级任务队列、基于磁盘的任务队列、基于内存的任务队列；</li>
+</ul>
+
+<h1 id="4请求指纹过滤器">4.请求指纹过滤器</h1>
+
+<p>先来看请求指纹过滤器是什么？</p>
+
+<p>在配置文件中定义的默认指纹过滤器是<code class="language-plaintext highlighter-rouge">RFPDupeFilter</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">RFPDupeFilter</span><span class="p">(</span><span class="n">BaseDupeFilter</span><span class="p">):</span>
+    <span class="s">"""请求指纹过滤器"""</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="nb">file</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="c1"># 指纹集合，使用的是set，基于内存
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">fingerprints</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">logdupes</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="p">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+        <span class="c1"># 请求指纹可存入磁盘
+</span>        <span class="k">if</span> <span class="n">path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="nb">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">'requests.seen'</span><span class="p">),</span> <span class="s">'a+'</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">.</span><span class="nb">file</span><span class="p">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">fingerprints</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="nb">file</span><span class="p">)</span>
+    <span class="o">@</span><span class="nb">classmethod</span>
+    <span class="k">def</span> <span class="nf">from_settings</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="n">debug</span> <span class="o">=</span> <span class="n">settings</span><span class="p">.</span><span class="n">getbool</span><span class="p">(</span><span class="s">'DUPEFILTER_DEBUG'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">job_dir</span><span class="p">(</span><span class="n">settings</span><span class="p">),</span> <span class="n">debug</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>请求指纹过滤器初始化时，定义了指纹集合，这个集合使用内存实现的<code class="language-plaintext highlighter-rouge">set</code>，而且可以控制这些指纹是否存入磁盘供下次重复使用。</p>
+
+<p>指纹过滤器的主要职责是：<code class="language-plaintext highlighter-rouge">过滤重复请求，可自定义过滤规则</code>。</p>
+
+<p>在下篇文章中会介绍到，每个请求是根据什么规则生成指纹，进而实现重复请求过滤逻辑的。</p>
+
+<h1 id="5任务队列">5.任务队列</h1>
+
+<p>调度器默认定义的2种队列类型：</p>
+<ul>
+  <li>基于磁盘的任务队列：在配置文件可配置存储路径，每次执行后会把队列任务保存到磁盘上；</li>
+  <li>基于内存的任务队列：每次都在内存中执行，下次启动则消失；</li>
+</ul>
+
+<p>配置文件默认定义如下：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 基于磁盘的任务队列(后进先出)
+</span><span class="n">SCHEDULER_DISK_QUEUE</span> <span class="o">=</span> <span class="s">'scrapy.squeues.PickleLifoDiskQueue'</span>
+<span class="c1"># 基于内存的任务队列(后进先出)
+</span><span class="n">SCHEDULER_MEMORY_QUEUE</span> <span class="o">=</span> <span class="s">'scrapy.squeues.LifoMemoryQueue'</span>
+<span class="c1"># 优先级队列
+</span><span class="n">SCHEDULER_PRIORITY_QUEUE</span> <span class="o">=</span> <span class="s">'queuelib.PriorityQueue'</span>
+</code></pre></div></div>
+
+<p>如果用户在配置文件中定义了<code class="language-plaintext highlighter-rouge">JOBDIR</code>，那么则每次把任务队列保存在磁盘中，下次启动时自动加载。</p>
+
+<p>如果没有定义，那么则使用的是内存队列。</p>
+
+<p>细心的你会发现，默认定义的这些队列结构都是后进先出的，什么意思呢？</p>
+
+<p>也就是说：Scrapy默认的采集规则是深度优先采集！</p>
+
+<p>如何改变这种机制，变为广度优先采集呢？那么你可以看一下<code class="language-plaintext highlighter-rouge">scrapy.squeues</code>模块，其中定义了：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 先进先出磁盘队列(pickle序列化)
+</span><span class="n">PickleFifoDiskQueue</span> <span class="o">=</span> <span class="n">_serializable_queue</span><span class="p">(</span><span class="n">queue</span><span class="p">.</span><span class="n">FifoDiskQueue</span><span class="p">,</span> \
+    <span class="n">_pickle_serialize</span><span class="p">,</span> <span class="n">pickle</span><span class="p">.</span><span class="n">loads</span><span class="p">)</span>
+<span class="c1"># 后进先出磁盘队列(pickle序列化)
+</span><span class="n">PickleLifoDiskQueue</span> <span class="o">=</span> <span class="n">_serializable_queue</span><span class="p">(</span><span class="n">queue</span><span class="p">.</span><span class="n">LifoDiskQueue</span><span class="p">,</span> \
+    <span class="n">_pickle_serialize</span><span class="p">,</span> <span class="n">pickle</span><span class="p">.</span><span class="n">loads</span><span class="p">)</span>
+<span class="c1"># 先进先出磁盘队列(marshal序列化)
+</span><span class="n">MarshalFifoDiskQueue</span> <span class="o">=</span> <span class="n">_serializable_queue</span><span class="p">(</span><span class="n">queue</span><span class="p">.</span><span class="n">FifoDiskQueue</span><span class="p">,</span> \
+    <span class="n">marshal</span><span class="p">.</span><span class="n">dumps</span><span class="p">,</span> <span class="n">marshal</span><span class="p">.</span><span class="n">loads</span><span class="p">)</span>
+<span class="c1"># 后进先出磁盘队列(marshal序列化)
+</span><span class="n">MarshalLifoDiskQueue</span> <span class="o">=</span> <span class="n">_serializable_queue</span><span class="p">(</span><span class="n">queue</span><span class="p">.</span><span class="n">LifoDiskQueue</span><span class="p">,</span> \
+    <span class="n">marshal</span><span class="p">.</span><span class="n">dumps</span><span class="p">,</span> <span class="n">marshal</span><span class="p">.</span><span class="n">loads</span><span class="p">)</span>
+<span class="c1"># 先进先出内存队列
+</span><span class="n">FifoMemoryQueue</span> <span class="o">=</span> <span class="n">queue</span><span class="p">.</span><span class="n">FifoMemoryQueue</span>
+<span class="c1"># 后进先出内存队列
+</span><span class="n">LifoMemoryQueue</span> <span class="o">=</span> <span class="n">queue</span><span class="p">.</span><span class="n">LifoMemoryQueue</span>
+</code></pre></div></div>
+
+<p>你只需要在配置文件中把队列类修改为先进先出队列类就可以了！有没有发现，模块化、组件替代再次发挥威力！</p>
+
+<p>如果你想追究这些队列是如何实现的，可以参考scrapy作者写的<code class="language-plaintext highlighter-rouge">scrapy/queuelib</code>模块。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_29.png" alt="ssl" /></p>
+
+<h1 id="6下载器">6.下载器</h1>
+
+<p>回头引擎的初始化，来看下载器是如何初始化的。</p>
+
+<p>在默认的配置文件<code class="language-plaintext highlighter-rouge">default_settings.py</code>中，下载器配置如下：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">DOWNLOADER</span> <span class="o">=</span> <span class="s">'scrapy.core.downloader.Downloader'</span>
+</code></pre></div></div>
+
+<p>Downloader实例化：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Downloader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="s">"""下载器"""</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crawler</span><span class="p">):</span>
+    	<span class="c1"># 同样的，拿到settings对象
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">crawler</span><span class="p">.</span><span class="n">settings</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">crawler</span><span class="p">.</span><span class="n">signals</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">slots</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">active</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="c1"># 初始化DownloadHandlers
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="n">DownloadHandlers</span><span class="p">(</span><span class="n">crawler</span><span class="p">)</span>
+        <span class="c1"># 从配置中获取设置的并发数
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">total_concurrency</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">.</span><span class="n">getint</span><span class="p">(</span><span class="s">'CONCURRENT_REQUESTS'</span><span class="p">)</span>
+        <span class="c1"># 同一域名并发数
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">domain_concurrency</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">.</span><span class="n">getint</span><span class="p">(</span><span class="s">'CONCURRENT_REQUESTS_PER_DOMAIN'</span><span class="p">)</span>
+        <span class="c1"># 同一IP并发数
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">ip_concurrency</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">.</span><span class="n">getint</span><span class="p">(</span><span class="s">'CONCURRENT_REQUESTS_PER_IP'</span><span class="p">)</span>
+        <span class="c1"># 随机延迟下载时间
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">randomize_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">.</span><span class="n">getbool</span><span class="p">(</span><span class="s">'RANDOMIZE_DOWNLOAD_DELAY'</span><span class="p">)</span>
+        <span class="c1"># 初始化下载器中间件
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">middleware</span> <span class="o">=</span> <span class="n">DownloaderMiddlewareManager</span><span class="p">.</span><span class="n">from_crawler</span><span class="p">(</span><span class="n">crawler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_slot_gc_loop</span> <span class="o">=</span> <span class="n">task</span><span class="p">.</span><span class="n">LoopingCall</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">_slot_gc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_slot_gc_loop</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>这个过程主要是初始化了下载处理器、下载器中间件管理器以及从配置文件中拿到抓取请求控制相关参数。</p>
+
+<p>下载器<code class="language-plaintext highlighter-rouge">DownloadHandlers</code>是做什么的？</p>
+
+<p>下载器中间件<code class="language-plaintext highlighter-rouge">DownloaderMiddlewareManager</code>初始化发生了什么？</p>
+
+<h1 id="7下载处理器">7.下载处理器</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DownloadHandlers</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="s">"""下载器处理器"""</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crawler</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_crawler</span> <span class="o">=</span> <span class="n">crawler</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_schemes</span> <span class="o">=</span> <span class="p">{}</span>	<span class="c1"># 存储scheme对应的类路径，后面用于实例化
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">_handlers</span> <span class="o">=</span> <span class="p">{}</span>	<span class="c1"># 存储scheme对应的下载器
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">_notconfigured</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># 从配置中找到DOWNLOAD_HANDLERS_BASE，构造下载处理器
+</span>        <span class="c1"># 注意：这里是调用getwithbase方法，取的是配置中的XXXX_BASE配置
+</span>        <span class="n">handlers</span> <span class="o">=</span> <span class="n">without_none_values</span><span class="p">(</span>
+            <span class="n">crawler</span><span class="p">.</span><span class="n">settings</span><span class="p">.</span><span class="n">getwithbase</span><span class="p">(</span><span class="s">'DOWNLOAD_HANDLERS'</span><span class="p">))</span>
+        <span class="c1"># 存储scheme对应的类路径，后面用于实例化
+</span>        <span class="k">for</span> <span class="n">scheme</span><span class="p">,</span> <span class="n">clspath</span> <span class="ow">in</span> <span class="n">six</span><span class="p">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">handlers</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">_schemes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span> <span class="o">=</span> <span class="n">clspath</span>
+        <span class="n">crawler</span><span class="p">.</span><span class="n">signals</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">_close</span><span class="p">,</span> <span class="n">signals</span><span class="p">.</span><span class="n">engine_stopped</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>下载处理器在默认的配置文件中是这样配置的：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 用户可自定义的下载处理器
+</span><span class="n">DOWNLOAD_HANDLERS</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="c1"># 默认的下载处理器
+</span><span class="n">DOWNLOAD_HANDLERS_BASE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'file'</span><span class="p">:</span> <span class="s">'scrapy.core.downloader.handlers.file.FileDownloadHandler'</span><span class="p">,</span>
+    <span class="s">'http'</span><span class="p">:</span> <span class="s">'scrapy.core.downloader.handlers.http.HTTPDownloadHandler'</span><span class="p">,</span>
+    <span class="s">'https'</span><span class="p">:</span> <span class="s">'scrapy.core.downloader.handlers.http.HTTPDownloadHandler'</span><span class="p">,</span>
+    <span class="s">'s3'</span><span class="p">:</span> <span class="s">'scrapy.core.downloader.handlers.s3.S3DownloadHandler'</span><span class="p">,</span>
+    <span class="s">'ftp'</span><span class="p">:</span> <span class="s">'scrapy.core.downloader.handlers.ftp.FTPDownloadHandler'</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>看到这里你应该能明白了，说白了就是需下载的资源是什么类型，就选用哪一种下载处理器进行网络下载，其中最常用的就是http和https对应的处理器。</p>
+
+<p>从这里你也能看出，scrapy的架构是非常低耦合的，任何涉及到的组件及模块都是可重写和配置的。scrapy提供了基础的服务组件，你也可以自己实现其中的某些组件，修改配置即可达到替换的目的。</p>
+
+<p>到这里，大概就能明白，下载处理器的工作就是：<code class="language-plaintext highlighter-rouge">管理着各种资源对应的下载器，在真正发起网络请求时，选取对应的下载器进行资源下载</code>。</p>
+
+<p>但是请注意，在这个初始化过程中，这些下载器是没有被实例化的，也就是说，在真正发起网络请求时，才会进行初始化，而且只会初始化一次，后面会讲到。</p>
+
+<h1 id="8下载器中间件管理器">8.下载器中间件管理器</h1>
+
+<p>下面来看下载器中间件<code class="language-plaintext highlighter-rouge">DownloaderMiddlewareManager</code>初始化，同样的这里又调用了类方法<code class="language-plaintext highlighter-rouge">from_crawler</code>进行初始化，<code class="language-plaintext highlighter-rouge">DownloaderMiddlewareManager</code>继承了<code class="language-plaintext highlighter-rouge">MiddlewareManager</code>类，来看它在初始化做了哪些工作：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MiddlewareManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="s">"""所有中间件的父类，提供中间件公共的方法"""</span>
+    <span class="n">component_name</span> <span class="o">=</span> <span class="s">'foo middleware'</span>
+    <span class="o">@</span><span class="nb">classmethod</span>
+    <span class="k">def</span> <span class="nf">from_crawler</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">crawler</span><span class="p">):</span>
+        <span class="c1"># 调用from_settings
+</span>        <span class="k">return</span> <span class="n">cls</span><span class="p">.</span><span class="n">from_settings</span><span class="p">(</span><span class="n">crawler</span><span class="p">.</span><span class="n">settings</span><span class="p">,</span> <span class="n">crawler</span><span class="p">)</span>
+    
+    <span class="o">@</span><span class="nb">classmethod</span>
+    <span class="k">def</span> <span class="nf">from_settings</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">crawler</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c1"># 调用子类_get_mwlist_from_settings得到所有中间件类的模块
+</span>        <span class="n">mwlist</span> <span class="o">=</span> <span class="n">cls</span><span class="p">.</span><span class="n">_get_mwlist_from_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+        <span class="n">middlewares</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">enabled</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># 依次实例化
+</span>        <span class="k">for</span> <span class="n">clspath</span> <span class="ow">in</span> <span class="n">mwlist</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># 加载这些中间件模块
+</span>                <span class="n">mwcls</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">clspath</span><span class="p">)</span>
+                <span class="c1"># 如果此中间件类定义了from_crawler，则调用此方法实例化
+</span>                <span class="k">if</span> <span class="n">crawler</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mwcls</span><span class="p">,</span> <span class="s">'from_crawler'</span><span class="p">):</span>
+                    <span class="n">mw</span> <span class="o">=</span> <span class="n">mwcls</span><span class="p">.</span><span class="n">from_crawler</span><span class="p">(</span><span class="n">crawler</span><span class="p">)</span>
+                <span class="c1"># 如果此中间件类定义了from_settings，则调用此方法实例化
+</span>                <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mwcls</span><span class="p">,</span> <span class="s">'from_settings'</span><span class="p">):</span>
+                    <span class="n">mw</span> <span class="o">=</span> <span class="n">mwcls</span><span class="p">.</span><span class="n">from_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+                <span class="c1"># 上面2个方法都没有，则直接调用构造实例化
+</span>                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">mw</span> <span class="o">=</span> <span class="n">mwcls</span><span class="p">()</span>
+                <span class="n">middlewares</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">mw</span><span class="p">)</span>
+                <span class="n">enabled</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">clspath</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">NotConfigured</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">e</span><span class="p">.</span><span class="n">args</span><span class="p">:</span>
+                    <span class="n">clsname</span> <span class="o">=</span> <span class="n">clspath</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">'.'</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">logger</span><span class="p">.</span><span class="n">warning</span><span class="p">(</span><span class="s">"Disabled %(clsname)s: %(eargs)s"</span><span class="p">,</span>
+                                   <span class="p">{</span><span class="s">'clsname'</span><span class="p">:</span> <span class="n">clsname</span><span class="p">,</span> <span class="s">'eargs'</span><span class="p">:</span> <span class="n">e</span><span class="p">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]},</span>
+                                   <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'crawler'</span><span class="p">:</span> <span class="n">crawler</span><span class="p">})</span>
+        <span class="n">logger</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">"Enabled %(componentname)ss:</span><span class="se">\n</span><span class="s">%(enabledlist)s"</span><span class="p">,</span>
+                    <span class="p">{</span><span class="s">'componentname'</span><span class="p">:</span> <span class="n">cls</span><span class="p">.</span><span class="n">component_name</span><span class="p">,</span>
+                     <span class="s">'enabledlist'</span><span class="p">:</span> <span class="n">pprint</span><span class="p">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">enabled</span><span class="p">)},</span>
+                    <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'crawler'</span><span class="p">:</span> <span class="n">crawler</span><span class="p">})</span>
+        <span class="c1"># 调用构造方法
+</span>        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="o">*</span><span class="n">middlewares</span><span class="p">)</span>
+    <span class="o">@</span><span class="nb">classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_mwlist_from_settings</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="c1"># 具体有哪些中间件类，子类定义
+</span>        <span class="k">raise</span> <span class="nb">NotImplementedError</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">middlewares</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">middlewares</span> <span class="o">=</span> <span class="n">middlewares</span>
+        <span class="c1"># 定义中间件方法
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">methods</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">mw</span> <span class="ow">in</span> <span class="n">middlewares</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">_add_middleware</span><span class="p">(</span><span class="n">mw</span><span class="p">)</span>
+        
+	<span class="k">def</span> <span class="nf">_add_middleware</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mw</span><span class="p">):</span>
+        <span class="c1"># 默认定义的，子类可覆盖
+</span>        <span class="c1"># 如果中间件类有定义open_spider,则加入到methods
+</span>        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s">'open_spider'</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'open_spider'</span><span class="p">].</span><span class="n">append</span><span class="p">(</span><span class="n">mw</span><span class="p">.</span><span class="n">open_spider</span><span class="p">)</span>
+        <span class="c1"># 如果中间件类有定义close_spider,则加入到methods
+</span>        <span class="c1"># methods就是一串中间件的方法链，后期会依次调用
+</span>        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s">'close_spider'</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'close_spider'</span><span class="p">].</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mw</span><span class="p">.</span><span class="n">close_spider</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">DownloaderMiddlewareManager</code>实例化：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DownloaderMiddlewareManager</span><span class="p">(</span><span class="n">MiddlewareManager</span><span class="p">):</span>
+	<span class="s">"""下载中间件管理器"""</span>
+    <span class="n">component_name</span> <span class="o">=</span> <span class="s">'downloader middleware'</span>
+    <span class="o">@</span><span class="nb">classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_mwlist_from_settings</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="c1"># 从配置文件DOWNLOADER_MIDDLEWARES_BASE和DOWNLOADER_MIDDLEWARES获得所有下载器中间件
+</span>        <span class="k">return</span> <span class="n">build_component_list</span><span class="p">(</span>
+            <span class="n">settings</span><span class="p">.</span><span class="n">getwithbase</span><span class="p">(</span><span class="s">'DOWNLOADER_MIDDLEWARES'</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">_add_middleware</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mw</span><span class="p">):</span>
+        <span class="c1"># 定义下载器中间件请求、响应、异常一串方法
+</span>        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s">'process_request'</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_request'</span><span class="p">].</span><span class="n">append</span><span class="p">(</span><span class="n">mw</span><span class="p">.</span><span class="n">process_request</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s">'process_response'</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_response'</span><span class="p">].</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mw</span><span class="p">.</span><span class="n">process_response</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s">'process_exception'</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_exception'</span><span class="p">].</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mw</span><span class="p">.</span><span class="n">process_exception</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">下载器中间件管理器</code>继承了<code class="language-plaintext highlighter-rouge">MiddlewareManager</code>类，然后重写了<code class="language-plaintext highlighter-rouge">_add_middleware</code>方法，为下载行为定义默认的下载前、下载后、异常时对应的处理方法。</p>
+
+<p>中间件的职责是什么？从这里能大概看出，从某个组件流向另一个组件时，会经过一系列中间件，每个中间件都定义了自己的处理流程，相当于一个个管道，输入时可以针对数据进行处理，然后送达到另一个组件，另一个组件处理完逻辑后，又经过这一系列中间件，这些中间件可再针对这个响应结果进行处理，最终输出。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_30.png" alt="ssl" /></p>
+
+<h1 id="9scraper">9.Scraper</h1>
+
+<p>下载器实例化完了之后，回到引擎的初始化方法中，然后是实例化Scraper，在Scrapy源码分析（一）架构概览中已经大概说到，这个类没有在架构图中出现，但这个类其实是处于Engine、Spiders、Pipeline之间，是连通这3个组件的桥梁。</p>
+
+<p>来看它的初始化：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Scraper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crawler</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">slot</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="c1"># 实例化爬虫中间件管理器
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">spidermw</span> <span class="o">=</span> <span class="n">SpiderMiddlewareManager</span><span class="p">.</span><span class="n">from_crawler</span><span class="p">(</span><span class="n">crawler</span><span class="p">)</span>
+        <span class="c1"># 从配置文件中加载Pipeline处理器类
+</span>        <span class="n">itemproc_cls</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">crawler</span><span class="p">.</span><span class="n">settings</span><span class="p">[</span><span class="s">'ITEM_PROCESSOR'</span><span class="p">])</span>
+        <span class="c1"># 实例化Pipeline处理器
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">itemproc</span> <span class="o">=</span> <span class="n">itemproc_cls</span><span class="p">.</span><span class="n">from_crawler</span><span class="p">(</span><span class="n">crawler</span><span class="p">)</span>
+        <span class="c1"># 从配置文件中获取同时处理输出的任务个数
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">concurrent_items</span> <span class="o">=</span> <span class="n">crawler</span><span class="p">.</span><span class="n">settings</span><span class="p">.</span><span class="n">getint</span><span class="p">(</span><span class="s">'CONCURRENT_ITEMS'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">crawler</span> <span class="o">=</span> <span class="n">crawler</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">crawler</span><span class="p">.</span><span class="n">signals</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">logformatter</span> <span class="o">=</span> <span class="n">crawler</span><span class="p">.</span><span class="n">logformatter</span>
+</code></pre></div></div>
+
+<h4 id="爬虫中间件管理器">爬虫中间件管理器</h4>
+
+<p><code class="language-plaintext highlighter-rouge">SpiderMiddlewareManager</code>初始化：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">SpiderMiddlewareManager</span><span class="p">(</span><span class="n">MiddlewareManager</span><span class="p">):</span>
+	<span class="s">"""爬虫中间件管理器"""</span>
+    <span class="n">component_name</span> <span class="o">=</span> <span class="s">'spider middleware'</span>
+    <span class="o">@</span><span class="nb">classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_mwlist_from_settings</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="c1"># 从配置文件中SPIDER_MIDDLEWARES_BASE和SPIDER_MIDDLEWARES获取默认的爬虫中间件类
+</span>        <span class="k">return</span> <span class="n">build_component_list</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">getwithbase</span><span class="p">(</span><span class="s">'SPIDER_MIDDLEWARES'</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">_add_middleware</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mw</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SpiderMiddlewareManager</span><span class="p">,</span> <span class="bp">self</span><span class="p">).</span><span class="n">_add_middleware</span><span class="p">(</span><span class="n">mw</span><span class="p">)</span>
+        <span class="c1"># 定义爬虫中间件处理方法
+</span>        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s">'process_spider_input'</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_spider_input'</span><span class="p">].</span><span class="n">append</span><span class="p">(</span><span class="n">mw</span><span class="p">.</span><span class="n">process_spider_input</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s">'process_spider_output'</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_spider_output'</span><span class="p">].</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mw</span><span class="p">.</span><span class="n">process_spider_output</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s">'process_spider_exception'</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_spider_exception'</span><span class="p">].</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mw</span><span class="p">.</span><span class="n">process_spider_exception</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s">'process_start_requests'</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_start_requests'</span><span class="p">].</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mw</span><span class="p">.</span><span class="n">process_start_requests</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>爬虫中间件管理器初始化与之前的下载器中间件管理器类似，先是从配置文件中加载了默认的爬虫中间件类，然后依次注册爬虫中间件的一系列流程方法。</p>
+
+<p>配置文件中定义的默认的爬虫中间件类如下：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">SPIDER_MIDDLEWARES_BASE</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="c1"># 默认的爬虫中间件类
+</span>    <span class="s">'scrapy.spidermiddlewares.httperror.HttpErrorMiddleware'</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="s">'scrapy.spidermiddlewares.offsite.OffsiteMiddleware'</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+    <span class="s">'scrapy.spidermiddlewares.referer.RefererMiddleware'</span><span class="p">:</span> <span class="mi">700</span><span class="p">,</span>
+    <span class="s">'scrapy.spidermiddlewares.urllength.UrlLengthMiddleware'</span><span class="p">:</span> <span class="mi">800</span><span class="p">,</span>
+    <span class="s">'scrapy.spidermiddlewares.depth.DepthMiddleware'</span><span class="p">:</span> <span class="mi">900</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>这些默认的爬虫中间件职责分别如下：</p>
+<ul>
+  <li>HttpErrorMiddleware：会针对响应不是200错误进行逻辑处理；</li>
+  <li>OffsiteMiddleware：如果Spider中定义了allowed_domains，会自动过滤初次之外的域名请求；</li>
+  <li>RefererMiddleware：追加Referer头信息；</li>
+  <li>UrlLengthMiddleware：控制过滤URL长度超过配置的请求；</li>
+  <li>DepthMiddleware：过滤超过配置深入的抓取请求；</li>
+</ul>
+
+<p>当然，你也可以定义自己的爬虫中间件，来处理自己需要的逻辑。</p>
+
+<h4 id="pipeline管理器">Pipeline管理器</h4>
+
+<p>爬虫中间件管理器初始化完之后，然后就是<code class="language-plaintext highlighter-rouge">Pipeline</code>组件的初始化，默认的<code class="language-plaintext highlighter-rouge">Pipeline</code>组件是<code class="language-plaintext highlighter-rouge">ItemPipelineManager</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ItemPipelineManager</span><span class="p">(</span><span class="n">MiddlewareManager</span><span class="p">):</span>
+    <span class="n">component_name</span> <span class="o">=</span> <span class="s">'item pipeline'</span>
+    <span class="o">@</span><span class="nb">classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_mwlist_from_settings</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="c1"># 从配置文件加载ITEM_PIPELINES_BASE和ITEM_PIPELINES类
+</span>        <span class="k">return</span> <span class="n">build_component_list</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">getwithbase</span><span class="p">(</span><span class="s">'ITEM_PIPELINES'</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">_add_middleware</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipe</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ItemPipelineManager</span><span class="p">,</span> <span class="bp">self</span><span class="p">).</span><span class="n">_add_middleware</span><span class="p">(</span><span class="n">pipe</span><span class="p">)</span>
+        <span class="c1"># 定义默认的pipeline处理逻辑
+</span>        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="s">'process_item'</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_item'</span><span class="p">].</span><span class="n">append</span><span class="p">(</span><span class="n">pipe</span><span class="p">.</span><span class="n">process_item</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+        <span class="c1"># 依次调用所有子类的process_item方法
+</span>        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_process_chain</span><span class="p">(</span><span class="s">'process_item'</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>可以看到<code class="language-plaintext highlighter-rouge">ItemPipelineManager</code>也是一个中间件管理器的子类，由于它的行为非常类似于中间件，但由于功能较为独立，所以属于核心组件之一。</p>
+
+<p>从Scraper的初始化能够看到，它管理着<code class="language-plaintext highlighter-rouge">Spiders</code>和<code class="language-plaintext highlighter-rouge">Pipeline</code>相关的交互逻辑。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_31.png" alt="ssl" /></p>
+
+<p>到这里，所有组件：<code class="language-plaintext highlighter-rouge">引擎</code>、<code class="language-plaintext highlighter-rouge">下载器</code>、<code class="language-plaintext highlighter-rouge">调度器</code>、<code class="language-plaintext highlighter-rouge">爬虫类</code>、<code class="language-plaintext highlighter-rouge">输出处理器</code>都依次初始化完成，每个核心组件下其实都包含一些小的组件在里面，帮助处理某一环节的各种流程。</p>
+
+:ET

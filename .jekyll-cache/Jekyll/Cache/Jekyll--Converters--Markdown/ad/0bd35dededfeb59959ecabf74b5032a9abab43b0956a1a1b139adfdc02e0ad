@@ -1,0 +1,17 @@
+I"�<p>本贴记录android调用微信的错误，并记录解决方案。</p>
+
+<h1 id="1签名错误">1.签名错误</h1>
+
+<p>在调用微信登录授权时，弹出签名不对，请检查签名是否与开发平台签名一致。</p>
+
+<p>先去<a href="https://open.weixin.qq.com/" title="https://open.weixin.qq.com/">微信开放平台</a>查看自己申请的应用</p>
+
+<p><img src="http://walidream.com:9999/blogImage/mobile/mobile_2.png" alt="ssl" /></p>
+
+<p>找到<code class="language-plaintext highlighter-rouge">应用签名</code>和<code class="language-plaintext highlighter-rouge">包名</code>。微信官方提供的<a href="https://res.wx.qq.com/open/zh_CN/htmledition/res/dev/download/sdk/Gen_Signature_Android2.apk" title="https://res.wx.qq.com/open/zh_CN/htmledition/res/dev/download/sdk/Gen_Signature_Android2.apk">签名生成工具</a>如果不相信呢，小菜这里放个<a href="https://developers.weixin.qq.com/doc/oplatform/Downloads/Android_Resource.html" title="https://developers.weixin.qq.com/doc/oplatform/Downloads/Android_Resource.html">微信资源下载链接</a></p>
+
+<p>下载完签名工具后，输入开放平台的应用包名，然后看生成的应用签名和开放平台上的应用签名是否一致。如果不一致，请将开放平台的应用签名修改为<code class="language-plaintext highlighter-rouge">最新生成的应用签名</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/mobile/mobile_3.png" alt="ssl" /></p>
+
+:ET

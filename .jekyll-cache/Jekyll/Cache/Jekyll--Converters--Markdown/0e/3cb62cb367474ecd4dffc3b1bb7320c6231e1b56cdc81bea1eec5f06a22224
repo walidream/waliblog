@@ -1,0 +1,2 @@
+I"�<p>在初学scrapy时，按照官方的文档写了一个爬虫片段，发现怎么都会不会进入<code class="language-plaintext highlighter-rouge">parse()</code>方法。下面是spider代码</p>
+:ET

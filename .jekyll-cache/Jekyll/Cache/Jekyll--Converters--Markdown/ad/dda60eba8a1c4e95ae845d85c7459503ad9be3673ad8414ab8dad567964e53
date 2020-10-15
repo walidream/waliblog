@@ -1,0 +1,489 @@
+I"1J<p>webpack-dev-server是一个用来快速搭建本地运行环境的工具。在实际开发中调试接口需要打http请求，我们用之前的方式本地直接打开html文件是不行的，本地直接打开html文件，在浏览器中显示的协议是file协议不是http协议。</p>
+
+<p>使用devServer的好处：</p>
+<ul>
+  <li>自动打开浏览器页面</li>
+  <li>调试接口</li>
+  <li>实时刷新</li>
+  <li>热更新</li>
+  <li>使用代理</li>
+  <li>局域网访问</li>
+</ul>
+
+<h1 id="1安装插件">1.安装插件</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add webpack-dev-server
+</code></pre></div></div>
+
+<h1 id="2devserver配置">2.devServer配置</h1>
+
+<h4 id="packagejson">package.json</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">{</span>
+  "scripts": {
+    "dev": "npx webpack-dev-server --mode=development --colors",
+    "dist": "npx webpack --mode=production"
+  }
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="webpackconfigjs">webpack.config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');    //生成html文件
+const CleanWebpackPlugin = require('clean-webpack-plugin');  //清除
+</span>
+
+
+module.exports = {
+  mode:'development',
+  entry:'./src/index.js',
+  module:{
+	rules:[
+		{
+			test:/\.css$/,
+			use:[
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:1
+					}					
+				},
+				'postcss-loader'
+				
+			]
+		},
+		{
+			test:/\.scss$/,
+			use:[
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'sass-loader',
+				'postcss-loader'
+			]
+		},
+		{
+			test: /\.less$/,
+			use: [
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'less-loader',
+				'postcss-loader'
+			]
+		},
+		{
+			test:/\.(png|svg|jpeg|jpg|gif)$/,
+			use:[		
+				{
+					loader:'file-loader',
+					options:{
+						name:'[name].[ext]',  //[path] 上下文环境路径
+						publicPath:'./assets/image/',    //公共路径
+						outputPath:'assets/image/',  //输出路径							
+					}
+				},
+				{
+					loader: 'image-webpack-loader',
+					options: {
+						bypassOnDebug: true, // webpack@1.x
+						disable: true,       // webpack@2.x and newer
+					},
+				},
+			]
+		},
+		{
+			test: /\.html$/,
+			use:[
+				{
+					loader:'html-loader',
+					options:{
+						arrts:['img:src','img:data-src'],
+						minimize:false  //是否压缩html
+					}
+				}
+			]
+		},
+		{
+			test: /(iconfont.svg)|\.(woff|woff2|eot|ttf|otf)$/,
+			use:[
+				{
+					loader:'file-loader',
+					options:{
+						name:'[name].[ext]',  //[path] 上下文环境路径
+						publicPath:'./assets/iconfont/',    //公共路径
+						outputPath:'assets/iconfont/',  //输出路径							
+					}
+				}				
+			]
+		}
+
+	]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+    	title: '瓦力博客',
+    	template: './src/index.html'   //以src/index.html为编译模板
+    }),
+    new CleanWebpackPlugin()
+  ],
+<span class="gi">+  devServer:{
++    contentBase: path.join(__dirname, 'dist'),
++    clientLogLevel: 'info',
++    open:true,  //启动时默认打开浏览器
++    host:'localhost', //域名 0.0.0.0局域网可访问
++    port:'9009',
++    inline:true, //实时更新
++    proxy:{
++    	'/':{
++    		target:'http://www.waliblog.com'
++    	},
++    	'/upload':{
++    		target:'http://www.waliblog.com'
++    	}
++    }
++  },  
+</span>  output:{
+    path: path.resolve(__dirname,'dist')
+  }
+<span class="err">}</span>
+
+</code></pre></div></div>
+
+<h4 id="运行webpack">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run dev
+</code></pre></div></div>
+
+<h1 id="3使用代理">3.使用代理</h1>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">proxy</span><span class="p">:{</span>
+	<span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">:{</span>
+		<span class="nl">target</span><span class="p">:</span><span class="dl">'</span><span class="s1">http://www.waliblog.com</span><span class="dl">'</span>
+	<span class="p">},</span>
+	<span class="dl">'</span><span class="s1">/upload</span><span class="dl">'</span><span class="p">:{</span>
+		<span class="nl">target</span><span class="p">:</span><span class="dl">'</span><span class="s1">http://www.baidu.com</span><span class="dl">'</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>小菜这里想提到一点就是proxy可以根据匹配路径来设置不同的host。举个例子，小菜要上传一个文件到服务器，请求的url是<code class="language-plaintext highlighter-rouge">http://www.yagm.com/upload</code>，如果配置代理，请求的url就会变成<code class="language-plaintext highlighter-rouge">http://www.baidu.com/upload</code>。proxy会匹配到<code class="language-plaintext highlighter-rouge">/uploade</code>这个路径，将host替换成target的值。</p>
+
+<h1 id="4设置局域网访问">4.设置局域网访问</h1>
+
+<p>不知道大家有没有遇到过这种需求，当你开发完一个功能时，其他人想先在自己电脑上浏览一下，但是你还没有更新部署。如果在局域网内，可以设置<code class="language-plaintext highlighter-rouge">host</code>这个属性。将上面配置的<code class="language-plaintext highlighter-rouge">host:'localhost'</code>修改为<code class="language-plaintext highlighter-rouge">host:'0.0.0.0'</code>然后重启webpack。在浏览器上访问需要输入IP地址加端口号。例如小菜的电脑在局域网的IP:192.168.3.21，那么其他人访问页面的url:’http://192.168.3.21:9009’。<code class="language-plaintext highlighter-rouge">9009</code>端口号是小菜在上面配置自己设置的，大家要替换成自己设置的端口号。</p>
+
+<h1 id="5热模块替换">5.热模块替换</h1>
+
+<h4 id="webpackconfigjs-1">webpack.config.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  const path = require('path');
+<span class="gi">+ const webpack = require('webpack');
+</span>  const HtmlWebpackPlugin = require('html-webpack-plugin');    //生成html文件
+  const CleanWebpackPlugin = require('clean-webpack-plugin');  //清除
+
+
+
+module.exports = {
+  mode:'development',
+  entry:'./src/index.js',
+  module:{
+	rules:[
+		{
+			test:/\.css$/,
+			use:[
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:1
+					}					
+				},
+				'postcss-loader'
+				
+			]
+		},
+		{
+			test:/\.scss$/,
+			use:[
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'sass-loader',
+				'postcss-loader'
+			]
+		},
+		{
+			test: /\.less$/,
+			use: [
+				'style-loader',
+				{
+					loader:'css-loader',
+					options:{
+						importLoaders:2
+					}					
+				},
+				'less-loader',
+				'postcss-loader'
+			]
+		},
+		{
+			test:/\.(png|svg|jpeg|jpg|gif)$/,
+			use:[		
+				{
+					loader:'file-loader',
+					options:{
+						name:'[name].[ext]',  //[path] 上下文环境路径
+						publicPath:'./assets/image/',    //公共路径
+						outputPath:'assets/image/',  //输出路径							
+					}
+				},
+				{
+					loader: 'image-webpack-loader',
+					options: {
+						bypassOnDebug: true, // webpack@1.x
+						disable: true,       // webpack@2.x and newer
+					},
+				},
+			]
+		},
+		{
+			test: /\.html$/,
+			use:[
+				{
+					loader:'html-loader',
+					options:{
+						arrts:['img:src','img:data-src'],
+						minimize:false  //是否压缩html
+					}
+				}
+			]
+		},
+		{
+			test: /(iconfont.svg)|\.(woff|woff2|eot|ttf|otf)$/,
+			use:[
+				{
+					loader:'file-loader',
+					options:{
+						name:'[name].[ext]',  //[path] 上下文环境路径
+						publicPath:'./assets/iconfont/',    //公共路径
+						outputPath:'assets/iconfont/',  //输出路径							
+					}
+				}				
+			]
+		}
+
+	]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+    	title: '瓦力博客',
+    	template: './src/index.html'   //以src/index.html为编译模板
+    }),
+    new CleanWebpackPlugin(),
+<span class="gi">+		new webpack.HotModuleReplacementPlugin()
+</span>  ],
+  devServer:{
+    contentBase: path.join(__dirname, 'dist'),
+    clientLogLevel: 'info',
+    open:true,  //启动时默认打开浏览器
+    host:'localhost', //域名 0.0.0.0局域网可访问
+    port:'9009',
+    inline:true, //实时更新
+<span class="gi">+    hot:true,    //热替换
++    hotOnly:true,
+</span>    proxy:{
+    	'/':{
+    		target:'http://www.waliblog.com'
+    	},
+    	'/upload':{
+    		target:'http://www.waliblog.com'
+    	}
+    }
+  },  
+  output:{
+    path: path.resolve(__dirname,'dist')
+  }
+<span class="err">}</span>
+</code></pre></div></div>
+
+<h4 id="srcassetscssindexcss">src/assets/css/index.css</h4>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">h1</span><span class="p">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h4 id="srcindexhtml">src/index.html</h4>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;title&gt;</span>title<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;h1&gt;</span>欢迎来到瓦力博客<span class="nt">&lt;/h1&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<h4 id="srcindexjs">src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="dl">"</span><span class="s2">./assets/css/index.css</span><span class="dl">"</span>
+</code></pre></div></div>
+
+<h4 id="运行webpack-1">运行webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run dev
+</code></pre></div></div>
+
+<p>webpack启起来后，我们修改样式将字体颜色变成蓝色</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">h1</span><span class="p">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="no">blue</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>这个时候浏览器中<code class="language-plaintext highlighter-rouge">欢迎来到瓦力博客</code>字体也会变蓝，这里值得注意的是浏览器并未刷新，只是将样式替换而已。这个热替换对样式有用，但是对js脚本就没有用了。接下来我们做个演示</p>
+
+<h4 id="文件结构">文件结构</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">myProject
+</span> |-dist  
+ |-node_modules
+ |-src
+     |-assets
+        |-css
+            |-index.css
+        |-less
+            |-index.less     
+        |-sass
+            |-index.scss
+        |-images
+            |-wali_logo.png
+        |-iconfont
+            |-demo.css
+            |-demo_index.html
+            |-iconfont.css
+            |-iconfont.eot
+            |-iconfont.js
+            |-iconfont.svg
+            |-iconfont.ttf
+            |-iconfont.woff
+            |-iconfont.woff2            
+     |-index.html
+     |-index.js
+<span class="gi">+     |-print.js
+</span> |-package.json
+ |-webpack.config.js
+ |-postcss.config.js
+</code></pre></div></div>
+
+<h4 id="srcindexjs-1">src/index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">printMe</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./print.js</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">component</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">element</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">'</span><span class="s1">div</span><span class="dl">'</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">btn</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">'</span><span class="s1">button</span><span class="dl">'</span><span class="p">);</span>
+
+    <span class="nx">element</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">hello webpapck</span><span class="dl">'</span><span class="p">;</span>
+
+    <span class="nx">btn</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">Click me and check the console!</span><span class="dl">'</span><span class="p">;</span>
+    <span class="nx">btn</span><span class="p">.</span><span class="nx">onclick</span> <span class="o">=</span> <span class="nx">printMe</span><span class="p">;</span>
+
+    <span class="nx">element</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">btn</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nx">element</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">component</span><span class="p">());</span>
+</code></pre></div></div>
+
+<p>上面代码什么作用呢？创建一个div标签，创建一个按钮，在div标签里填充<code class="language-plaintext highlighter-rouge">hello webpapck</code>。按钮上的文案改为<code class="language-plaintext highlighter-rouge">Click me and check the console!</code>，给按钮绑定一个点击事件，将按钮放在div标签里，将div元素返回出去。最后将div元素挂在body元素里。</p>
+
+<h4 id="srcprintjs">src/print.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="kd">function</span> <span class="nx">printMe</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">hello !</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>导出一个函数，这个函数的功能是在控制台输出一句<code class="language-plaintext highlighter-rouge">hello !</code></p>
+
+<h4 id="启动webpack">启动webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run dev
+</code></pre></div></div>
+
+<p>启动起来，打开控制台，在浏览器中点击按钮，控制台会输出<code class="language-plaintext highlighter-rouge">hello !</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_13.png" alt="ssl" /></p>
+
+<h4 id="修改srcprintjs">修改src/print.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">export default function printMe() {
+</span><span class="gi">+    console.log('欢迎来到瓦力博客');
+</span><span class="err">}</span>
+</code></pre></div></div>
+
+<p>保存后，这个时候不要刷新浏览器，继续点击按钮，此刻控制台输出的依然是<code class="language-plaintext highlighter-rouge">hello !</code>而不是我们想要的<code class="language-plaintext highlighter-rouge">欢迎来到瓦力博客</code>。</p>
+
+<h4 id="修改srcindexjs">修改src/index.js</h4>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">import printMe from './print.js';
+</span>
+function component() {
+    var element = document.createElement('div');
+    var btn = document.createElement('button');
+
+    element.innerHTML = 'hello webpapck';
+
+    btn.innerHTML = 'Click me and check the console!';
+    btn.onclick = printMe;
+
+    element.appendChild(btn);
+
+    return element;
+<span class="err">}</span>
+
+<span class="p">document.body.appendChild(component());
+</span>
++if (module.hot) {
+<span class="gi">+  module.hot.accept('./print.js', function() {
++      var btn = document.querySelector('button');
++      btn.onclick = printMe;
++
++  })
++}
+</span></code></pre></div></div>
+
+<p>保存后刷新浏览器，然后点击按钮。看到控制台输出<code class="language-plaintext highlighter-rouge">欢迎来到瓦力博客</code>这个时候我们回过头将print.js的内容重新修改为</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">export default function printMe() {
+</span><span class="gi">+    console.log('hello !');
+</span><span class="err">}</span>
+</code></pre></div></div>
+
+<p>保存后不要刷新浏览器，在点击按钮，这个时候控制就会输出<code class="language-plaintext highlighter-rouge">hello !</code>。我们来看看在index.js中添加的代码作用，当开启了热替换后，我们手动监听<code class="language-plaintext highlighter-rouge">print.js</code>文件如果发生更改，在回调中更新按钮的点击事件。小菜举这个例子是想说明，当我们在devServer中开启热替换，只有样式会被热替换，js文件不会被热替换，想要js也被热替换需要手动编写代码。事实上，样式文件也不会被热替换，而是开发人员在代码中帮我们做了这个功能，我们才不需要去写。</p>
+
+<p>演示完毕后我们删除print.js文件</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">myProject
+</span><span class="gd">-	|-print.js
+</span></code></pre></div></div>
+
+:ET

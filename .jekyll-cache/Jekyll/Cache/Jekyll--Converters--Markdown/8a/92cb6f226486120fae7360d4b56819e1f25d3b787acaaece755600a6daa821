@@ -1,0 +1,238 @@
+I"�C<p>距离上次写webpack时间已经过去2年时间，这期间一直想写webpack教程都由于没有时间而放弃。最近看到女友在慕课网上买了webpack教程，小菜也跟着看了，老师讲的非常好。如果大家有多余的零花钱还有时间，建议大家可以买个课程看看，小菜在文章的最后放上购买二维码，这样也可以给大伙省一点钱，如果手头紧的话那就看小菜写的教程吧！小菜这里默认大家对webpack有一定的了解，如果还不知道webpack是什么，做什么用的。建议先阅读webpack官方文档。</p>
+
+<p>在开始之前，小菜要说明本次PC的操作系统<code class="language-plaintext highlighter-rouge">win10</code>，包管理<code class="language-plaintext highlighter-rouge">yarn</code>。yarn和npm一样，只是小菜的个人习惯。</p>
+
+<ul>
+  <li><a href="https://webpack.docschina.org/" title="https://webpack.docschina.org/" target="_blank">webpack官方文档</a></li>
+  <li><a href="https://yarnpkg.com/zh-Hant/" title="https://yarnpkg.com/zh-Hant/" target="_blank">yarn官方网站</a></li>
+</ul>
+
+<h1 id="1webpack核心配置">1.webpack核心配置</h1>
+
+<p>webpack 是一个现代 JavaScript 应用程序的静态模块打包工具。当 webpack 处理应用程序时，它会在内部构建一个 依赖图(dependency graph)，此依赖图会映射项目所需的每个模块，并生成一个或多个 bundle。</p>
+
+<p>webpack核心配置：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">entry</code>(入口)：指示webpack应该使用哪个模块,来作为构建其内部依赖图的开始</li>
+  <li><code class="language-plaintext highlighter-rouge">output</code>(出口)：告诉webpack在哪里输出它所创建的bundle以及如何命名这些文件，生成文件后默认放在<code class="language-plaintext highlighter-rouge">./dist</code>文件夹中</li>
+  <li><code class="language-plaintext highlighter-rouge">module</code>：loader 让 webpack 能够去处理其他类型的文件，并将它们转换为有效 模块，以供应用程序使用，以及被添加到依赖图中</li>
+  <li><code class="language-plaintext highlighter-rouge">plugin</code>(插件)：loader 用于转换某些类型的模块，而插件则可以用于执行范围更广的任务。包括：打包优化，资源管理，注入环境变量</li>
+  <li><code class="language-plaintext highlighter-rouge">resolve</code>: 配置寻找模块的规则</li>
+</ul>
+
+<h1 id="2webpack准备工作">2.webpack准备工作</h1>
+
+<h4 id="安装node">安装node</h4>
+
+<p><a href="https://nodejs.org/zh-cn/download/" title="https://nodejs.org/zh-cn/download/" target="_blank">nodejs官方网站下载</a></p>
+
+<p>安装好nodejs之后，检测node是否安装成功，打开cmd</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node -v
+</code></pre></div></div>
+
+<h4 id="创建一个项目">创建一个项目</h4>
+
+<p>在自己本地磁盘找一个地方，创建一个项目的文件夹。文件夹名字随便起，小菜命令为<code class="language-plaintext highlighter-rouge">myProject</code></p>
+
+<h4 id="初始化项目">初始化项目</h4>
+
+<p>进入刚才自己创建的文件夹，初始化项目，生成对应的package.json文件,package.json定义了这个项目所需要的各种模块，以及项目的配置信息（比如名称、版本、许可证等元数据</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">yarn</span> <span class="nx">init</span> 
+
+<span class="cm">/*需要配置选项
+question name (testdir):  项目名称
+question version (1.0.0):  项目的版本号
+question description: 项目的描述
+question entry point (index.js): 项目入口文件
+question git repository: git的远程仓库地址
+question author: 作者
+question license (MIT): 协议(默认MIT)
+question private: 
+*/</span>
+</code></pre></div></div>
+
+<p>成功后，就会在当前文件夹下生成一个package.json文件</p>
+
+<h4 id="packagejson">package.json</h4>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"myProject"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.0"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"webpack测试"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"main"</span><span class="p">:</span><span class="w"> </span><span class="s2">"index.js"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"author"</span><span class="p">:</span><span class="w"> </span><span class="s2">"wali"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"license"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MIT"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="安装webpack">安装webpack</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn add webpack
+yarn add webpack-cli
+</code></pre></div></div>
+
+<h4 id="文件结构">文件结构</h4>
+
+<pre><code class="language-txt">myProject 
+|-src  #源码
+|-dist  #编译后的目标文件
+|-node_modules  #本地库
+|-package.json  
+|-webpack.config.js #webpack配置
+|-yarn 
+</code></pre>
+
+<p>一般我们前端开发的工程项目结构就上面那样，对比你们的文件结构，在自己的项目下面建一个src，以后我们开发源码都会在src目录下，<code class="language-plaintext highlighter-rouge">dist</code>,<code class="language-plaintext highlighter-rouge">node_modules</code>,<code class="language-plaintext highlighter-rouge">package.json</code>,<code class="language-plaintext highlighter-rouge">yarn</code>目录或文件自动会生成，就是上面大家执行的那几条命令。大家只需要创建<code class="language-plaintext highlighter-rouge">src</code>目录和<code class="language-plaintext highlighter-rouge">webpack.config.js</code>文件。</p>
+
+<h1 id="3了解packagejson文件">3.了解package.json文件</h1>
+
+<p>每个项目的根目录下面，一般都有一个<code class="language-plaintext highlighter-rouge">package.json文件</code>，定义了这个项目所需要的各种模块，以及项目的配置信息（比如名称、版本、许可证等元数据）。<code class="language-plaintext highlighter-rouge">npm install</code>命令根据这个配置文件，自动下载所需的模块，也就是配置项目所需的运行和开发环境。</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hello World"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"标题"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.0.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"author"</span><span class="p">:</span><span class="w"> </span><span class="s2">"wali"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"contributors"</span><span class="p">:[</span><span class="w">
+        </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="s2">"李四"</span><span class="p">,</span><span class="nl">"email"</span><span class="p">:</span><span class="s2">"lisi@example.com"</span><span class="p">}</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"package.json说明"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"keywords"</span><span class="p">:[</span><span class="s2">"node.js"</span><span class="p">,</span><span class="s2">"javascript"</span><span class="p">],</span><span class="w">
+    </span><span class="nl">"repository"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"git"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://path/to/url"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"license"</span><span class="p">:</span><span class="s2">"MIT"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"engines"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"node"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.10.x"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"bugs"</span><span class="p">:{</span><span class="w">
+        </span><span class="nl">"url"</span><span class="p">:</span><span class="s2">"http://path/to/bug"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"email"</span><span class="p">:</span><span class="s2">"bug@example.com"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"start"</span><span class="p">:</span><span class="w"> </span><span class="s2">"node index.js"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"express3-handlebars"</span><span class="p">:</span><span class="w"> </span><span class="s2">"~0.5.0"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"MD5"</span><span class="p">:</span><span class="w"> </span><span class="s2">"~1.2.0"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"grunt-contrib-clean"</span><span class="p">:</span><span class="w"> </span><span class="s2">"~0.5.0"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"browserify"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.36.1"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"grunt-browserify"</span><span class="p">:</span><span class="w"> </span><span class="s2">"~1.3.0"</span><span class="p">,</span><span class="w">
+    </span><span class="p">}</span><span class="w">    
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="必须字段">必须字段</h4>
+
+<h3 id="name">name</h3>
+
+<p>全部小写，没有空格，可以使用下划线或者横线</p>
+
+<h3 id="version">Version</h3>
+
+<p>项目版本号,符合“语义化版本规则”</p>
+
+<pre><code class="language-txt">x.x.x 的格式
+</code></pre>
+
+<h4 id="可选字段">可选字段</h4>
+
+<h3 id="title">title</h3>
+
+<p>标题</p>
+
+<h3 id="author">author</h3>
+
+<p>作者，一个人</p>
+
+<h3 id="contributors">contributors</h3>
+
+<p>作者，一组人</p>
+
+<h3 id="description">description</h3>
+
+<p>对项目的描述</p>
+
+<h3 id="keywords">Keywords</h3>
+
+<p>字符串数组。人们使用 npm search 搜索时发现你的项目</p>
+
+<h3 id="repository">repository</h3>
+
+<p>仓库的线上地址</p>
+
+<h3 id="license">license</h3>
+
+<p>授权协议</p>
+
+<h3 id="engines">engines</h3>
+
+<p>engines字段指明了该模块运行的平台，比如 Node 的某个版本或者浏览器，既可以指定node版本<code class="language-plaintext highlighter-rouge">{ "engines" : {"node" : "&gt;=0.10.3 &lt;0.12" } }</code></p>
+
+<h3 id="bugs">bugs</h3>
+
+<p>问题追踪系统的URL或邮箱地址</p>
+
+<h3 id="scripts">scripts</h3>
+
+<p>scripts是<code class="language-plaintext highlighter-rouge">Object</code>类型，<code class="language-plaintext highlighter-rouge">Key</code>是生命周期事件名，value是在事件点要跑的命令。当我们执行命令需要设置参数，比如</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//本地开发</span>
+<span class="nx">npx</span> <span class="nx">webpack</span><span class="o">-</span><span class="nx">cli</span> <span class="nx">webpack</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">js</span> <span class="o">--</span><span class="nx">confi</span> <span class="o">--</span><span class="nx">colors</span> <span class="o">--</span><span class="nx">mode</span><span class="o">=</span><span class="nx">development</span>
+<span class="c1">//生产环境</span>
+<span class="nx">npx</span> <span class="nx">webpack</span><span class="o">-</span><span class="nx">cli</span> <span class="nx">webpack</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">js</span> <span class="o">--</span><span class="nx">confi</span> <span class="o">--</span><span class="nx">mode</span><span class="o">=</span><span class="nx">production</span>
+</code></pre></div></div>
+
+<p>每次执行上面两条命令就会比较繁琐，如果我们将命令写在<code class="language-plaintext highlighter-rouge">scripts</code>里面就方面多了，相当于创建了一个快捷命令。</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"scripts"</span><span class="p">:{</span><span class="w">
+        </span><span class="nl">"dev"</span><span class="p">:</span><span class="w"> </span><span class="s2">"npx webpack-cli webpack.config.js --confi --colors --mode=development"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"dist"</span><span class="p">:</span><span class="w"> </span><span class="s2">"npx webpack-cli webpack.config.js --confi --mode=production"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<p>在执行时我们只需要在命令行中执行</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run dev
+或者
+yarn run dist
+</code></pre></div></div>
+
+<h3 id="dependencies">dependencies</h3>
+
+<p>dependencies字段指定了项目运行所依赖的模块</p>
+
+<h3 id="devdependencies">devDependencies</h3>
+
+<p>devDependencies指定项目开发所需要的模块</p>
+
+<h3 id="版本格式">版本格式</h3>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">ersion</code> 完全匹配</li>
+  <li><code class="language-plaintext highlighter-rouge">&gt;version</code> 大于这个版本</li>
+  <li><code class="language-plaintext highlighter-rouge">&gt;=version</code> 大于或等于这个版本</li>
+  <li><code class="language-plaintext highlighter-rouge">&lt;version</code></li>
+  <li><code class="language-plaintext highlighter-rouge">&lt;=version</code></li>
+  <li><code class="language-plaintext highlighter-rouge">~version</code> 非常接近这个版本</li>
+  <li><code class="language-plaintext highlighter-rouge">^version</code> 与当前版本兼容</li>
+  <li><code class="language-plaintext highlighter-rouge">1.2.x</code> X代表任意数字，因此1.2.1, 1.2.3等都可以</li>
+  <li><code class="language-plaintext highlighter-rouge">http://... </code> Unix系统下使用的tarball的URL。</li>
+  <li><code class="language-plaintext highlighter-rouge">*</code> 任何版本都可以</li>
+  <li><code class="language-plaintext highlighter-rouge">""</code>任何版本都可以</li>
+  <li><code class="language-plaintext highlighter-rouge">version1 - version2</code>  等价于 <code class="language-plaintext highlighter-rouge">&gt;=version1 &lt;=version2</code></li>
+  <li><code class="language-plaintext highlighter-rouge">range1 || range2</code> 满足任意一个即可</li>
+  <li><code class="language-plaintext highlighter-rouge">git...</code> Git地址</li>
+  <li><code class="language-plaintext highlighter-rouge">user/repo</code></li>
+</ul>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_1.png" alt="ssl" /></p>
+
+:ET

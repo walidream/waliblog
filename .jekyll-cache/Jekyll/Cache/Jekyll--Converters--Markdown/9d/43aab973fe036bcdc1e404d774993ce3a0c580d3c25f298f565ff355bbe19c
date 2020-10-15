@@ -1,0 +1,2 @@
+I"�<p>最近小菜的<code class="language-plaintext highlighter-rouge">C</code>盘快满了，虽然暂时不影响工作，有强迫症的我感觉很别扭。思考再三决定对C盘进行扩容。写这篇文章时，小菜已经扩容好了，为了给小伙伴详细教程，小菜重新在来一遍。小菜总结两种方式，第一种是<strong>C盘旁没有恢复分区</strong>，第二种是<strong>C盘旁有恢复分区</strong>。在windowns系统升级或更新时，可能会在系统盘旁边创建一个<code class="language-plaintext highlighter-rouge">恢复分区</code>，防止系统在升级或更新失败系统回滚。</p>
+:ET

@@ -1,0 +1,158 @@
+I"�<p>小菜记录在centos7服务上安装PostgreSQL。</p>
+
+<p>● <a href="https://www.jianshu.com/p/342f887838c8" title="https://www.jianshu.com/p/342f887838c8" target="_blank">简书原贴博客</a></p>
+
+<h1 id="1安装postgresql">1.安装PostgreSQL</h1>
+
+<p>在官网地址<a href="https://www.postgresql.org/download/linux/redhat/" title="https://www.postgresql.org/download/linux/redhat/" target="_blank">传送门</a>
+选择好选项后会自己生成配置。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/sql/sql_1.png" alt="ssl" /></p>
+
+<h3 id="安装rpm">安装RPM</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum install https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
+</code></pre></div></div>
+
+<h3 id="安装客户端包">安装客户端包</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum install postgresql96
+</code></pre></div></div>
+
+<h3 id="安装postgresql-96">安装PostgreSQL 9.6</h3>
+
+<ul>
+  <li>postgresql96-server  数据库核心服务端</li>
+  <li>postgresql96-contrib  附加第三方扩展</li>
+  <li>postgresql96-devel  C语言开发Header头文件和库</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum install postgresql96-server postgresql96-contrib postgresql96-devel
+</code></pre></div></div>
+
+<h3 id="验证是否安装成功">验证是否安装成功</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rpm -aq| grep postgres
+</code></pre></div></div>
+
+<p>默认Postgresql数据库路径是 <code class="language-plaintext highlighter-rouge">/var/lib/pgsql/9.6/data</code> ，可以新建一个目录，假如是/mnt/vdb1</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd /mnt
+sudo mkdir vdb1
+sudo chown -R postgres:postgres vdb1
+sudo chmod 700 vdb1
+vi /usr/lib/systemd/system/postgresql-9.6.service
+Environment=PGDATA=/mnt/vdb1/  修改为自己的新的数据路径
+</code></pre></div></div>
+
+<h3 id="初始化数据库">初始化数据库</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/usr/pgsql-9.6/bin/postgresql96-setup initdb
+</code></pre></div></div>
+
+<h3 id="开启服务">开启服务</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl enable postgresql-9.6  #关闭服务
+systemctl start postgresql-9.6   #启动服务
+</code></pre></div></div>
+
+<h3 id="开机启动">开机启动</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo chkconfig postgresql-9.6 on  
+systemctl enable postgresql-9.6.service
+</code></pre></div></div>
+
+<h3 id="修改密码">修改密码</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>su postgres
+
+psql
+
+ALTER USER postgres WITH PASSWORD '密码';   --必须以分号结束，成功执行后会出现ALTER ROLE
+
+\q
+
+su root
+</code></pre></div></div>
+
+<h3 id="开启远程访问">开启远程访问</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vi /var/lib/pgsql/9.6/data/postgresql.conf  
+或者
+vi /mnt/vdb1/postgresql.conf
+</code></pre></div></div>
+
+<p>修改#listen_addresses = ‘localhost’  为  listen_addresses=’*’</p>
+
+<p>当然，此<code class="language-plaintext highlighter-rouge">*</code>也可以改为任何你想开放的服务器IP</p>
+
+<p><img src="http://walidream.com:9999/blogImage/sql/sql_2.png" alt="ssl" /></p>
+
+<h3 id="信任远程连接">信任远程连接</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vi /var/lib/pgsql/9.6/data/pg_hba.conf  或者  vi /mnt/vdb1/pg_hba.conf
+</code></pre></div></div>
+
+<p>修改如下内容，信任指定服务器连接</p>
+
+<h1 id="ipv4-local-connections">IPv4 local connections:</h1>
+
+<p>host    all            all      127.0.0.1/32      md5</p>
+
+<p>host    all             all             0.0.0.0/32            trust
+host    all             all             0.0.0.0/24            trust
+host    all             all             0.0.0.0/0             trust</p>
+
+<p><img src="http://walidream.com:9999/blogImage/sql/sql_3.png" alt="ssl" /></p>
+
+<h3 id="重启服务">重启服务</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>service postgresql-9.6 restart 或者 systemctl restart postgresql-9.6.service
+</code></pre></div></div>
+
+<h3 id="打开防火墙">打开防火墙</h3>
+
+<p>CentOS 防火墙中内置了PostgreSQL服务，配置文件位置在<code class="language-plaintext highlighter-rouge">/usr/lib/firewalld/services/postgresql.xml</code>，我们只需以服务方式将PostgreSQL服务开放即可。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl enable firewalld #开机启用防火墙
+
+systemctl start firewalld #开启防火墙
+
+firewall-cmd --add-service=postgresql --permanent   #开放postgresql服务
+
+firewall-cmd --zone=public --add-port=5432/tcp --permanent #或者可以直接添加端口
+
+firewall-cmd --reload  #重载防火墙
+
+firewall-cmd --list-ports # 查看占用端口
+</code></pre></div></div>
+
+<h3 id="简单使用">简单使用</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>psql -U postgres postgres  连接数据库
+
+说明：-h表示主机（Host），-p表示端口（Port），-U表示用户（User）
+
+显示所有数据库： \l
+</code></pre></div></div>
+
+<h3 id="卸载postgresql">卸载PostgreSQL</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum erase postgresql96
+</code></pre></div></div>
+
+<h1 id="2远程连接测试">2.远程连接测试</h1>
+
+<p>如果还没安装navicat软件，参考我之前的帖子<a href="/sql/2019/04/03/sql-1.html" title="/sql/2019/04/03/sql-1.html" target="_blank">传送门</a></p>
+
+<h3 id="开放服务器端口访问">开放服务器端口访问</h3>
+
+<p>这里需要注意的是当前面的工作做完之后，一定要检查阿里云实例的数据库端口是否开放，如果没有开放，那么要允许外网访问数据库不然是连接不成功的。</p>
+
+<p><img src="http://walidream.com:9999/blogImage/sql/sql_6.png" alt="ssl" /></p>
+
+<p>打开Navicat软件,新建连接，选择自己要连接的数据库类型</p>
+
+<p><img src="http://walidream.com:9999/blogImage/sql/sql_7.png" alt="ssl" /></p>
+
+:ET

@@ -1,0 +1,117 @@
+I"� <p>Scrapy是一个用于爬取网站并提取结构化数据的应用程序框架，可用于各种有用的应用程序，例如数据挖掘，信息处理或历史档案。</p>
+
+<ul>
+  <li><a href="https://docs.scrapy.org/en/latest/index.html" title="https://docs.scrapy.org/en/latest/index.html">Scrapy 官方手册</a></li>
+  <li><a href="https://doc.yonyoucloud.com/doc/wiki/project/scrapy/items.html" title="https://doc.yonyoucloud.com/doc/wiki/project/scrapy/items.html">Scrapy 中文指南</a></li>
+</ul>
+
+<p>小菜之前有过一篇<a href="/python/2019/05/13/anaconda.html" title="/python/2019/05/13/anaconda.html">anaconda安装</a>,爬虫项目小菜就使用<code class="language-plaintext highlighter-rouge">anaconda</code>来管理包。<code class="language-plaintext highlighter-rouge">anaconda</code>管理包也很方便。如果小伙伴们不想安装<code class="language-plaintext highlighter-rouge">anaconda</code>，那小菜建议使用<code class="language-plaintext highlighter-rouge">pipenv</code>来管理下载python包。具体教程<a href="/python/2019/07/08/flask-1.html" title="/python/2019/07/08/flask-1.html">Flask 准备工作</a></p>
+
+<p>好了，大家掌握了一门包管理工具后，下面就正式开始了。</p>
+
+<h1 id="1安装scrapy">1.安装Scrapy</h1>
+
+<p>创建一个文件夹<code class="language-plaintext highlighter-rouge">testScrapy</code>，进入<code class="language-plaintext highlighter-rouge">testScrapy</code>，启动cmd</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#进入虚拟环境
+activate PY37
+
+#安装Scrapy
+conda install -c conda-forge scrapy
+
+#查看Scrapy是否安装
+pip list
+
+#找到Scrapy说明安装成功
+Scrapy             1.7.3
+</code></pre></div></div>
+
+<h1 id="2创建scrapy项目">2.创建Scrapy项目</h1>
+
+<p>在开始抓取之前，您将必须设置一个新的Scrapy项目。输入要存储代码并运行的目录：</p>
+
+<pre><code class="language-txt">scrapy startproject tutorial
+</code></pre>
+<p>如果运行命令出现错误，请参考<a href="/python/2019/08/12/scrapy-error-1.html" title="/python/2019/08/12/scrapy-error-1.html">scrapy 解决方案</a>。如果在后面遇到相同问题，请小伙们自行解决。</p>
+
+<p>这将创建一个<code class="language-plaintext highlighter-rouge">tutorial</code>包含以下内容的目录：</p>
+
+<pre><code class="language-txt">tutorial
+|--scrapy.cfg            # 配置文件
+|--tutorial              # 项目
+    |--__init__.py
+    |--items.py          # project items definition file
+    |--middlewares.py    # project middlewares file
+    |--pipelines.py      # project pipelines file
+    |--settings.py       # project settings file
+    |--spiders           # 我们的爬虫写在这个文件夹下
+        |--__init__.py
+</code></pre>
+
+<h4 id="手写一个爬虫">手写一个爬虫</h4>
+<p>创建一个<code class="language-plaintext highlighter-rouge">quotes_spider.py</code>文件，将其放到<code class="language-plaintext highlighter-rouge">spiders</code>文件夹下</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">tutorial
+</span><span class="err">|--scrapy.cfg</span>            
+<span class="err">|--tutorial</span>              
+    |--__init__.py
+    |--items.py          
+    |--middlewares.py   
+    |--pipelines.py      
+    |--settings.py       
+    |--spiders           
+        |--__init__.py
+<span class="gi">+       |--quotes_spider.py
+</span></code></pre></div></div>
+
+<h4 id="quotes_spiderpy">quotes_spider.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">scrapy</span>
+
+
+<span class="k">class</span> <span class="nc">QuotesSpider</span><span class="p">(</span><span class="n">scrapy</span><span class="p">.</span><span class="n">Spider</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">"quotes"</span>
+
+    <span class="k">def</span> <span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s">'http://quotes.toscrape.com/page/1/'</span><span class="p">,</span>
+            <span class="s">'http://quotes.toscrape.com/page/2/'</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">scrapy</span><span class="p">.</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="p">.</span><span class="n">parse</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">url</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s">'quotes-%s.html'</span> <span class="o">%</span> <span class="n">page</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="n">body</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">'Saved file %s'</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h1 id="3运行爬虫">3.运行爬虫</h1>
+
+<p>为了使我们的蜘蛛工作，请转到项目的顶级目录并运行：<code class="language-plaintext highlighter-rouge">tutorial</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>scrapy crawl quotes 
+</code></pre></div></div>
+
+<p>该命令使用<code class="language-plaintext highlighter-rouge">quotes</code>我们刚刚添加的名称运行Spider ，它将发送对该quotes.toscrape.com域的一些请求。您将获得类似于以下的输出：</p>
+
+<pre><code class="language-txt">... (omitted for brevity)
+2016-12-16 21:24:05 [scrapy.core.engine] INFO: Spider opened
+2016-12-16 21:24:05 [scrapy.extensions.logstats] INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+2016-12-16 21:24:05 [scrapy.extensions.telnet] DEBUG: Telnet console listening on 127.0.0.1:6023
+2016-12-16 21:24:05 [scrapy.core.engine] DEBUG: Crawled (404) &lt;GET http://quotes.toscrape.com/robots.txt&gt; (referer: None)
+2016-12-16 21:24:05 [scrapy.core.engine] DEBUG: Crawled (200) &lt;GET http://quotes.toscrape.com/page/1/&gt; (referer: None)
+2016-12-16 21:24:05 [scrapy.core.engine] DEBUG: Crawled (200) &lt;GET http://quotes.toscrape.com/page/2/&gt; (referer: None)
+2016-12-16 21:24:05 [quotes] DEBUG: Saved file quotes-1.html
+2016-12-16 21:24:05 [quotes] DEBUG: Saved file quotes-2.html
+2016-12-16 21:24:05 [scrapy.core.engine] INFO: Closing spider (finished)
+...
+</code></pre>
+
+<p>现在，检查当前目录中的文件。您应该注意，已经创建了两个新文件：<code class="language-plaintext highlighter-rouge">quotes-1.html</code> 和 <code class="language-plaintext highlighter-rouge">quotes-2.html</code>，按照我们的parse方法说明，其内容分别为URL。</p>
+
+<p>到目前为止，我们已经编写了一个爬虫，并且成功的运行了起来</p>
+
+:ET

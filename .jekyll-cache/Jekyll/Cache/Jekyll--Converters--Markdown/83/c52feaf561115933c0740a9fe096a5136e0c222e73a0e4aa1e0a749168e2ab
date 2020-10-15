@@ -1,0 +1,197 @@
+I"F<p>上小节从无到有写了一个完整的小爬虫，本小节我们继续练习爬虫。相信小伙伴已经知道我们这次爬取的目标是谁了，爬取<code class="language-plaintext highlighter-rouge">知乎</code>比爬取<code class="language-plaintext highlighter-rouge">下厨房</code>困难一些，原因就是<code class="language-plaintext highlighter-rouge">知乎</code>的反爬机制比<code class="language-plaintext highlighter-rouge">下厨房</code>的反爬机制更完善。知乎查看问答，必须要登录。我们要想爬取知乎的数据，首先得让程序自动登录。</p>
+
+<h1 id="1session和cookie自动登录机制">1.session和cookie自动登录机制</h1>
+
+<h4 id="cookie">cookie</h4>
+
+<p>HTTP Cookie（也叫Web Cookie或浏览器Cookie）是服务器发送到用户浏览器并保存在本地的一小块数据，它会在浏览器下次向同一服务器再发起请求时被携带并发送到服务器上。通常，它用于告知服务端两个请求是否来自同一浏览器，如保持用户的登录状态。Cookie使基于无状态的HTTP协议记录稳定的状态信息成为了可能。</p>
+
+<h4 id="cookie自动登录">cookie自动登录</h4>
+
+<p>由于<code class="language-plaintext highlighter-rouge">HTTP</code>是一种无状态协议，通俗点就是没有记录客户端的状态信息。当A浏览器向服务器发送一个请求，服务返回数据。然后B浏览器向服务器发送请求，服务器返回数据。但是服务器无法识别出A浏览和B浏览器到底哪个是A,哪个是B。服务器要想识别出A和B，在数据返回时，将A和B的状态信息也一起返回去，下次A浏览器请求时，就会携带A的状态信息，服务器通过状态信息就能够识别谁是A,谁是B。</p>
+
+<p>用户敏感信息直接存放在cookie中是不安全的，当用户请求被拦截时，通过请求所携cookie带信息就能分析出用户的敏感信息。</p>
+
+<h4 id="session">session</h4>
+
+<p>session 是一个抽象概念，开发者为了实现中断和继续等操作，将 <code class="language-plaintext highlighter-rouge">user agent</code> 和 <code class="language-plaintext highlighter-rouge">server</code> 之间一对一的交互，抽象为“会话”，进而衍生出“会话状态”，也就是 session 的概念。一次会话过程，这个过程是连续的，也可以时断时续的。session是存放在服务器内存，这个不同于cookie。</p>
+
+<h4 id="session自动登录">session自动登录</h4>
+
+<p>首先浏览器请求服务器访问web站点时，程序需要为客户端的请求创建一个session的时候，服务器首先会检查这个客户端请求是否已经包含了一个session标识、称为SESSIONID，如果已经包含了一个sessionid则说明以前已经为此客户端创建过session，服务器就按照sessionid把这个session检索出来使用，如果客户端请求不包含session id，则服务器为此客户端创建一个session并且生成一个与此session相关联的session id，sessionid 的值应该是一个既不会重复，又不容易被找到规律以仿造的字符串，这个sessionid将在本次响应中返回到客户端保存，保存这个sessionid的方式就可以是cookie，这样在交互的过程中，浏览器可以自动的按照规则把这个标识发回给服务器，服务器根据这个sessionid就可以找得到对应的session。</p>
+
+<h1 id="2创建scrapy项目">2.创建scrapy项目</h1>
+
+<p>创建一个scrapy爬取知乎问答的项目，具体的创建方式请小伙伴参考上一小节，具体这里就不在演示了。</p>
+
+<p>创建好后的项目结构:</p>
+
+<pre><code class="language-txt">zhihu
+|-zhihu
+   |--spiders
+       |--__init__.py
+       |--zh.py
+   |--__init__.py
+   |--items.py
+   |--middlewares.py
+   |--pipelines.py
+   |--settings.py 
+|-scrapy.cfg
+</code></pre>
+
+<h1 id="3创建爬虫启动文件">3.创建爬虫启动文件</h1>
+
+<p>为了方便调试，我们写一个爬虫的启动文件<code class="language-plaintext highlighter-rouge">main.py</code>,存放位置</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">zhihu
+</span> |-zhihu
+    |--spiders
+        |--__init__.py
+        |--zh.py
+    |--__init__.py
+    |--items.py
+    |--middlewares.py
+    |--pipelines.py
+    |--settings.py 
+ |-scrapy.cfg
+<span class="gi">+|-mian.py
+</span></code></pre></div></div>
+
+<h4 id="编写mianpy文件">编写mian.py文件</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">scrapy.cmdline</span> <span class="kn">import</span> <span class="n">execute</span>
+
+<span class="n">curr_path</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span>
+<span class="n">dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">curr_path</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">sys</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span>
+    <span class="n">execute</span><span class="p">([</span><span class="s">"python -m scrapy"</span><span class="p">,</span><span class="s">"crawl"</span><span class="p">,</span><span class="s">"zh"</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">注意:python虚拟环境要设置正确</code></p>
+
+<h1 id="4安装selenium">4.安装selenium</h1>
+
+<p>知乎的自动登录我们要借助<code class="language-plaintext highlighter-rouge">selenium</code>插件完成，后面我们会继续介绍<code class="language-plaintext highlighter-rouge">selenium</code>的。</p>
+
+<h4 id="anaconda-中安装selenium">anaconda 中安装selenium</h4>
+
+<pre><code class="language-txt">#安装selenium
+conda install selenium
+
+#检查
+pip list
+</code></pre>
+
+<h1 id="5下载安装chromedriver">5.下载安装ChromeDriver</h1>
+
+<p><a href="https://chromedriver.chromium.org/downloads" title="https://chromedriver.chromium.org/downloads">下载ChromeDriver</a>，下载前，需要查看自己<code class="language-plaintext highlighter-rouge">chrome</code>浏览器的版本。<code class="language-plaintext highlighter-rouge">帮助</code> -&gt; <code class="language-plaintext highlighter-rouge">关于google chrome</code></p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_54.png" alt="ssl" /></p>
+
+<p>小菜这里的chrome版本是<code class="language-plaintext highlighter-rouge">78</code>,所以要找到支持chrome浏览器78版本<code class="language-plaintext highlighter-rouge">ChromeDriver</code>。然后根据自己的操作系统选择对应的版本</p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_55.png" alt="ssl" />
+<img src="http://walidream.com:9999/blogImage/python/python_56.png" alt="ssl" /></p>
+
+<p>小菜用的是windows系统，所以下载的是<code class="language-plaintext highlighter-rouge">win32</code>。下载完后，解压。<strong>要记住解压后的路径，后面我们有用到</strong>,小菜的路径是<code class="language-plaintext highlighter-rouge">E:\chromedriver_win32\chromedriver.exe</code></p>
+
+<h1 id="6模拟登陆">6.模拟登陆</h1>
+
+<p>安装好<code class="language-plaintext highlighter-rouge">selenium</code>和<code class="language-plaintext highlighter-rouge">ChromeDriver</code>，下面就来模拟知乎登陆。先展示下生成的<code class="language-plaintext highlighter-rouge">zh.py</code>代码</p>
+
+<h4 id="spiderzhpy">spider/zh.py</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">scrapy</span>
+
+<span class="k">class</span> <span class="nc">ZhSpider</span><span class="p">(</span><span class="n">scrapy</span><span class="p">.</span><span class="n">Spider</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">'zh'</span>
+    <span class="n">allowed_domains</span> <span class="o">=</span> <span class="p">[</span><span class="s">'zhihu.com'</span><span class="p">]</span>
+    <span class="n">start_urls</span> <span class="o">=</span> <span class="p">[</span><span class="s">'https://www.zhihu.com/hot'</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+</code></pre></div></div>
+
+<p>在爬取知乎前，首先我们要在爬虫入口登陆知乎。在<code class="language-plaintext highlighter-rouge">spider</code>类中，爬虫的入口是<code class="language-plaintext highlighter-rouge">start_requests()</code>，所以我们只需要重载<code class="language-plaintext highlighter-rouge">start_requests()</code>方法就可以了。</p>
+
+<h4 id="配置settingspy">配置settings.py</h4>
+
+<p>在<code class="language-plaintext highlighter-rouge">settings.py</code>最下面添加，路径就是刚才解压的chromdriver，大家要填写自己的路径。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Crawl responsibly by identifying yourself (and your website) on the user-agent
+</span><span class="n">USER_AGENT</span> <span class="o">=</span> <span class="s">'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'</span>
+
+<span class="c1">#Obey robots.txt rules
+</span><span class="n">ROBOTSTXT_OBEY</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="c1"># 配置ChromeDriver启动路径
+</span><span class="n">CHROMEDRIVER_PATH</span> <span class="o">=</span> <span class="s">'E:/chromedriver_win32/chromedriver.exe'</span>
+
+<span class="c1"># 配置知乎账号
+</span><span class="n">USER_NAME</span> <span class="o">=</span> <span class="s">'1**********3'</span>
+<span class="n">USER_PASSWD</span> <span class="o">=</span> <span class="s">'**********'</span>
+</code></pre></div></div>
+
+<h4 id="zhpy中-添加-start_requests方法">zh.py中 添加 start_requests()方法</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">scrapy</span>
+
+<span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.common.keys</span> <span class="kn">import</span> <span class="n">Keys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">class</span> <span class="nc">ZhSpider</span><span class="p">(</span><span class="n">scrapy</span><span class="p">.</span><span class="n">Spider</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">'zh'</span>
+    <span class="n">allowed_domains</span> <span class="o">=</span> <span class="p">[</span><span class="s">'zhihu.com'</span><span class="p">]</span>
+    <span class="n">start_urls</span> <span class="o">=</span> <span class="p">[</span><span class="s">'https://www.zhihu.com/hot'</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">option</span> <span class="o">=</span> <span class="n">webdriver</span><span class="p">.</span><span class="n">ChromeOptions</span><span class="p">()</span>
+        <span class="c1">#这里去掉window.navigator.webdriver的特性
+</span>        <span class="n">option</span><span class="p">.</span><span class="n">add_experimental_option</span><span class="p">(</span><span class="s">'excludeSwitches'</span><span class="p">,</span> <span class="p">[</span><span class="s">'enable-automation'</span><span class="p">])</span> 
+
+
+        <span class="n">chromeDirver</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">[</span><span class="s">"CHROMEDRIVER_PATH"</span><span class="p">]</span>
+        <span class="n">browser</span> <span class="o">=</span> <span class="n">webdriver</span><span class="p">.</span><span class="n">Chrome</span><span class="p">(</span><span class="n">executable_path</span><span class="o">=</span><span class="n">chromeDirver</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">option</span><span class="p">)</span>
+        <span class="n">browser</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"https://www.zhihu.com/signin"</span><span class="p">)</span>
+
+
+        <span class="n">browser</span><span class="p">.</span><span class="n">find_elements_by_css_selector</span><span class="p">(</span><span class="s">".SignFlow .SignFlow-tab"</span><span class="p">)[</span><span class="mi">1</span><span class="p">].</span><span class="n">click</span><span class="p">()</span>
+        <span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">browser</span><span class="p">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span><span class="s">".SignFlow-account input[name='username']"</span><span class="p">).</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="p">.</span><span class="n">CONTROL</span> <span class="o">+</span> <span class="s">'a'</span><span class="p">)</span>
+        <span class="n">browser</span><span class="p">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span><span class="s">".SignFlow-account input[name='username']"</span><span class="p">).</span><span class="n">send_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">[</span><span class="s">"USER_NAME"</span><span class="p">])</span>
+        <span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>        
+        <span class="n">browser</span><span class="p">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span><span class="s">".SignFlow-password input[name='password']"</span><span class="p">).</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="p">.</span><span class="n">CONTROL</span> <span class="o">+</span> <span class="s">'a'</span><span class="p">)</span>
+        <span class="n">browser</span><span class="p">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span><span class="s">".SignFlow-password input[name='password']"</span><span class="p">).</span><span class="n">send_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">settings</span><span class="p">[</span><span class="s">"USER_PASSWD"</span><span class="p">])</span>
+        <span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">browser</span><span class="p">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span><span class="s">".SignFlow .Button.SignFlow-submitButton"</span><span class="p">).</span><span class="n">click</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+</code></pre></div></div>
+
+<p>重启<code class="language-plaintext highlighter-rouge">main.py</code>文件，可以看到<code class="language-plaintext highlighter-rouge">selenium</code>调用<code class="language-plaintext highlighter-rouge">chromedirver</code>来成功模拟登陆知乎。可能也会有小伙伴登陆不成功，登陆不成功大概会是这么两种情况：</p>
+<ul>
+  <li>知乎识别出了<code class="language-plaintext highlighter-rouge">chromedirver</code>所以登陆不成功,<a href="/python/2019/08/21/scrapy-error-3.html" title="/python/2019/08/21/scrapy-error-3.html">解决方案 chromedriver被识别怎么办</a></li>
+  <li>在登录时，出现了验证码，后面我们详细解决这种情况</li>
+</ul>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_57.gif" alt="ssl" /></p>
+
+<h1 id="7系统性实现知乎验证">7.系统性实现知乎验证</h1>
+
+<p>上面只是简单验用<code class="language-plaintext highlighter-rouge">selenium</code>来模拟一个登陆。真实情况稍微复杂点，下面放一张模拟知乎登陆流程图。后面就整体实现下</p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_58.png" alt="ssl" /></p>
+
+<p>####</p>
+
+:ET

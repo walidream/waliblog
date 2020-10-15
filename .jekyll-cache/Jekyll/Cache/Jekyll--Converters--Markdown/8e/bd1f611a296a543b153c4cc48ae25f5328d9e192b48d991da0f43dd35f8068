@@ -1,0 +1,2 @@
+I"�<p>之前的配置是单页面应用，就是只有一个html文件。多页面应用就是多个html文件。实现多页面webpack配置基本思路就是采用多个入口配置，然后配置多个<code class="language-plaintext highlighter-rouge">html-webpack-plugin</code>来生成多个html文件。我们在之前的项目中新增一个登陆页面和退出页面(这里只是为了演示，大家根据实际实际情况自己配置)</p>
+:ET

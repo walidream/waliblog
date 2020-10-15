@@ -1,0 +1,918 @@
+I"�G<p>在小菜初学<code class="language-plaintext highlighter-rouge">scrapy</code>时，从google上发现了几篇非常不错的文章，未经博主同意擅自将博主的文章收藏，主要怕日后看时，找不到此文章。小菜在这里向博主致敬，希望看到这篇帖子的小伙伴能够阅读原贴。</p>
+
+<ul>
+  <li><a href="http://kaito-kidd.com/2016/11/01/scrapy-code-analyze-architecture/" title="http://kaito-kidd.com/2016/11/01/scrapy-code-analyze-architecture/">Kaito 博主</a></li>
+</ul>
+
+<p>上一篇文章：<a href="http://kaito-kidd.com/2016/11/21/scrapy-code-analyze-component-initialization/" title="http://kaito-kidd.com/2016/11/21/scrapy-code-analyze-component-initialization/">Scrapy源码分析（三）核心组件初始化</a>已经分析了Scrapy核心组件的主要职责，以及它们在初始化时都完成了哪些工作。</p>
+
+<p>这篇文章就让我们来看一下，Scrapy的核心流程是如何运行的，它是如何调度各个组件，完成抓取工作的。</p>
+
+<h1 id="1运行入口">1.运行入口</h1>
+
+<p>还是回到最初的入口，在Scrapy源码分析（二）运行入口这篇文章中已经讲解到，在执行scrapy命令时，调用流程如下：</p>
+<ul>
+  <li>调用<code class="language-plaintext highlighter-rouge">cmdline.py</code>的<code class="language-plaintext highlighter-rouge">execute</code>方法</li>
+  <li>调用<code class="language-plaintext highlighter-rouge">命令实例</code>解析命令行</li>
+  <li>构建<code class="language-plaintext highlighter-rouge">CrawlerProcess</code>实例，调用<code class="language-plaintext highlighter-rouge">crawl</code>和<code class="language-plaintext highlighter-rouge">start</code>方法</li>
+</ul>
+
+<p>而<code class="language-plaintext highlighter-rouge">crawl</code>方法最终是调用了<code class="language-plaintext highlighter-rouge">Cralwer</code>实例的<code class="language-plaintext highlighter-rouge">crawl</code>，这个方法最终把控制权交由<code class="language-plaintext highlighter-rouge">Engine</code>，而<code class="language-plaintext highlighter-rouge">start</code>方法注册好协程池，开始异步调度。</p>
+
+<p>我们来看<code class="language-plaintext highlighter-rouge">Cralwer</code>的<code class="language-plaintext highlighter-rouge">crawl</code>方法：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">defer</span><span class="p">.</span><span class="n">inlineCallbacks</span>
+<span class="k">def</span> <span class="nf">crawl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">.</span><span class="n">crawling</span><span class="p">,</span> <span class="s">"Crawling already taking place"</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">crawling</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># 创建爬虫实例
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">spider</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_create_spider</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># 创建引擎
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">engine</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_create_engine</span><span class="p">()</span>
+        <span class="c1"># 调用spider的start_requests，获取种子URL
+</span>        <span class="n">start_requests</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">spider</span><span class="p">.</span><span class="n">start_requests</span><span class="p">())</span>
+        <span class="c1"># 调用engine的open_spider，交由引擎调度
+</span>        <span class="k">yield</span> <span class="bp">self</span><span class="p">.</span><span class="n">engine</span><span class="p">.</span><span class="n">open_spider</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">spider</span><span class="p">,</span> <span class="n">start_requests</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">defer</span><span class="p">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">engine</span><span class="p">.</span><span class="n">start</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">six</span><span class="p">.</span><span class="n">PY2</span><span class="p">:</span>
+            <span class="n">exc_info</span> <span class="o">=</span> <span class="n">sys</span><span class="p">.</span><span class="n">exc_info</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">crawling</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">engine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="p">.</span><span class="n">engine</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">six</span><span class="p">.</span><span class="n">PY2</span><span class="p">:</span>
+            <span class="n">six</span><span class="p">.</span><span class="n">reraise</span><span class="p">(</span><span class="o">*</span><span class="n">exc_info</span><span class="p">)</span>
+        <span class="k">raise</span>
+
+</code></pre></div></div>
+
+<p>在把控制权交给引擎调度之前，先创建出爬虫实例，然后创建引擎实例（此过程见<a href="http://kaito-kidd.com/2016/11/21/scrapy-code-analyze-component-initialization/" title="http://kaito-kidd.com/2016/11/21/scrapy-code-analyze-component-initialization/">Scrapy源码分析（三）核心组件初始化</a>），然后调用了<code class="language-plaintext highlighter-rouge">spider</code>的start_requests方法，这个方法就是我们平时写的最多爬虫类的父类，它在<code class="language-plaintext highlighter-rouge">spiders/__init__.py</code>中：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c1"># 根据定义好的start_urls属性，生成种子URL对象
+</span>    <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">start_urls</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="p">.</span><span class="n">make_requests_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">make_requests_from_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+    <span class="c1"># 构建Request对象
+</span>    <span class="k">return</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">dont_filter</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h1 id="2构建请求">2.构建请求</h1>
+
+<p>在这里我们能看到，平时我们必须要定义的<code class="language-plaintext highlighter-rouge">start_urls</code>，原来是在这里拿来构建Request的，来看Request的是如何构建的：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Request</span><span class="p">(</span><span class="n">object_ref</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s">'GET'</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">cookies</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">'utf-8'</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">dont_filter</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">errback</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c1"># 编码
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">_encoding</span> <span class="o">=</span> <span class="n">encoding</span>
+        <span class="c1"># 请求方法
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">method</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">method</span><span class="p">).</span><span class="n">upper</span><span class="p">()</span>
+        <span class="c1"># 设置url
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">_set_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="c1"># 设置body
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">_set_body</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">priority</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s">"Request priority not an integer: %r"</span> <span class="o">%</span> <span class="n">priority</span>
+        <span class="c1"># 优先级
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">priority</span> <span class="o">=</span> <span class="n">priority</span>
+        <span class="k">assert</span> <span class="n">callback</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">errback</span><span class="p">,</span> <span class="s">"Cannot use errback without a callback"</span>
+        <span class="c1"># 回调函数
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">callback</span> <span class="o">=</span> <span class="n">callback</span>
+        <span class="c1"># 异常回调函数
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">errback</span> <span class="o">=</span> <span class="n">errback</span>
+        <span class="c1"># cookies
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">cookies</span> <span class="o">=</span> <span class="n">cookies</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="c1"># 构建Header
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">headers</span> <span class="o">=</span> <span class="n">Headers</span><span class="p">(</span><span class="n">headers</span> <span class="ow">or</span> <span class="p">{},</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
+        <span class="c1"># 是否需要过滤
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">dont_filter</span> <span class="o">=</span> <span class="n">dont_filter</span>
+		<span class="c1"># 附加信息
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">_meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span> <span class="k">if</span> <span class="n">meta</span> <span class="k">else</span> <span class="bp">None</span>
+    <span class="o">@</span><span class="nb">property</span>
+    <span class="k">def</span> <span class="nf">meta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">_meta</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">_meta</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_meta</span>
+    <span class="k">def</span> <span class="nf">_get_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_url</span>
+    <span class="k">def</span> <span class="nf">_set_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">six</span><span class="p">.</span><span class="n">string_types</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="nb">TypeError</span><span class="p">(</span><span class="s">'Request url must be str or unicode, got %s:'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">url</span><span class="p">).</span><span class="n">__name__</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">safe_url_string</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">encoding</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_url</span> <span class="o">=</span> <span class="n">escape_ajax</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">':'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">_url</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nb">ValueError</span><span class="p">(</span><span class="s">'Missing scheme in request url: %s'</span> <span class="o">%</span> <span class="bp">self</span><span class="p">.</span><span class="n">_url</span><span class="p">)</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_get_url</span><span class="p">,</span> <span class="n">obsolete_setter</span><span class="p">(</span><span class="n">_set_url</span><span class="p">,</span> <span class="s">'url'</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">_get_body</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_body</span>
+    <span class="k">def</span> <span class="nf">_set_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">body</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">_body</span> <span class="o">=</span> <span class="s">b''</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">_body</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">encoding</span><span class="p">)</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_get_body</span><span class="p">,</span> <span class="n">obsolete_setter</span><span class="p">(</span><span class="n">_set_body</span><span class="p">,</span> <span class="s">'body'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Request对象比较简单，就是简单封装了请求参数、方式、回调以及可附加的属性信息。</p>
+
+<p>当然，你也可以在子类重写<code class="language-plaintext highlighter-rouge">start_requests</code>以及<code class="language-plaintext highlighter-rouge">make_requests_from_url</code>这2个方法，来构建种子请求。</p>
+
+<h1 id="3引擎调度">3.引擎调度</h1>
+
+<p>回到crawl方法，构建好种子请求对象后，调用了<code class="language-plaintext highlighter-rouge">engine</code>的<code class="language-plaintext highlighter-rouge">open_spider</code>方法：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">defer</span><span class="p">.</span><span class="n">inlineCallbacks</span>
+ <span class="k">def</span> <span class="nf">open_spider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spider</span><span class="p">,</span> <span class="n">start_requests</span><span class="o">=</span><span class="p">(),</span> <span class="n">close_if_idle</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+     <span class="k">assert</span> <span class="bp">self</span><span class="p">.</span><span class="n">has_capacity</span><span class="p">(),</span> <span class="s">"No free spider slot when opening %r"</span> <span class="o">%</span> \
+         <span class="n">spider</span><span class="p">.</span><span class="n">name</span>
+     <span class="n">logger</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">"Spider opened"</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'spider'</span><span class="p">:</span> <span class="n">spider</span><span class="p">})</span>
+     <span class="c1"># 注册_next_request调度方法，循环调度
+</span>     <span class="n">nextcall</span> <span class="o">=</span> <span class="n">CallLaterOnce</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">_next_request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+     <span class="c1"># 初始化scheduler
+</span>     <span class="n">scheduler</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">scheduler_cls</span><span class="p">.</span><span class="n">from_crawler</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">crawler</span><span class="p">)</span>
+     <span class="c1"># 调用爬虫中间件，处理种子请求
+</span>     <span class="n">start_requests</span> <span class="o">=</span> <span class="k">yield</span> <span class="bp">self</span><span class="p">.</span><span class="n">scraper</span><span class="p">.</span><span class="n">spidermw</span><span class="p">.</span><span class="n">process_start_requests</span><span class="p">(</span><span class="n">start_requests</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+     <span class="c1"># 封装Slot对象
+</span>     <span class="n">slot</span> <span class="o">=</span> <span class="n">Slot</span><span class="p">(</span><span class="n">start_requests</span><span class="p">,</span> <span class="n">close_if_idle</span><span class="p">,</span> <span class="n">nextcall</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">)</span>
+     <span class="bp">self</span><span class="p">.</span><span class="n">slot</span> <span class="o">=</span> <span class="n">slot</span>
+     <span class="bp">self</span><span class="p">.</span><span class="n">spider</span> <span class="o">=</span> <span class="n">spider</span>
+     <span class="c1"># 调用scheduler的open
+</span>     <span class="k">yield</span> <span class="n">scheduler</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span><span class="n">spider</span><span class="p">)</span>
+     <span class="c1"># 调用scrapyer的open
+</span>     <span class="k">yield</span> <span class="bp">self</span><span class="p">.</span><span class="n">scraper</span><span class="p">.</span><span class="n">open_spider</span><span class="p">(</span><span class="n">spider</span><span class="p">)</span>
+     <span class="c1"># 调用stats的open
+</span>     <span class="bp">self</span><span class="p">.</span><span class="n">crawler</span><span class="p">.</span><span class="n">stats</span><span class="p">.</span><span class="n">open_spider</span><span class="p">(</span><span class="n">spider</span><span class="p">)</span>
+     <span class="k">yield</span> <span class="bp">self</span><span class="p">.</span><span class="n">signals</span><span class="p">.</span><span class="n">send_catch_log_deferred</span><span class="p">(</span><span class="n">signals</span><span class="p">.</span><span class="n">spider_opened</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+     <span class="c1"># 发起调度
+</span>     <span class="n">slot</span><span class="p">.</span><span class="n">nextcall</span><span class="p">.</span><span class="n">schedule</span><span class="p">()</span>
+     <span class="n">slot</span><span class="p">.</span><span class="n">heartbeat</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>初始化的过程之前的文章已讲到，这里不再多说。主要说一下处理流程，这里第一步是构建了<code class="language-plaintext highlighter-rouge">CallLaterOnce</code>，把<code class="language-plaintext highlighter-rouge">_next_request</code>注册进去，看此类的实现：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">CallLaterOnce</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="c1"># 在twisted的reactor中循环调度一个方法
+</span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_func</span> <span class="o">=</span> <span class="n">func</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_a</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_kw</span> <span class="o">=</span> <span class="n">kw</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_call</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">def</span> <span class="nf">schedule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="c1"># 上次发起调度，才可再次继续调度
+</span>        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">_call</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c1"># 注册self到callLater中
+</span>            <span class="bp">self</span><span class="p">.</span><span class="n">_call</span> <span class="o">=</span> <span class="n">reactor</span><span class="p">.</span><span class="n">callLater</span><span class="p">(</span><span class="n">delay</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">_call</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">_call</span><span class="p">.</span><span class="n">cancel</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># 上面注册的是self,所以会执行__call__
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">_call</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_func</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="p">.</span><span class="n">_a</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="p">.</span><span class="n">_kw</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>这里封装了循环执行的方法类，并且注册的方法会在<code class="language-plaintext highlighter-rouge">twisted</code>的<code class="language-plaintext highlighter-rouge">reactor</code>中异步执行，以后执行只需调用<code class="language-plaintext highlighter-rouge">schedule</code>方法，就会注册self到<code class="language-plaintext highlighter-rouge">reactor</code>的<code class="language-plaintext highlighter-rouge">callLater</code>中，然后它会执行<code class="language-plaintext highlighter-rouge">__call__</code>方法，进而执行我们注册的方法。而这里我们注册的方法是引擎的<code class="language-plaintext highlighter-rouge">_next_request</code>，也就是说，此方法会循环调度，直到程序退出。</p>
+
+<p>然后调用了<code class="language-plaintext highlighter-rouge">爬虫中间件</code>的<code class="language-plaintext highlighter-rouge">process_start_requests</code>方法，也就是说，你可以定义多个自己的爬虫中间件，每个类都重写此方法，爬虫在调度之前会分别调用你定义好的爬虫中间件，来分别处理初始化请求，你可以进行过滤、加工、筛选以及你想做的任何逻辑。这样做的好处就是，把想做的逻辑拆分成做个中间件，功能独立而且维护起来更加清晰。</p>
+
+<h1 id="4调度器">4.调度器</h1>
+
+<p>接着调用了<code class="language-plaintext highlighter-rouge">Scheduler</code>的<code class="language-plaintext highlighter-rouge">open</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">spider</span> <span class="o">=</span> <span class="n">spider</span>
+    <span class="c1"># 实例化优先级队列
+</span>    <span class="bp">self</span><span class="p">.</span><span class="n">mqs</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">pqclass</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">_newmq</span><span class="p">)</span>
+    <span class="c1"># 如果定义了dqdir则实例化基于磁盘的队列
+</span>    <span class="bp">self</span><span class="p">.</span><span class="n">dqs</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_dq</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">dqdir</span> <span class="k">else</span> <span class="bp">None</span>
+    <span class="c1"># 调用请求指纹过滤器的open方法
+</span>    <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">df</span><span class="p">.</span><span class="nb">open</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">_dq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c1"># 实例化磁盘队列
+</span>    <span class="n">activef</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">dqdir</span><span class="p">,</span> <span class="s">'active.json'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">exists</span><span class="p">(</span><span class="n">activef</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">activef</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">prios</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">prios</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">pqclass</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">_newdq</span><span class="p">,</span> <span class="n">startprios</span><span class="o">=</span><span class="n">prios</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">q</span><span class="p">:</span>
+        <span class="n">logger</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">"Resuming crawl (%(queuesize)d requests scheduled)"</span><span class="p">,</span>
+                    <span class="p">{</span><span class="s">'queuesize'</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">q</span><span class="p">)},</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'spider'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">spider</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">q</span>
+</code></pre></div></div>
+
+<p>在<code class="language-plaintext highlighter-rouge">open</code>方法中，实例化出优先级队列以及根据<code class="language-plaintext highlighter-rouge">dqdir</code>决定是否使用磁盘队列，然后调用了<code class="language-plaintext highlighter-rouge">请求指纹过滤器的open</code>，在父类<code class="language-plaintext highlighter-rouge">BaseDupeFilter</code>中定义：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BaseDupeFilter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="c1"># 过滤器基类,子类可重写以下方法
+</span>    <span class="o">@</span><span class="nb">classmethod</span>
+    <span class="k">def</span> <span class="nf">from_settings</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">request_seen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="c1"># 请求过滤
+</span>        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># 可重写,完成过滤器的初始化工作
+</span>        <span class="k">pass</span>
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="p">):</span>
+        <span class="c1"># 可重写,完成关闭过滤器工作
+</span>        <span class="k">pass</span>
+    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+        <span class="n">pas</span>
+
+</code></pre></div></div>
+
+<p>请求过滤器提供了请求过滤的具体实现方式，Scrapy默认提供了<code class="language-plaintext highlighter-rouge">RFPDupeFilter</code>过滤器实现过滤重复请求的逻辑，后面讲具体是如何过滤重复请求的。</p>
+
+<h1 id="5scraper">5.Scraper</h1>
+
+<p>再来看Scraper的<code class="language-plaintext highlighter-rouge">open_spider</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">defer</span><span class="p">.</span><span class="n">inlineCallbacks</span>
+<span class="k">def</span> <span class="nf">open_spider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">slot</span> <span class="o">=</span> <span class="n">Slot</span><span class="p">()</span>
+    <span class="c1"># 调用所有pipeline的open_spider
+</span>    <span class="k">yield</span> <span class="bp">self</span><span class="p">.</span><span class="n">itemproc</span><span class="p">.</span><span class="n">open_spider</span><span class="p">(</span><span class="n">spider</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>这里的工作主要是<code class="language-plaintext highlighter-rouge">Scraper</code>调用所有<code class="language-plaintext highlighter-rouge">Pipeline</code>的<code class="language-plaintext highlighter-rouge">open_spider</code>方法，也就是说，如果我们定义了多个Pipeline输出类，可重写<code class="language-plaintext highlighter-rouge">open_spider</code>完成每个<code class="language-plaintext highlighter-rouge">Pipeline</code>处理输出开始的初始化工作。</p>
+
+<h1 id="6循环调度">6.循环调度</h1>
+
+<p>调用了一些列的组件的open方法后，最后调用了<code class="language-plaintext highlighter-rouge">nextcall.schedule()</code>开始调度，也就是循环执行在上面注册的<code class="language-plaintext highlighter-rouge">_next_request</code>方法：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">_next_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="c1"># 此方法会循环调度
+</span>    <span class="n">slot</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">slot</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">slot</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="c1"># 暂停
+</span>    <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">paused</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="c1"># 是否等待
+</span>    <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">.</span><span class="n">_needs_backout</span><span class="p">(</span><span class="n">spider</span><span class="p">):</span>
+        <span class="c1"># 从scheduler中获取request
+</span>        <span class="c1"># 注意：第一次获取时，是没有的，也就是会break出来
+</span>        <span class="c1"># 从而执行下面的逻辑
+</span>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">.</span><span class="n">_next_request_from_scheduler</span><span class="p">(</span><span class="n">spider</span><span class="p">):</span>
+            <span class="k">break</span>
+    <span class="c1"># 如果start_requests有数据且不需要等待
+</span>    <span class="k">if</span> <span class="n">slot</span><span class="p">.</span><span class="n">start_requests</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">.</span><span class="n">_needs_backout</span><span class="p">(</span><span class="n">spider</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># 获取下一个种子请求
+</span>            <span class="n">request</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">slot</span><span class="p">.</span><span class="n">start_requests</span><span class="p">)</span>
+        <span class="k">except</span> <span class="nb">StopIteration</span><span class="p">:</span>
+            <span class="n">slot</span><span class="p">.</span><span class="n">start_requests</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
+            <span class="n">slot</span><span class="p">.</span><span class="n">start_requests</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">logger</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="s">'Error while obtaining start requests'</span><span class="p">,</span>
+                         <span class="n">exc_info</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'spider'</span><span class="p">:</span> <span class="n">spider</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># 调用crawl,实际是把request放入scheduler的队列中
+</span>            <span class="bp">self</span><span class="p">.</span><span class="n">crawl</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="c1"># 空闲则关闭spider
+</span>    <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">spider_is_idle</span><span class="p">(</span><span class="n">spider</span><span class="p">)</span> <span class="ow">and</span> <span class="n">slot</span><span class="p">.</span><span class="n">close_if_idle</span><span class="p">:</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_spider_idle</span><span class="p">(</span><span class="n">spider</span><span class="p">)</span>
+        
+<span class="k">def</span> <span class="nf">_needs_backout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="c1"># 是否需要等待，取决4个条件
+</span>    <span class="c1"># 1. Engine是否stop
+</span>    <span class="c1"># 2. slot是否close
+</span>    <span class="c1"># 3. downloader下载超过预设
+</span>    <span class="c1"># 4. scraper处理response超过预设
+</span>    <span class="n">slot</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">slot</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">.</span><span class="n">running</span> \
+        <span class="ow">or</span> <span class="n">slot</span><span class="p">.</span><span class="n">closing</span> \
+        <span class="ow">or</span> <span class="bp">self</span><span class="p">.</span><span class="n">downloader</span><span class="p">.</span><span class="n">needs_backout</span><span class="p">()</span> \
+        <span class="ow">or</span> <span class="bp">self</span><span class="p">.</span><span class="n">scraper</span><span class="p">.</span><span class="n">slot</span><span class="p">.</span><span class="n">needs_backout</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">_next_request_from_scheduler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="n">slot</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">slot</span>
+    <span class="c1"># 从scheduler拿出下个request
+</span>    <span class="n">request</span> <span class="o">=</span> <span class="n">slot</span><span class="p">.</span><span class="n">scheduler</span><span class="p">.</span><span class="n">next_request</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="c1"># 下载
+</span>    <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_download</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="c1"># 注册成功、失败、出口回调方法
+</span>    <span class="n">d</span><span class="p">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">_handle_downloader_output</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="n">d</span><span class="p">.</span><span class="n">addErrback</span><span class="p">(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">logger</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">'Error while handling downloader output'</span><span class="p">,</span>
+                                       <span class="n">exc_info</span><span class="o">=</span><span class="n">failure_to_exc_info</span><span class="p">(</span><span class="n">f</span><span class="p">),</span>
+                                       <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'spider'</span><span class="p">:</span> <span class="n">spider</span><span class="p">}))</span>
+    <span class="n">d</span><span class="p">.</span><span class="n">addBoth</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">slot</span><span class="p">.</span><span class="n">remove_request</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+    <span class="n">d</span><span class="p">.</span><span class="n">addErrback</span><span class="p">(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">logger</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">'Error while removing request from slot'</span><span class="p">,</span>
+                                       <span class="n">exc_info</span><span class="o">=</span><span class="n">failure_to_exc_info</span><span class="p">(</span><span class="n">f</span><span class="p">),</span>
+                                       <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'spider'</span><span class="p">:</span> <span class="n">spider</span><span class="p">}))</span>
+    <span class="n">d</span><span class="p">.</span><span class="n">addBoth</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">slot</span><span class="p">.</span><span class="n">nextcall</span><span class="p">.</span><span class="n">schedule</span><span class="p">())</span>
+    <span class="n">d</span><span class="p">.</span><span class="n">addErrback</span><span class="p">(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">logger</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">'Error while scheduling new request'</span><span class="p">,</span>
+                                       <span class="n">exc_info</span><span class="o">=</span><span class="n">failure_to_exc_info</span><span class="p">(</span><span class="n">f</span><span class="p">),</span>
+                                       <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'spider'</span><span class="p">:</span> <span class="n">spider</span><span class="p">}))</span>
+    <span class="k">return</span> <span class="n">d</span>
+<span class="k">def</span> <span class="nf">crawl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">spider</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">open_spiders</span><span class="p">,</span> \
+        <span class="s">"Spider %r not opened when crawling: %s"</span> <span class="o">%</span> <span class="p">(</span><span class="n">spider</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+    <span class="c1"># request放入scheduler队列，调用nextcall的schedule
+</span>    <span class="bp">self</span><span class="p">.</span><span class="n">schedule</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">slot</span><span class="p">.</span><span class="n">nextcall</span><span class="p">.</span><span class="n">schedule</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">schedule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">signals</span><span class="p">.</span><span class="n">send_catch_log</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="p">.</span><span class="n">request_scheduled</span><span class="p">,</span>
+            <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+    <span class="c1"># 调用scheduler的enqueue_request，把request放入scheduler队列
+</span>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">.</span><span class="n">slot</span><span class="p">.</span><span class="n">scheduler</span><span class="p">.</span><span class="n">enqueue_request</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">signals</span><span class="p">.</span><span class="n">send_catch_log</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="p">.</span><span class="n">request_dropped</span><span class="p">,</span>
+                                    <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">_next_request</code>方法首先调用<code class="language-plaintext highlighter-rouge">_needs_backout</code>方法检查是否需要等待，等待的条件有：</p>
+<ul>
+  <li>引擎是否主动关闭</li>
+  <li>Slot是否关闭</li>
+  <li>下载器网络下载超过预设参数</li>
+  <li>Scraper处理输出超过预设参数</li>
+</ul>
+
+<p>如果不需要等待，则调用<code class="language-plaintext highlighter-rouge">_next_request_from_scheduler</code>，此方法从名字上就能看出，主要是从Schduler中获取Request。</p>
+
+<p>这里要注意，在第一次调用此方法时，<code class="language-plaintext highlighter-rouge">Scheduler</code>中是没有放入任何<code class="language-plaintext highlighter-rouge">Request</code>的，这里会直接<code class="language-plaintext highlighter-rouge">break</code>出来，执行下面的逻辑，而下面就会调用crawl方法，实际是把请求放到<code class="language-plaintext highlighter-rouge">Scheduler</code>的请求队列，放入队列的过程会经过请求过滤器校验是否重复。</p>
+
+<p>下次再调用<code class="language-plaintext highlighter-rouge">_next_request_from_scheduler</code>时，就能从<code class="language-plaintext highlighter-rouge">Scheduler</code>中获取到下载请求，然后执行下载动作。</p>
+
+<p>先来看第一次调度，执行<code class="language-plaintext highlighter-rouge">crawl</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">crawl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">spider</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">open_spiders</span><span class="p">,</span> \
+        <span class="s">"Spider %r not opened when crawling: %s"</span> <span class="o">%</span> <span class="p">(</span><span class="n">spider</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+    <span class="c1"># 放入Scheduler队列
+</span>    <span class="bp">self</span><span class="p">.</span><span class="n">schedule</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="c1"># 进行下一次调度
+</span>    <span class="bp">self</span><span class="p">.</span><span class="n">slot</span><span class="p">.</span><span class="n">nextcall</span><span class="p">.</span><span class="n">schedule</span><span class="p">()</span>
+    
+<span class="k">def</span> <span class="nf">schedule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">signals</span><span class="p">.</span><span class="n">send_catch_log</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="p">.</span><span class="n">request_scheduled</span><span class="p">,</span>
+            <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+    <span class="c1"># 放入Scheduler队列
+</span>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">.</span><span class="n">slot</span><span class="p">.</span><span class="n">scheduler</span><span class="p">.</span><span class="n">enqueue_request</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">signals</span><span class="p">.</span><span class="n">send_catch_log</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="p">.</span><span class="n">request_dropped</span><span class="p">,</span>
+                                    <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>调用引擎的<code class="language-plaintext highlighter-rouge">crawl</code>实际就是把请求放入<code class="language-plaintext highlighter-rouge">Scheduler</code>的队列中，下面看请求是如何入队列的。</p>
+
+<h1 id="7请求入队">7.请求入队</h1>
+
+<p>Scheduler请求入队方法：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">enqueue_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+    <span class="c1"># 请求入队,若请求过滤器验证重复,返回False
+</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="p">.</span><span class="n">dont_filter</span> <span class="ow">and</span> <span class="bp">self</span><span class="p">.</span><span class="n">df</span><span class="p">.</span><span class="n">request_seen</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">df</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">spider</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="c1"># 磁盘队列是否入队成功
+</span>    <span class="n">dqok</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_dqpush</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dqok</span><span class="p">:</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">stats</span><span class="p">.</span><span class="n">inc_value</span><span class="p">(</span><span class="s">'scheduler/enqueued/disk'</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="bp">self</span><span class="p">.</span><span class="n">spider</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># 没有定义磁盘队列，则使用内存队列
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">_mqpush</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">stats</span><span class="p">.</span><span class="n">inc_value</span><span class="p">(</span><span class="s">'scheduler/enqueued/memory'</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="bp">self</span><span class="p">.</span><span class="n">spider</span><span class="p">)</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">stats</span><span class="p">.</span><span class="n">inc_value</span><span class="p">(</span><span class="s">'scheduler/enqueued'</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="bp">self</span><span class="p">.</span><span class="n">spider</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">True</span>
+<span class="k">def</span> <span class="nf">_dqpush</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+    <span class="c1"># 是否定义磁盘队列
+</span>    <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">dqs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Request对象转dict
+</span>        <span class="n">reqd</span> <span class="o">=</span> <span class="n">request_to_dict</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">spider</span><span class="p">)</span>
+        <span class="c1"># 放入磁盘队列
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">dqs</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">reqd</span><span class="p">,</span> <span class="o">-</span><span class="n">request</span><span class="p">.</span><span class="n">priority</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># non serializable request
+</span>        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">logunser</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s">"Unable to serialize request: %(request)s - reason:"</span>
+                   <span class="s">" %(reason)s - no more unserializable requests will be"</span>
+                   <span class="s">" logged (stats being collected)"</span><span class="p">)</span>
+            <span class="n">logger</span><span class="p">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="p">{</span><span class="s">'request'</span><span class="p">:</span> <span class="n">request</span><span class="p">,</span> <span class="s">'reason'</span><span class="p">:</span> <span class="n">e</span><span class="p">},</span>
+                           <span class="n">exc_info</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'spider'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">spider</span><span class="p">})</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">logunser</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">stats</span><span class="p">.</span><span class="n">inc_value</span><span class="p">(</span><span class="s">'scheduler/unserializable'</span><span class="p">,</span>
+                             <span class="n">spider</span><span class="o">=</span><span class="bp">self</span><span class="p">.</span><span class="n">spider</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    
+<span class="k">def</span> <span class="nf">_mqpush</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+    <span class="c1"># 入内存队列
+</span>    <span class="bp">self</span><span class="p">.</span><span class="n">mqs</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">-</span><span class="n">request</span><span class="p">.</span><span class="n">priority</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>在之前将核心组件实例化时有说到，调度器主要定义了2种队列：基于磁盘队列、基于内存队列。</p>
+
+<p>如果在实例化<code class="language-plaintext highlighter-rouge">Scheduler</code>时候传入<code class="language-plaintext highlighter-rouge">jobdir</code>，则使用磁盘队列，否则使用内存队列，默认使用内存队列。</p>
+
+<h1 id="8指纹过滤">8.指纹过滤</h1>
+
+<p>在入队之前，首先通过请求指纹过滤器检查请求是否重复，也就是调用了过滤器的<code class="language-plaintext highlighter-rouge">request_seen</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">request_seen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+    <span class="c1"># 生成请求指纹
+</span>    <span class="n">fp</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">request_fingerprint</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="c1"># 请求指纹如果在指纹集合中,则认为重复
+</span>    <span class="k">if</span> <span class="n">fp</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">fingerprints</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="c1"># 不重复则记录此指纹
+</span>    <span class="bp">self</span><span class="p">.</span><span class="n">fingerprints</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+    <span class="c1"># 实例化如果有path则把指纹写入文件
+</span>    <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="nb">file</span><span class="p">:</span>
+        <span class="bp">self</span><span class="p">.</span><span class="nb">file</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">fp</span> <span class="o">+</span> <span class="n">os</span><span class="p">.</span><span class="n">linesep</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">request_fingerprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+    <span class="c1"># 调用utils.request的request_fingerprint
+</span>    <span class="k">return</span> <span class="n">request_fingerprint</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">utils.request</code>的<code class="language-plaintext highlighter-rouge">request_fingerprint</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">request_fingerprint</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">include_headers</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="s">"""生成请求指纹"""</span>
+    <span class="c1"># 指纹生成是否包含headers
+</span>    <span class="k">if</span> <span class="n">include_headers</span><span class="p">:</span>
+        <span class="n">include_headers</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="n">lower</span><span class="p">())</span>
+                                 <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">include_headers</span><span class="p">))</span>
+    <span class="n">cache</span> <span class="o">=</span> <span class="n">_fingerprint_cache</span><span class="p">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="k">if</span> <span class="n">include_headers</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cache</span><span class="p">:</span>
+        <span class="c1"># 使用sha1算法生成指纹
+</span>        <span class="n">fp</span> <span class="o">=</span> <span class="n">hashlib</span><span class="p">.</span><span class="n">sha1</span><span class="p">()</span>
+        <span class="n">fp</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">method</span><span class="p">))</span>
+        <span class="n">fp</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">canonicalize_url</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">url</span><span class="p">)))</span>
+        <span class="n">fp</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">body</span> <span class="ow">or</span> <span class="s">b''</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">include_headers</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="n">include_headers</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="n">request</span><span class="p">.</span><span class="n">headers</span><span class="p">:</span>
+                    <span class="n">fp</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">hdr</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">request</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="n">getlist</span><span class="p">(</span><span class="n">hdr</span><span class="p">):</span>
+                        <span class="n">fp</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">cache</span><span class="p">[</span><span class="n">include_headers</span><span class="p">]</span> <span class="o">=</span> <span class="n">fp</span><span class="p">.</span><span class="n">hexdigest</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">cache</span><span class="p">[</span><span class="n">include_headers</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>这个过滤器先是通过<code class="language-plaintext highlighter-rouge">Request</code>对象生成一个请求指纹，在这里使用<code class="language-plaintext highlighter-rouge">sha1</code>算法，并记录到指纹集合，每次请求入队前先到这里验证一下指纹集合，如果已存在，则认为请求重复，则不会重复入队列。</p>
+
+<p>不过如果我想不校验重复，也想重复爬取怎么办？看<code class="language-plaintext highlighter-rouge">enqueue_request</code>的第一行判断，仅需将Request实例的<code class="language-plaintext highlighter-rouge">dont_filter</code>定义为True就可以重复爬取此请求，非常灵活。</p>
+
+<p>Scrapy就是通过此逻辑实现重复请求的过滤逻辑，默认重复请求是不会进行重复抓取的。</p>
+
+<h1 id="9下载请求">9.下载请求</h1>
+
+<p>第一次请求进来后，肯定是不重复的，那么则会正常进入调度器队列。然后再进行下一次调度，再次调用<code class="language-plaintext highlighter-rouge">_next_request_from_scheduler</code>方法，此时调用调度器的<code class="language-plaintext highlighter-rouge">next_request</code>方法，就是从调度器队列中取出一个请求，这次就要开始进行网络下载了，也就是调用<code class="language-plaintext highlighter-rouge">_download</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="c1"># 下载请求
+</span>    <span class="n">slot</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">slot</span>
+    <span class="n">slot</span><span class="p">.</span><span class="n">add_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_on_success</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+        <span class="c1"># 成功回调,结果必须是Request或Response
+</span>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="p">(</span><span class="n">Response</span><span class="p">,</span> <span class="n">Request</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">Response</span><span class="p">):</span>
+            <span class="c1"># 如果下载后结果为Response,返回Response
+</span>            <span class="n">response</span><span class="p">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">request</span>
+            <span class="n">logkws</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">logformatter</span><span class="p">.</span><span class="n">crawled</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+            <span class="n">logger</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="o">*</span><span class="n">logformatter_adapter</span><span class="p">(</span><span class="n">logkws</span><span class="p">),</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'spider'</span><span class="p">:</span> <span class="n">spider</span><span class="p">})</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">signals</span><span class="p">.</span><span class="n">send_catch_log</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="p">.</span><span class="n">response_received</span><span class="p">,</span> \
+                <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span>
+    <span class="k">def</span> <span class="nf">_on_complete</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+        <span class="c1"># 此次下载完成后，继续进行下一次调度
+</span>        <span class="n">slot</span><span class="p">.</span><span class="n">nextcall</span><span class="p">.</span><span class="n">schedule</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">_</span>
+    <span class="c1"># 调用Downloader进行下载
+</span>    <span class="n">dwld</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">downloader</span><span class="p">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="c1"># 注册成功回调
+</span>    <span class="n">dwld</span><span class="p">.</span><span class="n">addCallbacks</span><span class="p">(</span><span class="n">_on_success</span><span class="p">)</span>
+    <span class="c1"># 结束回调
+</span>    <span class="n">dwld</span><span class="p">.</span><span class="n">addBoth</span><span class="p">(</span><span class="n">_on_complete</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dwld</span>
+</code></pre></div></div>
+
+<p>在进行网络下载时，调用了<code class="language-plaintext highlighter-rouge">Downloader</code>的<code class="language-plaintext highlighter-rouge">fetch</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_deactivate</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+        <span class="c1"># 下载结束后删除此记录
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">active</span><span class="p">.</span><span class="n">remove</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span>
+    <span class="c1"># 下载前记录处理中的请求
+</span>    <span class="bp">self</span><span class="p">.</span><span class="n">active</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="c1"># 调用下载器中间件download，并注册下载成功的回调方法是self._enqueue_request
+</span>    <span class="n">dfd</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">middleware</span><span class="p">.</span><span class="n">download</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">_enqueue_request</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="c1"># 注册结束回调
+</span>    <span class="k">return</span> <span class="n">dfd</span><span class="p">.</span><span class="n">addBoth</span><span class="p">(</span><span class="n">_deactivate</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>这里调用下载器中间件的<code class="language-plaintext highlighter-rouge">download</code>方法，并注册下载成功的回调方法是<code class="language-plaintext highlighter-rouge">_enqueue_request</code>，来看下载方法：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">download_func</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="o">@</span><span class="n">defer</span><span class="p">.</span><span class="n">inlineCallbacks</span>
+    <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="c1"># 如果下载器中间件有定义process_request，则依次执行
+</span>        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_request'</span><span class="p">]:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">yield</span> <span class="n">method</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">response</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="p">(</span><span class="n">Response</span><span class="p">,</span> <span class="n">Request</span><span class="p">)),</span> \
+                    <span class="s">'Middleware %s.process_request must return None, Response or Request, got %s'</span> <span class="o">%</span> \
+                    <span class="p">(</span><span class="n">six</span><span class="p">.</span><span class="n">get_method_self</span><span class="p">(</span><span class="n">method</span><span class="p">).</span><span class="n">__class__</span><span class="p">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">response</span><span class="p">.</span><span class="n">__class__</span><span class="p">.</span><span class="n">__name__</span><span class="p">)</span>
+            <span class="c1"># 如果下载器中间件有返回值，直接返回此结果
+</span>            <span class="k">if</span> <span class="n">response</span><span class="p">:</span>
+                <span class="n">defer</span><span class="p">.</span><span class="n">returnValue</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="c1"># 如果下载器中间件没有返回值，则执行注册进来的方法，也就是Downloader的_enqueue_request
+</span>        <span class="n">defer</span><span class="p">.</span><span class="n">returnValue</span><span class="p">((</span><span class="k">yield</span> <span class="n">download_func</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span><span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)))</span>
+    <span class="o">@</span><span class="n">defer</span><span class="p">.</span><span class="n">inlineCallbacks</span>
+    <span class="k">def</span> <span class="nf">process_response</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="s">'Received None in process_response'</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">Request</span><span class="p">):</span>
+            <span class="n">defer</span><span class="p">.</span><span class="n">returnValue</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="c1"># 如果下载器中间件有定义process_response，则依次执行
+</span>        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_response'</span><span class="p">]:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">yield</span> <span class="n">method</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span>
+                                    <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="p">(</span><span class="n">Response</span><span class="p">,</span> <span class="n">Request</span><span class="p">)),</span> \
+                <span class="s">'Middleware %s.process_response must return Response or Request, got %s'</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="n">six</span><span class="p">.</span><span class="n">get_method_self</span><span class="p">(</span><span class="n">method</span><span class="p">).</span><span class="n">__class__</span><span class="p">.</span><span class="n">__name__</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">Request</span><span class="p">):</span>
+                <span class="n">defer</span><span class="p">.</span><span class="n">returnValue</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="n">defer</span><span class="p">.</span><span class="n">returnValue</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+    <span class="o">@</span><span class="n">defer</span><span class="p">.</span><span class="n">inlineCallbacks</span>
+    <span class="k">def</span> <span class="nf">process_exception</span><span class="p">(</span><span class="n">_failure</span><span class="p">):</span>
+        <span class="n">exception</span> <span class="o">=</span> <span class="n">_failure</span><span class="p">.</span><span class="n">value</span>
+        <span class="c1"># 如果下载器中间件有定义process_exception，则依次执行
+</span>        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_exception'</span><span class="p">]:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">yield</span> <span class="n">method</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="n">exception</span><span class="p">,</span>
+                                    <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">response</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="p">(</span><span class="n">Response</span><span class="p">,</span> <span class="n">Request</span><span class="p">)),</span> \
+                <span class="s">'Middleware %s.process_exception must return None, Response or Request, got %s'</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="n">six</span><span class="p">.</span><span class="n">get_method_self</span><span class="p">(</span><span class="n">method</span><span class="p">).</span><span class="n">__class__</span><span class="p">.</span><span class="n">__name__</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">response</span><span class="p">:</span>
+                <span class="n">defer</span><span class="p">.</span><span class="n">returnValue</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="n">defer</span><span class="p">.</span><span class="n">returnValue</span><span class="p">(</span><span class="n">_failure</span><span class="p">)</span>
+    <span class="c1"># 注册执行、错误、回调方法
+</span>    <span class="n">deferred</span> <span class="o">=</span> <span class="n">mustbe_deferred</span><span class="p">(</span><span class="n">process_request</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+    <span class="n">deferred</span><span class="p">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">process_exception</span><span class="p">)</span>
+    <span class="n">deferred</span><span class="p">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">process_response</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">deferred</span>
+</code></pre></div></div>
+
+<p>在下载过程中，首先先找到所有定义好的下载器中间件，包括内置定义好的，也可以自己扩展下载器中间件，下载前先依次执行<code class="language-plaintext highlighter-rouge">process_request</code>方法，可对<code class="language-plaintext highlighter-rouge">request</code>进行加工、处理、校验等操作，然后发起真正的网络下载，也就是第一个参数<code class="language-plaintext highlighter-rouge">download_func</code>，在这里是<code class="language-plaintext highlighter-rouge">Downloader</code>的<code class="language-plaintext highlighter-rouge">_enqueue_request</code>方法：</p>
+
+<p>下载成功后回调Downloader的<code class="language-plaintext highlighter-rouge">_enqueue_request</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">_enqueue_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+       <span class="c1"># 加入下载请求队列
+</span>       <span class="n">key</span><span class="p">,</span> <span class="n">slot</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_get_slot</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+       <span class="n">request</span><span class="p">.</span><span class="n">meta</span><span class="p">[</span><span class="s">'download_slot'</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+       <span class="k">def</span> <span class="nf">_deactivate</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+           <span class="n">slot</span><span class="p">.</span><span class="n">active</span><span class="p">.</span><span class="n">remove</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+           <span class="k">return</span> <span class="n">response</span>
+       <span class="n">slot</span><span class="p">.</span><span class="n">active</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+       <span class="n">deferred</span> <span class="o">=</span> <span class="n">defer</span><span class="p">.</span><span class="n">Deferred</span><span class="p">().</span><span class="n">addBoth</span><span class="p">(</span><span class="n">_deactivate</span><span class="p">)</span>
+       <span class="c1"># 下载队列
+</span>       <span class="n">slot</span><span class="p">.</span><span class="n">queue</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="n">request</span><span class="p">,</span> <span class="n">deferred</span><span class="p">))</span>
+       <span class="c1"># 处理下载队列
+</span>       <span class="bp">self</span><span class="p">.</span><span class="n">_process_queue</span><span class="p">(</span><span class="n">spider</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+       <span class="k">return</span> <span class="n">deferred</span>
+   
+   <span class="k">def</span> <span class="nf">_process_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spider</span><span class="p">,</span> <span class="n">slot</span><span class="p">):</span>
+       <span class="k">if</span> <span class="n">slot</span><span class="p">.</span><span class="n">latercall</span> <span class="ow">and</span> <span class="n">slot</span><span class="p">.</span><span class="n">latercall</span><span class="p">.</span><span class="n">active</span><span class="p">():</span>
+           <span class="k">return</span>
+       <span class="c1"># 如果延迟下载参数有配置，则延迟处理队列
+</span>       <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+       <span class="n">delay</span> <span class="o">=</span> <span class="n">slot</span><span class="p">.</span><span class="n">download_delay</span><span class="p">()</span>
+       <span class="k">if</span> <span class="n">delay</span><span class="p">:</span>
+           <span class="n">penalty</span> <span class="o">=</span> <span class="n">delay</span> <span class="o">-</span> <span class="n">now</span> <span class="o">+</span> <span class="n">slot</span><span class="p">.</span><span class="n">lastseen</span>
+           <span class="k">if</span> <span class="n">penalty</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+               <span class="n">slot</span><span class="p">.</span><span class="n">latercall</span> <span class="o">=</span> <span class="n">reactor</span><span class="p">.</span><span class="n">callLater</span><span class="p">(</span><span class="n">penalty</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">_process_queue</span><span class="p">,</span> <span class="n">spider</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+               <span class="k">return</span>
+       <span class="c1"># 处理下载队列
+</span>       <span class="k">while</span> <span class="n">slot</span><span class="p">.</span><span class="n">queue</span> <span class="ow">and</span> <span class="n">slot</span><span class="p">.</span><span class="n">free_transfer_slots</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+           <span class="n">slot</span><span class="p">.</span><span class="n">lastseen</span> <span class="o">=</span> <span class="n">now</span>
+           <span class="c1"># 从下载队列中取出下载请求
+</span>           <span class="n">request</span><span class="p">,</span> <span class="n">deferred</span> <span class="o">=</span> <span class="n">slot</span><span class="p">.</span><span class="n">queue</span><span class="p">.</span><span class="n">popleft</span><span class="p">()</span>
+           <span class="c1"># 开始下载
+</span>           <span class="n">dfd</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_download</span><span class="p">(</span><span class="n">slot</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+           <span class="n">dfd</span><span class="p">.</span><span class="n">chainDeferred</span><span class="p">(</span><span class="n">deferred</span><span class="p">)</span>
+           <span class="c1"># 延迟
+</span>           <span class="k">if</span> <span class="n">delay</span><span class="p">:</span>
+               <span class="bp">self</span><span class="p">.</span><span class="n">_process_queue</span><span class="p">(</span><span class="n">spider</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+               <span class="k">break</span>
+               
+   <span class="k">def</span> <span class="nf">_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+       <span class="c1"># 注册方法，调用handlers的download_request
+</span>       <span class="n">dfd</span> <span class="o">=</span> <span class="n">mustbe_deferred</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">handlers</span><span class="p">.</span><span class="n">download_request</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+       <span class="c1"># 注册下载完成回调方法
+</span>       <span class="k">def</span> <span class="nf">_downloaded</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+           <span class="bp">self</span><span class="p">.</span><span class="n">signals</span><span class="p">.</span><span class="n">send_catch_log</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="p">.</span><span class="n">response_downloaded</span><span class="p">,</span>
+                                       <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span>
+                                       <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
+                                       <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+           <span class="k">return</span> <span class="n">response</span>
+       <span class="n">dfd</span><span class="p">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">_downloaded</span><span class="p">)</span>
+       <span class="n">slot</span><span class="p">.</span><span class="n">transferring</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+       <span class="k">def</span> <span class="nf">finish_transferring</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+           <span class="n">slot</span><span class="p">.</span><span class="n">transferring</span><span class="p">.</span><span class="n">remove</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+           <span class="c1"># 下载完成后调用_process_queue
+</span>           <span class="bp">self</span><span class="p">.</span><span class="n">_process_queue</span><span class="p">(</span><span class="n">spider</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+           <span class="k">return</span> <span class="n">_</span>
+       <span class="k">return</span> <span class="n">dfd</span><span class="p">.</span><span class="n">addBoth</span><span class="p">(</span><span class="n">finish_transferring</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>在这里，也维护了一个下载队列，可根据配置达到延迟下载的要求。真正发起下载请求的是调用了<code class="language-plaintext highlighter-rouge">self.handlers.download_request</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">download_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="c1"># 获取请求的scheme
+</span>    <span class="n">scheme</span> <span class="o">=</span> <span class="n">urlparse_cached</span><span class="p">(</span><span class="n">request</span><span class="p">).</span><span class="n">scheme</span>
+    <span class="c1"># 根据scheeme获取下载处理器
+</span>    <span class="n">handler</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_get_handler</span><span class="p">(</span><span class="n">scheme</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">handler</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">NotSupported</span><span class="p">(</span><span class="s">"Unsupported URL scheme '%s': %s"</span> <span class="o">%</span>
+                           <span class="p">(</span><span class="n">scheme</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">_notconfigured</span><span class="p">[</span><span class="n">scheme</span><span class="p">]))</span>
+    <span class="c1"># 开始下载，并返回结果
+</span>    <span class="k">return</span> <span class="n">handler</span><span class="p">.</span><span class="n">download_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_get_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">):</span>
+    <span class="c1"># 根据scheme获取对应的下载处理器
+</span>    <span class="c1"># 配置文件中定义好了http、https、ftp等资源的下载处理器
+</span>    <span class="k">if</span> <span class="n">scheme</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">_handlers</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_handlers</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">scheme</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">_notconfigured</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="n">scheme</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">_schemes</span><span class="p">:</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_notconfigured</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span> <span class="o">=</span> <span class="s">'no handler available for that scheme'</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_schemes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># 实例化下载处理器
+</span>        <span class="n">dhcls</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">dh</span> <span class="o">=</span> <span class="n">dhcls</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">_crawler</span><span class="p">.</span><span class="n">settings</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">NotConfigured</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_notconfigured</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="n">logger</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="s">'Loading "%(clspath)s" for scheme "%(scheme)s"'</span><span class="p">,</span>
+                     <span class="p">{</span><span class="s">"clspath"</span><span class="p">:</span> <span class="n">path</span><span class="p">,</span> <span class="s">"scheme"</span><span class="p">:</span> <span class="n">scheme</span><span class="p">},</span>
+                     <span class="n">exc_info</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>  <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'crawler'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">_crawler</span><span class="p">})</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_notconfigured</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_handlers</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span> <span class="o">=</span> <span class="n">dh</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_handlers</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>下载前，先通过解析<code class="language-plaintext highlighter-rouge">request</code>的<code class="language-plaintext highlighter-rouge">scheme</code>来获取对应的下载处理器，默认配置文件中定义的下载处理器：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">DOWNLOAD_HANDLERS_BASE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'file'</span><span class="p">:</span> <span class="s">'scrapy.core.downloader.handlers.file.FileDownloadHandler'</span><span class="p">,</span>
+    <span class="s">'http'</span><span class="p">:</span> <span class="s">'scrapy.core.downloader.handlers.http.HTTPDownloadHandler'</span><span class="p">,</span>
+    <span class="s">'https'</span><span class="p">:</span> <span class="s">'scrapy.core.downloader.handlers.http.HTTPDownloadHandler'</span><span class="p">,</span>
+    <span class="s">'s3'</span><span class="p">:</span> <span class="s">'scrapy.core.downloader.handlers.s3.S3DownloadHandler'</span><span class="p">,</span>
+    <span class="s">'ftp'</span><span class="p">:</span> <span class="s">'scrapy.core.downloader.handlers.ftp.FTPDownloadHandler'</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>然后调用<code class="language-plaintext highlighter-rouge">download_request</code>方法，完成网络下载，这里不再详细讲解每个处理器的实现，简单来说你就把它想象成封装好的网络下载库，输入URL，输出下载结果就好了，这样方便理解。</p>
+
+<p>在下载过程中，如果发生异常情况，则会依次调用下载器中间件的<code class="language-plaintext highlighter-rouge">process_exception</code>方法，每个中间件只需定义自己的异常处理逻辑即可。</p>
+
+<p>如果下载成功，则会依次执行下载器中间件的<code class="language-plaintext highlighter-rouge">process_response</code>方法，每个中间件可以进一步处理下载后的结果，最终返回。</p>
+
+<p>这里值得提一下，除了<code class="language-plaintext highlighter-rouge">process_request</code>方法是每个中间件顺序执行的，而<code class="language-plaintext highlighter-rouge">process_response</code>和<code class="language-plaintext highlighter-rouge">process_exception</code>方法是每个中间件倒序执行的，具体可看一下<code class="language-plaintext highlighter-rouge">DownaloderMiddlewareManager</code>的<code class="language-plaintext highlighter-rouge">_add_middleware</code>方法，可明白是如何注册这个方法链的。</p>
+
+<p>拿到最终的下载结果后，再回到<code class="language-plaintext highlighter-rouge">ExecuteEngine</code>的<code class="language-plaintext highlighter-rouge">_next_request_from_scheduler</code>方法，会看到调用了<code class="language-plaintext highlighter-rouge">_handle_downloader_output</code>方法，也就是处理下载结果的逻辑：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">_handle_downloader_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="c1"># 下载结果必须是Request、Response、Failure其一
+</span>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="p">(</span><span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">Failure</span><span class="p">)),</span> <span class="n">response</span>
+    <span class="c1"># 如果是Request，则再次调用crawl，执行Scheduler的入队逻辑
+</span>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">Request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">crawl</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="c1"># 如果是Response或Failure，则调用scraper的enqueue_scrape进一步处理
+</span>    <span class="c1"># 主要是和Spiders和Pipeline交互
+</span>    <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">scraper</span><span class="p">.</span><span class="n">enqueue_scrape</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="n">d</span><span class="p">.</span><span class="n">addErrback</span><span class="p">(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">logger</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="s">'Error while enqueuing downloader output'</span><span class="p">,</span>
+                                        <span class="n">exc_info</span><span class="o">=</span><span class="n">failure_to_exc_info</span><span class="p">(</span><span class="n">f</span><span class="p">),</span>
+                                        <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'spider'</span><span class="p">:</span> <span class="n">spider</span><span class="p">}))</span>
+    <span class="k">return</span> <span class="n">d</span>
+</code></pre></div></div>
+
+<p>拿到下载结果后，主要分2个逻辑，如果是<code class="language-plaintext highlighter-rouge">Request</code>实例，则直接再次放入<code class="language-plaintext highlighter-rouge">Scheduler</code>请求队列。如果是<code class="language-plaintext highlighter-rouge">Response</code>或<code class="language-plaintext highlighter-rouge">Failure</code>实例，则调用Scraper的<code class="language-plaintext highlighter-rouge">enqueue_scrape</code>方法，进行进一步处理。</p>
+
+<p>Scrapyer主要是与<code class="language-plaintext highlighter-rouge">Spider模块</code>和<code class="language-plaintext highlighter-rouge">Pipeline模块</code>进行交互。</p>
+
+<h1 id="10处理下载结果">10.处理下载结果</h1>
+
+<p>请求入队逻辑不用再说，前面已经讲过。现在主要看<code class="language-plaintext highlighter-rouge">Scraper</code>的<code class="language-plaintext highlighter-rouge">enqueue_scrape</code>，看Scraper组件是如何处理后续逻辑的：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">enqueue_scrape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="c1"># 加入Scrape处理队列
+</span>    <span class="n">slot</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">slot</span>
+    <span class="n">dfd</span> <span class="o">=</span> <span class="n">slot</span><span class="p">.</span><span class="n">add_response_request</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">finish_scraping</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+        <span class="n">slot</span><span class="p">.</span><span class="n">finish_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_check_if_closing</span><span class="p">(</span><span class="n">spider</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_scrape_next</span><span class="p">(</span><span class="n">spider</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_</span>
+    <span class="n">dfd</span><span class="p">.</span><span class="n">addBoth</span><span class="p">(</span><span class="n">finish_scraping</span><span class="p">)</span>
+    <span class="n">dfd</span><span class="p">.</span><span class="n">addErrback</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">logger</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="s">'Scraper bug processing %(request)s'</span><span class="p">,</span>
+                               <span class="p">{</span><span class="s">'request'</span><span class="p">:</span> <span class="n">request</span><span class="p">},</span>
+                               <span class="n">exc_info</span><span class="o">=</span><span class="n">failure_to_exc_info</span><span class="p">(</span><span class="n">f</span><span class="p">),</span>
+                               <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'spider'</span><span class="p">:</span> <span class="n">spider</span><span class="p">}))</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">_scrape_next</span><span class="p">(</span><span class="n">spider</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dfd</span>
+<span class="k">def</span> <span class="nf">_scrape_next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spider</span><span class="p">,</span> <span class="n">slot</span><span class="p">):</span>
+    <span class="k">while</span> <span class="n">slot</span><span class="p">.</span><span class="n">queue</span><span class="p">:</span>
+        <span class="c1"># 从Scraper队列中获取一个待处理的任务
+</span>        <span class="n">response</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">deferred</span> <span class="o">=</span> <span class="n">slot</span><span class="p">.</span><span class="n">next_response_request_deferred</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_scrape</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">).</span><span class="n">chainDeferred</span><span class="p">(</span><span class="n">deferred</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_scrape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="p">(</span><span class="n">Response</span><span class="p">,</span> <span class="n">Failure</span><span class="p">))</span>
+    <span class="c1"># 调用_scrape2继续处理
+</span>    <span class="n">dfd</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_scrape2</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="c1"># 注册异常回调
+</span>    <span class="n">dfd</span><span class="p">.</span><span class="n">addErrback</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">handle_spider_error</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="c1"># 出口回调
+</span>    <span class="n">dfd</span><span class="p">.</span><span class="n">addCallback</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">handle_spider_output</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dfd</span>
+<span class="k">def</span> <span class="nf">_scrape2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_result</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="c1"># 如果结果不是Failure实例，则调用爬虫中间件管理器的scrape_response
+</span>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request_result</span><span class="p">,</span> <span class="n">Failure</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">spidermw</span><span class="p">.</span><span class="n">scrape_response</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">call_spider</span><span class="p">,</span> <span class="n">request_result</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># 直接调用call_spider
+</span>        <span class="n">dfd</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">call_spider</span><span class="p">(</span><span class="n">request_result</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dfd</span><span class="p">.</span><span class="n">addErrback</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">_log_download_errors</span><span class="p">,</span> <span class="n">request_result</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>首先加入到<code class="language-plaintext highlighter-rouge">Scraper</code>的处理队列中，然后从队列中获取到任务，如果不是异常结果，则调用<code class="language-plaintext highlighter-rouge">爬虫中间件管理器</code>的<code class="language-plaintext highlighter-rouge">scrape_response</code>方法：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">scrape_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scrape_func</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span><span class="s">'%s.%s'</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">six</span><span class="p">.</span><span class="n">get_method_self</span><span class="p">(</span><span class="n">f</span><span class="p">).</span><span class="n">__class__</span><span class="p">.</span><span class="n">__name__</span><span class="p">,</span>
+            <span class="n">six</span><span class="p">.</span><span class="n">get_method_function</span><span class="p">(</span><span class="n">f</span><span class="p">).</span><span class="n">__name__</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">process_spider_input</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+        <span class="c1"># 执行一系列爬虫中间件的process_spider_input
+</span>        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_spider_input'</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">result</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">,</span> \
+                        <span class="s">'Middleware %s must returns None or '</span> \
+                        <span class="s">'raise an exception, got %s '</span> \
+                        <span class="o">%</span> <span class="p">(</span><span class="n">fname</span><span class="p">(</span><span class="n">method</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">scrape_func</span><span class="p">(</span><span class="n">Failure</span><span class="p">(),</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+        <span class="c1"># 执行完中间件的一系列process_spider_input方法后，执行call_spider
+</span>        <span class="k">return</span> <span class="n">scrape_func</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">process_spider_exception</span><span class="p">(</span><span class="n">_failure</span><span class="p">):</span>
+        <span class="c1"># 执行一系列爬虫中间件的process_spider_exception
+</span>        <span class="n">exception</span> <span class="o">=</span> <span class="n">_failure</span><span class="p">.</span><span class="n">value</span>
+        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_spider_exception'</span><span class="p">]:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="n">exception</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">result</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">_isiterable</span><span class="p">(</span><span class="n">result</span><span class="p">),</span> \
+                <span class="s">'Middleware %s must returns None, or an iterable object, got %s '</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="n">fname</span><span class="p">(</span><span class="n">method</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">_failure</span>
+    <span class="k">def</span> <span class="nf">process_spider_output</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+        <span class="c1"># 执行一系列爬虫中间件的process_spider_output
+</span>        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_spider_output'</span><span class="p">]:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">_isiterable</span><span class="p">(</span><span class="n">result</span><span class="p">),</span> \
+                <span class="s">'Middleware %s must returns an iterable object, got %s '</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="n">fname</span><span class="p">(</span><span class="n">method</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="c1"># 执行process_spider_input
+</span>    <span class="n">dfd</span> <span class="o">=</span> <span class="n">mustbe_deferred</span><span class="p">(</span><span class="n">process_spider_input</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+    <span class="c1"># 注册异常回调
+</span>    <span class="n">dfd</span><span class="p">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">process_spider_exception</span><span class="p">)</span>
+    <span class="c1"># 注册出口回调
+</span>    <span class="n">dfd</span><span class="p">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">process_spider_output</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dfd</span>
+</code></pre></div></div>
+
+<p>有没有感觉套路很熟悉？与上面下载器中间件调用方式非常相似，也调用一系列的前置方法，再执行真正的处理逻辑，然后执行一些列的后置方法。</p>
+
+<h1 id="11回调爬虫">11.回调爬虫</h1>
+
+<p>在这里真正的处理逻辑是<code class="language-plaintext highlighter-rouge">call_spider</code>，也就是回调我们写的爬虫类：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">call_spider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="c1"># 回调爬虫模块
+</span>    <span class="n">result</span><span class="p">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">request</span>
+    <span class="n">dfd</span> <span class="o">=</span> <span class="n">defer_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="c1"># 注册回调方法，取得request.callback，如果未定义则调用爬虫模块的parse方法
+</span>    <span class="n">dfd</span><span class="p">.</span><span class="n">addCallbacks</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">callback</span> <span class="ow">or</span> <span class="n">spider</span><span class="p">.</span><span class="n">parse</span><span class="p">,</span> <span class="n">request</span><span class="p">.</span><span class="n">errback</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dfd</span><span class="p">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">iterate_spider_output</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>看到这里，你应该更熟悉，平时我们写的最多的爬虫模块的<code class="language-plaintext highlighter-rouge">parse</code>则是第一个回调方法，后续爬虫模块拿到下载结果，可定义下载后的<code class="language-plaintext highlighter-rouge">callback</code>就是在这里进行回调执行的。</p>
+
+<h1 id="12处理输出">12.处理输出</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">handle_spider_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="c1"># 处理爬虫输出结果
+</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">defer_succeed</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+    <span class="n">it</span> <span class="o">=</span> <span class="n">iter_errback</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">handle_spider_error</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="c1"># 注册_process_spidermw_output
+</span>    <span class="n">dfd</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">concurrent_items</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_process_spidermw_output</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dfd</span>
+<span class="k">def</span> <span class="nf">_process_spidermw_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="c1"># 处理Spider模块返回的每一个Request/Item
+</span>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">Request</span><span class="p">):</span>
+        <span class="c1"># 如果结果是Request，再次入Scheduler的请求队列
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">crawler</span><span class="p">.</span><span class="n">engine</span><span class="p">.</span><span class="n">crawl</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">output</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="p">(</span><span class="n">BaseItem</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
+        <span class="c1"># 如果结果是BaseItem/dict
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">slot</span><span class="p">.</span><span class="n">itemproc_size</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1"># 调用Pipeline的process_item
+</span>        <span class="n">dfd</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">itemproc</span><span class="p">.</span><span class="n">process_item</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+        <span class="n">dfd</span><span class="p">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">_itemproc_finished</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dfd</span>
+    <span class="k">elif</span> <span class="n">output</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">typename</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">output</span><span class="p">).</span><span class="n">__name__</span>
+        <span class="n">logger</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="s">'Spider must return Request, BaseItem, dict or None, '</span>
+                     <span class="s">'got %(typename)r in %(request)s'</span><span class="p">,</span>
+                     <span class="p">{</span><span class="s">'request'</span><span class="p">:</span> <span class="n">request</span><span class="p">,</span> <span class="s">'typename'</span><span class="p">:</span> <span class="n">typename</span><span class="p">},</span>
+                     <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'spider'</span><span class="p">:</span> <span class="n">spider</span><span class="p">})</span>
+</code></pre></div></div>
+
+<p>我们编写爬虫类时，写的那些回调方法处理逻辑，也就是在这里被回调执行，执行完自定义的解析逻辑后，解析方法可返回新的<code class="language-plaintext highlighter-rouge">Request</code>或<code class="language-plaintext highlighter-rouge">BaseItem</code>实例，如果是新的请求，则再次通过<code class="language-plaintext highlighter-rouge">Scheduler</code>进入请求队列，如果是<code class="language-plaintext highlighter-rouge">BaseItem</code>实例，则调用<code class="language-plaintext highlighter-rouge">Pipeline</code>管理器，依次执行<code class="language-plaintext highlighter-rouge">process_item</code>，也就是我们想输出结果时，只定义Pepeline类，然后重写这个方法就可以了。</p>
+
+<p><code class="language-plaintext highlighter-rouge">ItemPipeManager</code>处理逻辑：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ItemPipelineManager</span><span class="p">(</span><span class="n">MiddlewareManager</span><span class="p">):</span>
+    <span class="n">component_name</span> <span class="o">=</span> <span class="s">'item pipeline'</span>
+    <span class="o">@</span><span class="nb">classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_mwlist_from_settings</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">build_component_list</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">getwithbase</span><span class="p">(</span><span class="s">'ITEM_PIPELINES'</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">_add_middleware</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipe</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ItemPipelineManager</span><span class="p">,</span> <span class="bp">self</span><span class="p">).</span><span class="n">_add_middleware</span><span class="p">(</span><span class="n">pipe</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="s">'process_item'</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">methods</span><span class="p">[</span><span class="s">'process_item'</span><span class="p">].</span><span class="n">append</span><span class="p">(</span><span class="n">pipe</span><span class="p">.</span><span class="n">process_item</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+        <span class="c1"># 依次调用Pipeline的process_item
+</span>        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_process_chain</span><span class="p">(</span><span class="s">'process_item'</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>可以看到<code class="language-plaintext highlighter-rouge">ItemPipeManager</code>也是一个中间件，和之前下载器中间件管理器和爬虫中间件管理器类似，如果子类有定义<code class="language-plaintext highlighter-rouge">process_item</code>，则依次执行它。</p>
+
+<p>执行完后，调用<code class="language-plaintext highlighter-rouge">_itemproc_finished</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">_itemproc_finished</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">slot</span><span class="p">.</span><span class="n">itemproc_size</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">Failure</span><span class="p">):</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="n">output</span><span class="p">.</span><span class="n">value</span>
+        <span class="c1"># 如果在Pipeline处理中抛DropItem异常，忽略处理结果
+</span>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="n">DropItem</span><span class="p">):</span>
+            <span class="n">logkws</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">logformatter</span><span class="p">.</span><span class="n">dropped</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">ex</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+            <span class="n">logger</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="o">*</span><span class="n">logformatter_adapter</span><span class="p">(</span><span class="n">logkws</span><span class="p">),</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'spider'</span><span class="p">:</span> <span class="n">spider</span><span class="p">})</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">signals</span><span class="p">.</span><span class="n">send_catch_log_deferred</span><span class="p">(</span>
+                <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="p">.</span><span class="n">item_dropped</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="n">item</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span>
+                <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="n">output</span><span class="p">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="s">'Error processing %(item)s'</span><span class="p">,</span> <span class="p">{</span><span class="s">'item'</span><span class="p">:</span> <span class="n">item</span><span class="p">},</span>
+                         <span class="n">exc_info</span><span class="o">=</span><span class="n">failure_to_exc_info</span><span class="p">(</span><span class="n">output</span><span class="p">),</span>
+                         <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'spider'</span><span class="p">:</span> <span class="n">spider</span><span class="p">})</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logkws</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">logformatter</span><span class="p">.</span><span class="n">scraped</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">spider</span><span class="p">)</span>
+        <span class="n">logger</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="o">*</span><span class="n">logformatter_adapter</span><span class="p">(</span><span class="n">logkws</span><span class="p">),</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s">'spider'</span><span class="p">:</span> <span class="n">spider</span><span class="p">})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">signals</span><span class="p">.</span><span class="n">send_catch_log_deferred</span><span class="p">(</span>
+            <span class="n">signal</span><span class="o">=</span><span class="n">signals</span><span class="p">.</span><span class="n">item_scraped</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="n">output</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span>
+            <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>这里可以看到，如果想在<code class="language-plaintext highlighter-rouge">Pipeline</code>中丢弃某个结果，直接抛出<code class="language-plaintext highlighter-rouge">DropItem</code>异常即可，Scrapy会进行对应的处理。</p>
+
+<p>到这里，抓取结果根据自定义的输出类输出到指定位置，而新的Request则会再次进入请求队列，等待引擎下一次调度，也就是再次调用<code class="language-plaintext highlighter-rouge">ExecutionEngine</code>的<code class="language-plaintext highlighter-rouge">_next_request</code>方法，直至请求队列没有新的任务，整个程序退出。</p>
+
+<h1 id="13crawlerspider">13.CrawlerSpider</h1>
+
+<p>这里也简单说一下<code class="language-plaintext highlighter-rouge">CrawlerSpider</code>类，它其实就继承了<code class="language-plaintext highlighter-rouge">Spider</code>类，然后重写了<code class="language-plaintext highlighter-rouge">parse</code>方法（这也是集成此类不要重写此方法的原因），并结合<code class="language-plaintext highlighter-rouge">Rule</code>等规则类，来完成<code class="language-plaintext highlighter-rouge">Request</code>的自动提取逻辑。</p>
+
+<p>由此也可看出，Scrapy的每个模块的实现都非常纯粹，每个组件都通过配置文件定义连接起来，如果想要扩展或替换，只需定义并实现自己的处理逻辑即可，其他模块均不受任何影响，这也导致编写一个插件是变得多么容易！</p>
+
+<h1 id="14总结">14.总结</h1>
+
+<p>总结一下整个运行流程，还是用这两张图表示再清楚不过：</p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_22.png" alt="ssl" /></p>
+
+<p><img src="http://walidream.com:9999/blogImage/python/python_24.png" alt="ssl" /></p>
+
+<p>Scrapy整体给我的感觉是，虽然它提供的只是单机版的爬虫框架，但我们可以通过编写更多的插件和替换某些组件，来定制化自己的爬虫，从而来实现更强大的功能，例如分布式、代理调度、并发控制、可视化、监控等等功能，都是非常方便的！</p>
+
+:ET

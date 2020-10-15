@@ -1,0 +1,241 @@
+I"[_<p>with 语句适用于对资源进行访问的场合，确保不管使用过程中是否发生异常都会执行必要的<code class="language-plaintext highlighter-rouge">清理</code>操作，释放资源，比如文件使用后自动关闭、线程中锁的自动获取和释放等。</p>
+
+<ul>
+  <li><a href="https://www.ibm.com/developerworks/cn/opensource/os-cn-pythonwith/index.html" title="https://www.ibm.com/developerworks/cn/opensource/os-cn-pythonwith/index.html">浅谈 Python 的 with 语句</a></li>
+</ul>
+
+<h1 id="1术语">1.术语</h1>
+
+<p>要使用 with 语句，首先要明白上下文管理器这一概念。有了上下文管理器，with 语句才能工作。</p>
+
+<p><strong>上下文管理协议（Context Management Protocol）:</strong> 包含方法 <code class="language-plaintext highlighter-rouge">__enter__()</code> 和 <code class="language-plaintext highlighter-rouge">__exit__()</code>，支持该协议的对象要实现这两个方法。</p>
+
+<p><strong>上下文管理器（Context Manager）：</strong>支持上下文管理协议的对象，这种对象实现了<code class="language-plaintext highlighter-rouge">__enter__()</code> 和 <code class="language-plaintext highlighter-rouge">__exit__()</code> 方法。上下文管理器定义执行 with 语句时要建立的运行时上下文，负责执行 <code class="language-plaintext highlighter-rouge">with</code> 语句块上下文中的进入与退出操作。通常使用 <code class="language-plaintext highlighter-rouge">with</code> 语句调用上下文管理器，也可以通过直接调用其方法来使用。</p>
+
+<p><strong>运行时上下文（runtime context）：</strong>由上下文管理器创建，通过上下文管理器的 <code class="language-plaintext highlighter-rouge">__enter__()</code> 和 <code class="language-plaintext highlighter-rouge">__exit__()</code>方法实现，<code class="language-plaintext highlighter-rouge">__enter__()</code> 方法在语句体执行之前进入运行时上下文，<code class="language-plaintext highlighter-rouge">__exit__()</code> 在语句体执行完后从运行时上下文退出。with 语句支持运行时上下文这一概念。</p>
+
+<p><strong>上下文表达式（Context Expression）：</strong>with 语句中跟在关键字 with 之后的表达式，该表达式要返回一个上下文管理器对象。</p>
+
+<p><strong>语句体（with-body）:</strong>with 语句包裹起来的代码块，在执行语句体之前会调用上下文管理器的 <code class="language-plaintext highlighter-rouge">__enter__()</code> 方法，执行完语句体之后会执行 <code class="language-plaintext highlighter-rouge">__exit__()</code> 方法。</p>
+
+<h1 id="2with语法格式">2.with语法格式</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">with</span> <span class="n">context_expression</span> <span class="p">[</span><span class="k">as</span> <span class="n">target</span><span class="p">(</span><span class="n">s</span><span class="p">)]:</span>
+    <span class="k">pass</span>
+</code></pre></div></div>
+
+<h1 id="3自定义上下文管理器">3.自定义上下文管理器</h1>
+
+<p>要实现<code class="language-plaintext highlighter-rouge">自定义上下文管理器</code>必须要实现<code class="language-plaintext highlighter-rouge">__enter__()</code>和<code class="language-plaintext highlighter-rouge">__exit__()</code>两个方法。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MyResource</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'enter'</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'exit'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>我们完成了一个名为<code class="language-plaintext highlighter-rouge">MyResource</code>的上下文管理器，后面我们详细介绍上下文管理器。<code class="language-plaintext highlighter-rouge">__exit__()</code>方法必须接收<code class="language-plaintext highlighter-rouge">4</code>个参数</p>
+
+<h1 id="4with执行顺序">4.with执行顺序</h1>
+
+<p>在<code class="language-plaintext highlighter-rouge">with</code>语句运行上下文管理器，先执行<code class="language-plaintext highlighter-rouge">__enter__()</code>方法然后执行<code class="language-plaintext highlighter-rouge">with-body</code>里面的代码，最后执行<code class="language-plaintext highlighter-rouge">__exit__()</code>方法。我们接下来验证一下</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MyResource</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'enter'</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'exit'</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">MyResource</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"with-body"</span><span class="p">)</span>
+
+<span class="c1">#输出
+</span><span class="s">"enter"</span>
+<span class="s">"with-body"</span>
+<span class="s">"exit"</span>
+</code></pre></div></div>
+
+<h1 id="5with的as语句">5.with的as语句</h1>
+
+<p>如果指定了<code class="language-plaintext highlighter-rouge">as</code>子句的话，会将上下文管理器的 <code class="language-plaintext highlighter-rouge">__enter__()</code> 方法的返回值赋值给 target(s)。target(s) 可以是<code class="language-plaintext highlighter-rouge">单个变量</code>或多个变量</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MyResource</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        
+        <span class="k">print</span><span class="p">(</span><span class="s">'enter'</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">a</span>
+    
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'exit'</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">MyResource</span><span class="p">()</span> <span class="k">as</span> <span class="n">resource</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+
+<span class="c1">#输出
+</span><span class="s">"enter"</span>
+<span class="mi">1</span>
+<span class="s">"exit"</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">__enter__</code>中可以返回多个变量</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MyResource</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        
+        <span class="k">print</span><span class="p">(</span><span class="s">'enter'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">'张三'</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="s">'男'</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'exit'</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">MyResource</span><span class="p">()</span> <span class="k">as</span> <span class="n">resource</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+
+<span class="c1"># 输出
+</span><span class="n">enter</span>
+<span class="p">(</span><span class="s">'张三'</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="s">'男'</span><span class="p">)</span>
+<span class="nb">exit</span>
+</code></pre></div></div>
+
+<h1 id="6exit">6.exit</h1>
+
+<p>在上面例子中，大家看到<code class="language-plaintext highlighter-rouge">__exit__</code>方法参数必须是4个，这是为什么呢？当程序在<code class="language-plaintext highlighter-rouge">with-body</code>中抛出异常，可以在<code class="language-plaintext highlighter-rouge">__exit__</code>中处理异常。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MyResource</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        
+        <span class="k">print</span><span class="p">(</span><span class="s">'enter'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"exc_type:"</span><span class="p">,</span><span class="n">exc_type</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"exc_value:"</span><span class="p">,</span><span class="n">exc_value</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"exc_tb:"</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span> 
+
+<span class="k">with</span> <span class="n">MyResource</span><span class="p">()</span> <span class="k">as</span> <span class="n">resource</span><span class="p">:</span>
+    <span class="mi">1</span><span class="o">/</span><span class="mi">0</span>  <span class="c1">#会抛出异常
+</span>    <span class="k">print</span><span class="p">(</span><span class="s">'with-body'</span><span class="p">)</span>
+
+<span class="c1">#输出
+</span><span class="n">enter</span>
+<span class="n">exc_type</span><span class="p">:</span> <span class="o">&lt;</span><span class="k">class</span> <span class="err">'</span><span class="nc">ZeroDivisionError</span><span class="s">'&gt;
+exc_value: division by zero
+exc_tb: &lt;traceback object at 0x02AD21E8&gt;
+Traceback (most recent call last):
+  File "re/re1.py", line 13, in &lt;module&gt;
+    1/0
+ZeroDivisionError: division by zero
+</span></code></pre></div></div>
+<p>从上面代码的数据结果来看，不管<code class="language-plaintext highlighter-rouge">with-body</code>语句是否抛出异常，最后都会执行<code class="language-plaintext highlighter-rouge">__exit__</code>方法，如果<code class="language-plaintext highlighter-rouge">with-body</code>语句没有异常,那么<code class="language-plaintext highlighter-rouge">exc_tpey</code>,<code class="language-plaintext highlighter-rouge">exc_value</code>,<code class="language-plaintext highlighter-rouge">exc_tb</code>的值都是<code class="language-plaintext highlighter-rouge">none</code>,<code class="language-plaintext highlighter-rouge">with-body</code>有异常，那么<code class="language-plaintext highlighter-rouge">exc_tpye</code>(异常类型)，<code class="language-plaintext highlighter-rouge">exc_value</code>(异常的值),<code class="language-plaintext highlighter-rouge">exc_tb</code>(异常信息)</p>
+
+<h4 id="exit-返回值"><strong>exit</strong> 返回值</h4>
+
+<p><code class="language-plaintext highlighter-rouge">__exit__</code>方法中也是有返回值的，但是返回值只有两种<code class="language-plaintext highlighter-rouge">True</code>和<code class="language-plaintext highlighter-rouge">False</code>。在上面中我们没有<code class="language-plaintext highlighter-rouge">__exit__</code>方法中写return也没有报错，这是因为如果不写,方法会默认返回<code class="language-plaintext highlighter-rouge">None</code>，python中<code class="language-plaintext highlighter-rouge">None</code>对应boolean的值就是<code class="language-plaintext highlighter-rouge">False</code>。</p>
+
+<p>接下来我们继续探讨下，返回<code class="language-plaintext highlighter-rouge">True</code>和<code class="language-plaintext highlighter-rouge">False</code>有什么区别？</p>
+
+<h4 id="exit-返回fasle"><strong>exit</strong> 返回Fasle</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MyResource</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        
+        <span class="k">print</span><span class="p">(</span><span class="s">'enter'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'exit'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">MyResource</span><span class="p">()</span> <span class="k">as</span> <span class="n">resource</span><span class="p">:</span>
+        <span class="mi">1</span><span class="o">/</span><span class="mi">0</span>  <span class="c1">#会抛出异常
+</span>        <span class="k">print</span><span class="p">(</span><span class="s">'with-body'</span><span class="p">)</span>
+<span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+
+<span class="c1"># 输出
+</span><span class="n">enter</span>
+<span class="nb">exit</span>
+<span class="n">division</span> <span class="n">by</span> <span class="n">zero</span>
+</code></pre></div></div>
+
+<h4 id="exit-返回true"><strong>exit</strong> 返回True</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MyResource</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        
+        <span class="k">print</span><span class="p">(</span><span class="s">'enter'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'exit'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">MyResource</span><span class="p">()</span> <span class="k">as</span> <span class="n">resource</span><span class="p">:</span>
+        <span class="mi">1</span><span class="o">/</span><span class="mi">0</span>  <span class="c1">#会抛出异常
+</span>        <span class="k">print</span><span class="p">(</span><span class="s">'with-body'</span><span class="p">)</span>
+<span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+
+<span class="c1"># 输出
+</span><span class="n">enter</span>
+<span class="nb">exit</span>
+</code></pre></div></div>
+
+<p>我们写了两组代码，一组在<code class="language-plaintext highlighter-rouge">__exit__</code>返回False，一组在<code class="language-plaintext highlighter-rouge">__exit__</code>返回True。通过两组输出，我们对比发现，当在<code class="language-plaintext highlighter-rouge">__exit__</code>方法中返回True时，<code class="language-plaintext highlighter-rouge">try except</code>会捕获不到异常，当返回值为False时，可以在<code class="language-plaintext highlighter-rouge">try except</code>捕获到异常。python为我们处理异常提供了非常灵活的方式，我们想在内部处理异常在<code class="language-plaintext highlighter-rouge">__exit__</code>方法中返回True，如果想在外面处理异常，在<code class="language-plaintext highlighter-rouge">__exit__</code>方法中返回False</p>
+
+<h1 id="7with使用场景">7.with使用场景</h1>
+
+<p>相信大家到这里，也已经基本掌握with的用法。with 语句适用于对资源进行访问的场合，如访问文件，连接数据库，线程等都比较适合使用with。下面为大家写个用with来处理数据库连接的代码</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">psycopg2</span>
+
+<span class="k">class</span> <span class="nc">MyPgsql</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#建立数据库连接
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">database</span><span class="o">=</span><span class="s">'GIS_GEO_DATA'</span><span class="p">,</span><span class="n">user</span><span class="o">=</span><span class="s">'postgres'</span><span class="p">,</span><span class="n">password</span><span class="o">=</span><span class="s">'1qa2ws3ed'</span><span class="p">,</span><span class="n">host</span><span class="o">=</span><span class="s">'103.248.102.20'</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="s">'5432'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="p">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">exc_type</span><span class="p">,</span><span class="n">exc_value</span><span class="p">,</span><span class="n">exc_tb</span><span class="p">):</span>
+        <span class="c1">#关闭数据库连接
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">cur</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">conn</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    
+    <span class="k">def</span> <span class="nf">qurey</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#操作查询
+</span>        <span class="k">print</span><span class="p">(</span><span class="s">'查询数据库'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">cur</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">conn</span><span class="p">.</span><span class="n">commit</span><span class="p">()</span>
+
+<span class="k">with</span> <span class="n">MyPgsql</span><span class="p">()</span> <span class="k">as</span> <span class="n">pg</span><span class="p">:</span>
+    <span class="n">pg</span><span class="p">.</span><span class="n">qurey</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h1 id="8contextlib简化上下文管理器">8.contextlib简化上下文管理器</h1>
+
+<p>上面讲定义一个上下文管理器需要<code class="language-plaintext highlighter-rouge">__enter__</code>和<code class="language-plaintext highlighter-rouge">__exit__</code>方法。其实python中给我们提供一个<code class="language-plaintext highlighter-rouge">contextlib</code>库，将一个函数包装成上下文管理器。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">contextlib</span>
+
+<span class="o">@</span><span class="n">contextlib</span><span class="p">.</span><span class="n">contextmanager</span>
+<span class="k">def</span> <span class="nf">file_open</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"file open"</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="p">{}</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"file end"</span><span class="p">)</span>
+
+
+<span class="k">with</span> <span class="n">file_open</span><span class="p">(</span><span class="s">"test.txt"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"file processing"</span><span class="p">)</span>
+
+</code></pre></div></div>
+:ET

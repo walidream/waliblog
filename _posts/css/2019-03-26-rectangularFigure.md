@@ -10,6 +10,7 @@ ghurl_zip:    #github zip下载
 comments: true
 
 post_nav: ["1.html结构","2.css样式","3.script脚本"]
+group_tag: css
 ---
 
 今天用css模拟了一个简单的正负条形图，下面是demo

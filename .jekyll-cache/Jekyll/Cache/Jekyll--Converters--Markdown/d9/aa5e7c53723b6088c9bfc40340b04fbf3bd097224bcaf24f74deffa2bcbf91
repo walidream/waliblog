@@ -1,0 +1,92 @@
+I"�!<p>这小节将记录dom的常用操作，希望对大家有帮助。</p>
+
+<h1 id="1dom绑定事件">1.dom绑定事件</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 功能：dom绑定事件
+ * 参数：element(dom节点)
+ *      event(事件名称)
+ *      handler(回调)
+ *返回：无
+ * */</span>
+<span class="kd">const</span> <span class="nx">on</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">element</span> <span class="o">&amp;&amp;</span> <span class="nx">event</span> <span class="o">&amp;&amp;</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">element</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">};</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">element</span> <span class="o">&amp;&amp;</span> <span class="nx">event</span> <span class="o">&amp;&amp;</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">element</span><span class="p">.</span><span class="nx">attachEvent</span><span class="p">(</span><span class="dl">'</span><span class="s1">on</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">};</span>
+    <span class="p">}</span>
+<span class="p">}();</span>
+
+<span class="cm">/**
+ * 功能：移除dom绑定的事件
+ * 参数：element(dom节点)
+ *      event(事件名称)
+ *      handler(回调函数)
+ * 返回：无
+ * */</span>
+<span class="kd">const</span> <span class="nx">off</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">element</span> <span class="o">&amp;&amp;</span> <span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">element</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">};</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">element</span> <span class="o">&amp;&amp;</span> <span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">element</span><span class="p">.</span><span class="nx">detachEvent</span><span class="p">(</span><span class="dl">'</span><span class="s1">on</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">handler</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">};</span>
+    <span class="p">}</span>
+<span class="p">}();</span>
+
+<span class="cm">/**
+ * 功能：dom绑定一次事件
+ * 参数：element(dom)
+ *      event(事件名称)
+ *      fn(回调函数)
+ * 返回：无
+ * */</span>
+<span class="kd">const</span> <span class="nx">once</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">listener</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">listener</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="nx">off</span><span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">listener</span><span class="p">);</span>
+    <span class="p">};</span>
+    <span class="nx">on</span><span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">listener</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h1 id="2获取dom元素属性">2.获取dom元素属性</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 功能：获取dom元素的宽，高,left,top,bottom,right 距离浏览器边缘
+ * 参数：element(dom)
+ * 返回：Object
+ * */</span>
+<span class="kd">const</span> <span class="nx">domPosition</span> <span class="o">=</span> <span class="nx">dom</span> <span class="o">=&gt;</span><span class="p">{</span>
+    <span class="k">return</span> <span class="nx">dom</span><span class="p">.</span><span class="nx">getBoundingClientRect</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="3获取html根节点fontsize">3.获取html根节点fontsize</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 功能：获取html根节点fontsize
+ * 返回：fontsize
+ * */</span>
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">htmlFontSize</span> <span class="o">=</span> <span class="p">()</span><span class="o">=&gt;</span><span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">fontsize</span> <span class="o">=</span> <span class="nx">getComputedStyle</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">)[</span><span class="dl">'</span><span class="s1">font-size</span><span class="dl">'</span><span class="p">];</span>
+    <span class="k">return</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">fontsize</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+:ET

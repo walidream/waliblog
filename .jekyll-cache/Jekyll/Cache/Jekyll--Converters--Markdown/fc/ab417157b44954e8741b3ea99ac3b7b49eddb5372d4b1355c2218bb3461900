@@ -1,0 +1,62 @@
+I"<h1 id="1property动态属性">1.property动态属性</h1>
+
+<p>python中当我们不想暴露一个变量时，常用的方法是这样的</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span>
+<span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">birthday</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">birthday</span> <span class="o">=</span> <span class="n">birthday</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">__age</span> <span class="o">=</span> 
+
+    <span class="k">def</span> <span class="nf">age</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="p">.</span><span class="n">now</span><span class="p">().</span><span class="n">year</span> <span class="o">-</span> <span class="bp">self</span><span class="p">.</span><span class="n">birthday</span><span class="p">.</span><span class="n">year</span>
+
+
+<span class="n">stu</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">1990</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">25</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">stu</span><span class="p">.</span><span class="n">age</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>通过<code class="language-plaintext highlighter-rouge">stu.age()</code>就可以获取年龄，在日常生活中，年龄就是这个人的属性，但是数据库中存储的数据是出生日期，那能不能让age向访问对象属性来进行访问呢？</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">from datetime import date, datetime
+class Student:
+</span>
+    def __init__(self, birthday):
+        self.birthday = birthday
+
++   @property
+    def age(self):
+        return datetime.now().year - self.birthday.year
+
+
+<span class="p">stu = Student(date(year=1990, month=10, day=25))
+print(stu.age)
+</span></code></pre></div></div>
+
+<p>通过<code class="language-plaintext highlighter-rouge">property</code>装饰器就可以完成，如果要设置属性值，需要用到<code class="language-plaintext highlighter-rouge">属性名.setter</code>装饰器</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">__score</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="o">@</span><span class="nb">property</span>
+    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">__score</span>
+
+    <span class="o">@</span><span class="n">score</span><span class="p">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">__score</span> <span class="o">=</span> <span class="n">value</span>
+
+<span class="n">stu</span> <span class="o">=</span> <span class="n">Student</span><span class="p">()</span>
+
+<span class="n">stu</span><span class="p">.</span><span class="n">score</span> <span class="o">=</span> <span class="mi">18</span>
+<span class="k">print</span><span class="p">(</span><span class="n">stu</span><span class="p">.</span><span class="n">score</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h1 id="2getattr和getattribute魔法函数">2.getattr和getattribute魔法函数</h1>
+
+<p>python中，类的属性没定义时，如果访问对象的属性就会抛错。</p>
+
+:ET

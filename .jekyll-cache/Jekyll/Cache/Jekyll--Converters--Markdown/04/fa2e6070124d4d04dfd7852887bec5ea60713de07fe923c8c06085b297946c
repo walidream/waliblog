@@ -1,0 +1,601 @@
+I"�G<p>在上面一节中，我们把最基本的webpack环境搭建起来了，这一小节，小菜教大家写一个最基本的webpack配置。没有<code class="language-plaintext highlighter-rouge">loader</code>,<code class="language-plaintext highlighter-rouge">module</code>,<code class="language-plaintext highlighter-rouge">resolve</code>,<code class="language-plaintext highlighter-rouge">server</code>模块，只有<code class="language-plaintext highlighter-rouge">entry</code>,<code class="language-plaintext highlighter-rouge">output</code>模块。</p>
+
+<h4 id="文件结构">文件结构</h4>
+
+<pre><code class="language-txt">myProject 
+|-src  
+    |-index.js
+|-dist 
+|-node_modules 
+|-package.json  
+|-webpack.config.js
+|-yarn
+</code></pre>
+
+<h4 id="indexjs">index.js</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">欢迎来到wali博客！</span><span class="dl">"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h1 id="1手写webpack配置">1.手写webpack配置</h1>
+
+<h4 id="webpackconfigjs">webpack.config.js</h4>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">mode</span><span class="p">:</span><span class="dl">'</span><span class="s1">development</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">entry</span><span class="p">:</span><span class="dl">'</span><span class="s1">./src/index.js</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">output</span><span class="p">:{</span>
+    <span class="na">path</span><span class="p">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span><span class="dl">'</span><span class="s1">dist</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="跑一下">跑一下</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npx webpack --colors
+</code></pre></div></div>
+
+<p>　　　　　　　　　　　　　　　　</p>
+
+<p><img src="http://walidream.com:9999/blogImage/webpack/webpack_2.png" alt="ssl" /></p>
+
+<h1 id="2让打包更便捷">2.让打包更便捷</h1>
+
+<p>当打包完成后，在dist目录下会生成一个mian.js。我们最简单webpack打包就做完了。每次都允许<code class="language-plaintext highlighter-rouge">npx webpack --colors</code>命令太麻烦了。<code class="language-plaintext highlighter-rouge">package.json</code>文件中，添加下面代码</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"scripts"</span><span class="p">:{</span><span class="w">
+  </span><span class="nl">"dev"</span><span class="p">:</span><span class="w"> </span><span class="s2">"npx webpack --mode=development ----colors --profile"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"dist"</span><span class="p">:</span><span class="w"> </span><span class="s2">"npx webpack --mode=production"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>添加成功后，我们再次执行</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn run dev
+</code></pre></div></div>
+
+<h1 id="3webpack命令传参">3.webpack命令传参</h1>
+
+<ul>
+  <li><a href="https://webpack.docschina.org/api/cli/" title="https://webpack.docschina.org/api/cli/" target="_blank">webpack 命令行接口参数</a></li>
+</ul>
+
+<h4 id="配置选项">配置选项</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>说明</th>
+      <th>输入类型</th>
+      <th>默认值</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>–config</td>
+      <td>配置文件的路径</td>
+      <td>string</td>
+      <td>webpack.config.js 或 webpackfile.js</td>
+    </tr>
+    <tr>
+      <td>–config-register, -r</td>
+      <td>在 webpack 配置文件加载前先预加载一个或多个模块</td>
+      <td>array</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>–config-name</td>
+      <td>要使用的配置名称</td>
+      <td>string</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>–env</td>
+      <td>当配置文件是一个函数时，会将环境变量传给这个函数</td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>–mode</td>
+      <td>用到的模式，”development” 或 “production” 之中的一个</td>
+      <td>string</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="输出配置">输出配置</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>说明</th>
+      <th>输入类型</th>
+      <th>默认值</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>–output-chunk-filename</td>
+      <td>输出的附带 chunk 的文件名</td>
+      <td>string</td>
+      <td>含有 [id] 的文件名，而不是 [name] 或者 [id] 作为前缀</td>
+    </tr>
+    <tr>
+      <td>–output-filename</td>
+      <td>打包文件的文件名</td>
+      <td>string</td>
+      <td>[name].js</td>
+    </tr>
+    <tr>
+      <td>–output-jsonp-function</td>
+      <td>加载 chunk 时使用的 JSONP 函数名</td>
+      <td>string</td>
+      <td>webpackJsonp</td>
+    </tr>
+    <tr>
+      <td>–output-library</td>
+      <td>以库的形式导出入口文件</td>
+      <td>string</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>–output-library-target</td>
+      <td>以库的形式导出入口文件时，输出的类型</td>
+      <td>string</td>
+      <td>var</td>
+    </tr>
+    <tr>
+      <td>–output-path</td>
+      <td>输出的路径（在公共路径的基础上）</td>
+      <td>string</td>
+      <td>当前目录</td>
+    </tr>
+    <tr>
+      <td>–output-pathinfo</td>
+      <td>加入一些依赖信息的注解</td>
+      <td>boolean</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td>–output-public-path</td>
+      <td>The 输出文件时使用的公共路径</td>
+      <td>string</td>
+      <td>/</td>
+    </tr>
+    <tr>
+      <td>–output-source-map-filename</td>
+      <td>生成的 SourceMap 的文件名</td>
+      <td>string</td>
+      <td>[name].map or [outputFilename].map</td>
+    </tr>
+    <tr>
+      <td>–build-delimiter</td>
+      <td>在构建输出之后，显示的自定义文本</td>
+      <td>string</td>
+      <td>默认字符串是 null。你可以提供一个 === Build done === 这样的字符串</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="debug-配置">Debug 配置</h4>
+
+<p>以下这些配置可以帮助你在 Webpack 编译过程中更好地 debug</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>说明</th>
+      <th>输入类型</th>
+      <th>默认值</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>–debug</td>
+      <td>把 loader 设置为 debug 模式</td>
+      <td>boolean</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td>–devtool</td>
+      <td>为打包好的资源定义 [source map 的类型]</td>
+      <td>string</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>–progress</td>
+      <td>打印出编译进度的百分比值</td>
+      <td>boolean</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td>–display-error-details</td>
+      <td>展示错误细节</td>
+      <td>boolean</td>
+      <td>false</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="模块配置">模块配置</h4>
+
+<p>这些配置可以用于绑定 Webpack 允许的模块。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>说明</th>
+      <th>用法</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>–module-bind</td>
+      <td>为 loader 绑定一个文件扩展</td>
+      <td>–module-bind js=babel-loader</td>
+    </tr>
+    <tr>
+      <td>–module-bind-post</td>
+      <td>为 post loader 绑定一个文件扩展</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>–module-bind-pre</td>
+      <td>为 pre loader 绑定一个文件扩展</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="watch选项">Watch选项</h4>
+
+<p>这些配置可以用于观察依赖文件的变化，一旦有变化，则可以重新执行构建流程</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>–watch, -w</td>
+      <td>观察文件系统的变化</td>
+    </tr>
+    <tr>
+      <td>–watch-aggregate-timeout</td>
+      <td>指定一个毫秒数，在这个时间内，文件若发送了多次变化，会被合并</td>
+    </tr>
+    <tr>
+      <td>–watch-poll</td>
+      <td>轮询观察文件变化的时间间隔（同时会打开轮询机制）</td>
+    </tr>
+    <tr>
+      <td>–watch-stdin, –stdin</td>
+      <td>当 stdin 关闭时，退出进程</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="性能优化配置">性能优化配置</h4>
+
+<p>在生产环境的构建时，这些配置可以用于调整的一些性能相关的配置</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>说明</th>
+      <th>使用的插件</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>–optimize-max-chunks</td>
+      <td>限制 chunk 的数量</td>
+      <td><a href="https://webpack.docschina.org/plugins/limit-chunk-count-plugin" title="https://webpack.docschina.org/plugins/limit-chunk-count-plugin">LimitChunkCountPlugin</a></td>
+    </tr>
+    <tr>
+      <td>–optimize-min-chunk-size</td>
+      <td>限制 chunk 的最小体积</td>
+      <td><a href="https://webpack.docschina.org/plugins/min-chunk-size-plugin" title="https://webpack.docschina.org/plugins/min-chunk-size-plugin">MinChunkSizePlugin</a></td>
+    </tr>
+    <tr>
+      <td>–optimize-minimize</td>
+      <td>压缩混淆 javascript，并且把 loader 设置为 minimizing</td>
+      <td><a href="https://webpack.docschina.org/plugins/terser-webpack-plugin/" title="https://webpack.docschina.org/plugins/terser-webpack-plugin/">TerserPlugin</a> &amp; <a href="https://webpack.docschina.org/plugins/loader-options-plugin/" title="https://webpack.docschina.org/plugins/loader-options-plugin/">LoaderOptionsPlugin</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="resolve配置">Resolve配置</h4>
+
+<p>这些配置可以用于设置 webpack resolver 时使用的别名(alias)和扩展名(extension)</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>说明</th>
+      <th>示例</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>–resolve-alias</td>
+      <td>指定模块的别名</td>
+      <td>–resolve-alias jquery-plugin=jquery.plugin</td>
+    </tr>
+    <tr>
+      <td>–resolve-extensions</td>
+      <td>指定需要被处理的文件的扩展名</td>
+      <td>–resolve-extensions .es6 .js .ts</td>
+    </tr>
+    <tr>
+      <td>–resolve-loader-alias</td>
+      <td>最小化 JavaScript，并且将 loader 切换到最简</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="统计数据配置">统计数据配置</h4>
+
+<p>以下选项用于配置 Webpack 在控制台输出的统计数据，以及这些数据的样式</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>说明</th>
+      <th>type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>–color, –colors</td>
+      <td>强制在控制台开启颜色 [默认：仅对 TTY 输出启用]</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–no-color, –no-colors</td>
+      <td>强制在控制台关闭颜色</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–display</td>
+      <td>选择显示预设(verbose - 繁琐, detailed - 细节, normal - 正常, minimal - 最小, errors-only - 仅错误, none - 无; 从 webpack 3.0.0 开始)</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <td>–display-cached</td>
+      <td>在输出中显示缓存的模块</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–display-cached-assets</td>
+      <td>在输出中显示缓存的 assets</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–display-chunks</td>
+      <td>在输出中显示 chunks</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–display-depth</td>
+      <td>显示从入口起点到每个模块的距离</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–display-entrypoints</td>
+      <td>在输出中显示入口文件</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–display-error-details</td>
+      <td>显示详细的错误信息</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–display-exclude</td>
+      <td>在输出中显示被排除的文件</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–display-max-modules</td>
+      <td>–display-max-modules</td>
+      <td>number</td>
+    </tr>
+    <tr>
+      <td>–display-modules</td>
+      <td>在输出中显示所有模块，包括被排除的模块</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–display-optimization-bailout</td>
+      <td>作用域提升回退触发器(Scope hoisting fallback trigger)（从 webpack 3.0.0 开始）</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–display-origins</td>
+      <td>在输出中显示最初的 chunk</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–display-provided-exports</td>
+      <td>显示有关从模块导出的信息</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–display-reasons</td>
+      <td>显示模块包含在输出中的原因</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–display-used-exports</td>
+      <td>显示模块中被使用的接口（Tree Shaking）</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–hide-modules</td>
+      <td>隐藏关于模块的信息</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>–sort-assets-by</td>
+      <td>对 assets 列表以某种属性排序</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <td>–sort-chunks-by</td>
+      <td>对 chunks 列表以某种属性排序</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <td>–sort-modules-by</td>
+      <td>对模块列表以某种属性排序</td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <td>–verbose</td>
+      <td>显示更多信息</td>
+      <td>boolean</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="高级配置">高级配置</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>参数</th>
+      <th>说明</th>
+      <th>用法</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>–bail</td>
+      <td>一旦发生错误，立即终止</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>–cache</td>
+      <td>开启缓存 [watch 时会默认打开]</td>
+      <td>–cache=false</td>
+    </tr>
+    <tr>
+      <td>–define</td>
+      <td>定义 bundle 中的任意自由变量，查看 shimming</td>
+      <td>–define process.env.NODE_ENV=”‘development’”</td>
+    </tr>
+    <tr>
+      <td>–hot</td>
+      <td>开启模块热替换</td>
+      <td>–hot=true</td>
+    </tr>
+    <tr>
+      <td>–labeled-modules</td>
+      <td>开启模块标签 [使用 LabeledModulesPlugin]</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>–plugin</td>
+      <td>加载某个插件</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>–prefetch</td>
+      <td>预加载某个文件</td>
+      <td>–prefetch=./files.js</td>
+    </tr>
+    <tr>
+      <td>–provide</td>
+      <td>在所有模块中将这些模块提供为自由变量，查看 shimming</td>
+      <td>–provide jQuery=jquery</td>
+    </tr>
+    <tr>
+      <td>–records-input-path</td>
+      <td>记录文件的路径（读取）</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>–records-output-path</td>
+      <td>记录文件的路径（写入）</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>–records-path</td>
+      <td>记录文件的路径</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>–target</td>
+      <td>目标的执行环境</td>
+      <td>–target=’node’</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="profiling">Profiling</h4>
+
+<p>–profile 选项捕获编译时每个步骤的时间信息，并且将这些信息包含在输出中</p>
+
+<pre><code class="language-txt">webpack --profile
+
+⋮
+[0] ./src/index.js 90 bytes {0} [built]
+    factory:22ms building:16ms = 38ms
+</code></pre>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">factory</code>: 收集模块元数据的时间（例如解析文件名）</li>
+  <li><code class="language-plaintext highlighter-rouge">building</code>: 构建模块的时间（例如加载器和解析</li>
+  <li><code class="language-plaintext highlighter-rouge">dependencies</code>: 时间来识别和连接模块的依赖项</li>
+</ul>
+
+<p>与–progress配对， - profile可让您深入了解编译中的哪一步需要多长时间。这可以帮助您以更明智的方式优化构建。</p>
+
+<pre><code class="language-txt">webpack --progress --profile
+
+30ms building modules
+1ms sealing
+1ms optimizing
+0ms basic module optimization
+1ms module optimization
+1ms advanced module optimization
+0ms basic chunk optimization
+0ms chunk optimization
+1ms advanced chunk optimization
+0ms module and chunk tree optimization
+1ms module reviving
+0ms module order optimization
+1ms module id optimization
+1ms chunk reviving
+0ms chunk order optimization
+1ms chunk id optimization
+10ms hashing
+0ms module assets processing
+13ms chunk assets processing
+1ms additional chunk assets processing
+0ms recording
+0ms additional asset processing
+26ms chunk asset optimization
+1ms asset optimization
+6ms emitting
+⋮
+</code></pre>
+
+:ET
