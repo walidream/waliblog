@@ -4,13 +4,13 @@ title:  css3 模拟正负条形图 #标题
 tagline: css3 模拟正负条形图
 category: css      #分类
 author: wali    #作者
-tag: input     #标签
+tag: css3     #标签
 ghurl:        #github url
 ghurl_zip:    #github zip下载
 comments: true
 
 post_nav: ["1.html结构","2.css样式","3.script脚本"]
-group_tag: css
+group_tag: css 相关
 ---
 
 今天用css模拟了一个简单的正负条形图，下面是demo

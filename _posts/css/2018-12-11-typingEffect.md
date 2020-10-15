@@ -4,13 +4,13 @@ title:  css3 打字渐变效果 #标题
 tagline: css3打字效果，字体颜色渐变
 category: css      #分类
 author: wali    #作者
-tag: animation     #标签
+tag: css3     #标签
 ghurl:        #github url
 ghurl_zip:    #github zip下载
 comments: true
 
 post_nav: ["1.html结构","2.css样式"]
-group_tag: css
+group_tag: css 相关
 ---
 
 小菜今天看到网上有个css3的打字动画，觉得不错就给收藏下来了。下面是demo

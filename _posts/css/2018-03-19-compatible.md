@@ -4,14 +4,16 @@ title:  PC端适配屏幕尺寸 #标题
 tagline: 适配1920、1366分辨率
 category: css      #分类
 author: wali    #作者
-tag: px     #标签
+tag: css3     #标签
 ghurl:        #github url
 ghurl_zip:    #github zip下载
 comments: true
 
-post_nav: false
-group_tag: css
+post_nav: ["1.html结构","2.css样式"]
+group_tag: css 相关
 ---
+
+
 
 小菜今天聊聊PC端适配，之前写了很多项目都是移动端的，移动端适配用`flexible.js`挺简单的，别人帮我们做好了。如果不懂请戳 [使用Flexible实现手淘H5页面的终端适配](https://www.w3cplus.com/mobile/lib-flexible-for-html5-layout.html "https://www.w3cplus.com/mobile/lib-flexible-for-html5-layout.html"){:target="_blank"}。这里讲讲PC端如何实现适配。PC没有`dpr`只有`像素`这个概念，实现起来就比移动端轻松了许多。
 
