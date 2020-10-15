@@ -1,4 +1,4 @@
-I"W�<p>　　这个一个菜鸟级jekyll教程，为什么说菜鸟级，因为我就是菜鸟。</p>
+I"��<p>　　这个一个菜鸟级jekyll教程，为什么说菜鸟级，因为我就是菜鸟。</p>
 
 <p>　　从小菜个人角度出发，觉得用jekyll搭建一个简单的博客，一般不会太难，因为网上教程太多。但是要根据自己需求来做一个博客这就比较复杂，而且耗费时间。写这篇帖子的目的就是记录下我遇到的坑，希望能帮助正在看帖子的你。好了，废话就不多说了，直接进入正题吧！我去，本想开始正题呢，就遇到两个小坑，看来是出师不利啊！用Markdown编写博客换行和缩进是个麻烦事，google下(需要能够翻墙)，看到帖子还是蛮多的，但是解决都比较复杂。有兴趣的朋友就去搜搜。稍后会在我的常用技巧中讲到。</p>
 
@@ -37,6 +37,10 @@
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//点击RubyGems下载到本地后，打开git Bash Here 命令窗口
 $ cd 进入到刚才解压的文件夹中
 $ ruby setup.rb
+或者
+sudo ruby ./setup.rb
+
+gem -v
 </code></pre></div></div>
 
 <ul>
@@ -47,6 +51,15 @@ $ ruby setup.rb
 </code></pre></div></div>
 
 <p>至此所有的准备工作都完成了。下面就正式开场了，不过小菜还是建议新手跟着上面阮一峰的帖子自己走一遍，那是博客最基础的功能，文件结构也稍微能简单点，适合新手上手。当然如果你喜欢挑战那么请直接上车吧！（我是老实人，所以跟着阮一峰教程走了一遍，其实也花不了几分钟）</p>
+
+<p>主要：在mac上安装可能不成功，可将文件下载下来在本地手动安装</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mac 操作
+
+brew install ruby
+
+gem install -n /usr/local/bin jekyll.4.1.1.gem
+</code></pre></div></div>
 
 <h4 id="02-跑通博客">02. 跑通博客</h4>
 

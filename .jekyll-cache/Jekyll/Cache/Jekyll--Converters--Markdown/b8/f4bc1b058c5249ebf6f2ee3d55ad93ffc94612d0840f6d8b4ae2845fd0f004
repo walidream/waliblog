@@ -1,0 +1,441 @@
+I"�<p>　　这个一个菜鸟级jekyll教程，为什么说菜鸟级，因为我就是菜鸟。</p>
+
+<p>　　从小菜个人角度出发，觉得用jekyll搭建一个简单的博客，一般不会太难，因为网上教程太多。但是要根据自己需求来做一个博客这就比较复杂，而且耗费时间。写这篇帖子的目的就是记录下我遇到的坑，希望能帮助正在看帖子的你。好了，废话就不多说了，直接进入正题吧！我去，本想开始正题呢，就遇到两个小坑，看来是出师不利啊！用Markdown编写博客换行和缩进是个麻烦事，google下(需要能够翻墙)，看到帖子还是蛮多的，但是解决都比较复杂。有兴趣的朋友就去搜搜。稍后会在我的常用技巧中讲到。</p>
+
+<p>　　从小菜需求出发，这个博客建成要有以下几个功能：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 1. 一个简单的博客（就是能够完整跑通整个流程）
+ 2. 绑定自己的域名
+ 3. 添加分页（帖子太多展示不下怎么办？）
+ 4. 打标签添、加分类（帖子太乱也不容易查找？）
+ 5. 添加访问量（给站点和每篇帖子添加访问量）
+ 6. 添加评论（没有评论怎么能看到的大家的批评呢？）
+ 7. html、scss压缩 （减少文件大小，是个小优化）
+ 8. 静态资源加速
+ 9. 添加小绿标
+</code></pre></div></div>
+
+<p>其实上面有几条不是一开始就想到的，只不过在做的时候临时加的功能，哎，纯属给自己找事！</p>
+
+<h1 id="1一个简单的博客">1.一个简单的博客</h1>
+
+<p>在github上搭建一个博客，那肯定在github上操作过，稍微了解过github。要是没了解，建议去 <a href="http://www.github.com" title="github">github</a> 注册个账号了解了解,练练手,如果能熟练使用git命令那就更好了。搭建一个 <code class="language-plaintext highlighter-rouge">简单的博客</code> 我是参考这两篇帖子,向前辈致敬。</p>
+
+<ul>
+  <li>知乎上的帖子 <a href="https://www.zhihu.com/question/30018945?sort=created" title="https://www.zhihu.com/question/30018945?sort=created">https://www.zhihu.com/question/30018945?sort=created</a></li>
+  <li>阮一峰的贴子 <a href="http://www.ruanyifeng.com/blog/2012/08/blogging_with_jekyll.html" title="http://www.ruanyifeng.com/blog/2012/08/blogging_with_jekyll.html">http://www.ruanyifeng.com/blog/2012/08/blogging_with_jekyll.html</a> 相信你也能独立完成这个搭建过程</li>
+</ul>
+
+<h4 id="01-安装流程">01. 安装流程</h4>
+
+<ul>
+  <li>必须要有github账号，本地有github环境 （跳过了啊）</li>
+  <li>用jekyll搭建博客（那你也得了解jekyll是什么吧？自己动手哦）windows 下要安装<a href="http://www.ruby-lang.org/zh_cn/" title="了解ruby">ruby</a> 来使用jekyll，可以点击 <a href="https://link.zhihu.com/?target=http%3A//rubyinstaller.org/" title="ruby install">ruby insatll</a>来进行安装。按 <code class="language-plaintext highlighter-rouge">win + R</code> 键，输入 <code class="language-plaintext highlighter-rouge">cmd</code>回车，打开windows命令窗口 输入 ruby -v 如果出现版本号，那就证明安装成功了</li>
+  <li>安装ruby之后就要安装 <a href="https://link.zhihu.com/?target=https%3A//rubygems.org/pages/download" title="RubyGems">RubyGems</a>，gem是ruby的包管理系统，功能类似npm或yarn包管理器，可以用gem很方便的在本地安装ruby应用。</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//点击RubyGems下载到本地后，打开git Bash Here 命令窗口
+$ cd 进入到刚才解压的文件夹中
+$ ruby setup.rb
+或者
+sudo ruby ./setup.rb
+
+gem -v
+</code></pre></div></div>
+
+<ul>
+  <li>安装好了 <code class="language-plaintext highlighter-rouge">gem</code> 之后，剩下的就是安装 <code class="language-plaintext highlighter-rouge">jekyll</code></li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ gem install jekyll  
+</code></pre></div></div>
+
+<p>至此所有的准备工作都完成了。下面就正式开场了，不过小菜还是建议新手跟着上面阮一峰的帖子自己走一遍，那是博客最基础的功能，文件结构也稍微能简单点，适合新手上手。当然如果你喜欢挑战那么请直接上车吧！（我是老实人，所以跟着阮一峰教程走了一遍，其实也花不了几分钟）</p>
+
+<p>主要：在mac上安装可能不成功，可将文件下载下来在本地手动安装</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mac 操作
+
+brew install ruby
+
+sudo ruby ./steup.rb (安装RubyGems)
+
+# gem 安装本地文件
+gem install -n /usr/local/bin jekyll.4.1.1.gem
+</code></pre></div></div>
+
+<h4 id="02-跑通博客">02. 跑通博客</h4>
+
+<ul>
+  <li>登录<a href="http://www.github.com/" title="github">github</a>，在github中新建一个仓库，我的仓库名waliblog，建好之后克隆下仓库地址</li>
+  <li>看你自己想把博客放在本地哪里了，这里假设放在 <code class="language-plaintext highlighter-rouge">h</code>盘 ，打开<code class="language-plaintext highlighter-rouge">git Bash Here</code>命令窗口，</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cd h:
+$ makdir github
+$ cd github
+$ git clone '刚才复制的github仓库地址' 
+</code></pre></div></div>
+
+<p>广告小插曲，如果你还不熟悉git命令操作，建议多练习下，git命令操作还是蛮好的。我贴出自己学习git教程帖子，仅供参考，向前辈致敬。</p>
+
+<ul>
+  <li>git官方文档[中文] <a href="https://git-scm.com/book/zh/v2" title="https://git-scm.com/book/zh/v2">https://git-scm.com/book/zh/v2</a></li>
+  <li>阮一峰的贴子 <a href="http://www.ruanyifeng.com/blog/2015/12/git-cheat-sheet.html" title="http://www.ruanyifeng.com/blog/2015/12/git-cheat-sheet.html">http://www.ruanyifeng.com/blog/2015/12/git-cheat-sheet.html</a> 小菜觉得这个教程可以当成手册来用，最上面git操作图非常形象的描绘出git的操作流程</li>
+  <li>廖雪峰的官方网站 <a href="https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000" title="https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000">https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000</a> 这篇教程我觉得也很好，大神一般都是深入浅出。</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//注意：'gh-pages' 分支名称不能错（如果不知道，那就是功课没做好，上篇阮一峰帖子也提到过）
+$ git checkout -b 'gh-pages'  #新建一个分支，并切换到该分支
+$ touch index.html  #向index.html 随便输入内容保存
+$ git add .
+$ git commit . -m '测试'
+$ git push origin gh-pages
+</code></pre></div></div>
+<p>jekyll模板风格 <a href="http://jekyllthemes.org/" title="jekyll themes">jekyll themes</a></p>
+
+<p>去github自己申请的仓库gh-pages 分支查看，看看有没有提交上来，如果提交上来了，那就说明本地和线上通了。点击 <a href="http://jekyllthemes.org/" title="jekyll themes">jekyll themes</a> 这里有很多模板，选择一个你喜欢的模板风格。(我用的是Cayman Blog Theme这个模板)，下载模板，解压后把所有文件(不包含最外层文件夹)拷贝到 <code class="language-plaintext highlighter-rouge">h/github/'仓库名'</code>中，记得把之前index.html删除掉</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ jekyll server  #在本地浏览器输入http://localhost:4000 就可以查看模板
+$ git add .
+$ git commit . -m '测试'
+$ git pull origin gh-pages   # 从服务器拉文件(这一步其实可以不做，但是在多人协同开发中就比较重要，因为不知道有没有冲突)
+$ git push origin gh-pages   # 提交文件到服务器上去
+</code></pre></div></div>
+<p>然后在github -&gt;waliblog[仓库] -&gt; gh-pages[分支] -&gt; [settings] -&gt; GitHub Pages -&gt; 有一个小对勾，后面是一个地址，点击它就可以看到你的博客主页了。</p>
+
+<p><img src="http://localhost:4002/assets/image/blog/blog_easy_01.png" alt="就是这样" /></p>
+
+<h1 id="2绑定自己的域名">2.绑定自己的域名</h1>
+
+<p>绑定自由域名前，必须要有自己的域名，如果没有那就去买个，建议去万网买个就是阿里的那个，这算不算给阿里拉了波生意呢。我自己是在万网买的，温馨提醒下，如果要购买后缀为.com域名那个是要实名认证的，可能会有点麻烦，如果只是兴趣来潮小菜建议买一个便宜点的域名，我自己之前就买了2元的。</p>
+
+<p>购买域名后，登录到后台管理有个 [域名与网站] –&gt; [域名] –&gt; [选择自己的域名，点击解析] –&gt; [添加解析] –&gt; 记录类型A　记录值是：192.30.252.153 –&gt;确定</p>
+
+<p>在重复之前的操作 添加一条解析记录 记录类型A 记录值是：192.30.252.154 -&gt; 确定，一切完成后就是这样。
+<img src="http://localhost:4002/assets/image/blog/blog_domian.png" alt="向这样" /></p>
+
+<p>添加成功后，我们在本地仓库(repo)，”repo”就是指仓库]被有道给坑惨了，翻译成回购，心酸泪就在这不说了，后面有机会提到。在本地仓库(repo)的根目录下创建CNAME文件，注意没有后缀，里面写上你刚刚申请的域名，不要带www。例如: example.com</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ git add . 
+$ git commit . -m '绑定私有域名'
+$ git pull origin gh-pages
+$ git push origin gh-pages  #以后就不写在4条命令了，本地提交到线上也就这4条
+</code></pre></div></div>
+
+<p>在github上 –&gt; [repo] –&gt; [gh-pages] –&gt; [settings] –&gt;[Custom domain]将自己申请的域名填入，注意不要带www
+<img src="http://localhost:4002/assets/image/blog/blog_domain_01.png" alt="自定义域名" /></p>
+
+<p>保存后，看到小对勾就说明ok了。在浏览器上输入 example.com 回车，看看会不会打开。能够打开就说明绑定私有域名完成了。这里有个小坑，浏览器输入<code class="language-plaintext highlighter-rouge">https://example.com</code> 发现谷歌提示不安全。个人猜测，在绑定域名时，输入了github提供的两个IP,其中有一个IP应该是https协议，当访问hppts://example.com时，用了github ssl证书，恰巧谷歌就是在今年实施新规，（即HTTP站点）打上“不安全”的标签。那么如何解决呢？在下面会写到。你可以直接按照最后一个功能教程添加小绿标，反正这中间又没有什么联系。</p>
+
+<h3 id="简单的热身">简单的热身</h3>
+
+<p>从这一步开始就稍微有点难度，我们之前只是跑通了整个流程，模板css，js 等都是他人的需求，现在要根据自己的需求去慢慢改了。小菜是先改的css，css改动不会造成编译时错误，顶多就是一堆样式问题，比较好着手，小菜用的<a href="http://jekyllthemes.org/themes/jekyll-theme-cayman-blog/" title="Cayman Blog Theme">Cayman Blog Theme</a>模板，这个模板用到了sass，如果你不知道<code class="language-plaintext highlighter-rouge">sass</code>，<a href="https://www.sass.hk/" title="sass">点击sass传送门</a>，sass是css的预处理器，跟less差不多，但是比less功能强大，sass中可以使用变量 、for循环、if判断、函数、宏等等，用sass来处理css，不管开发还是维护都变得很简单。后面有机会我会放上自己sass库，就是收集日常的样式，动画，免去新建项目时自己重复写样式的工作。</p>
+
+<p>既然是要改造，那么肯定得需要了解<code class="language-plaintext highlighter-rouge">jekyll</code>和<code class="language-plaintext highlighter-rouge">liquid</code>，想要更深入的了解，去官网肯定是没错。</p>
+
+<ul>
+  <li>jekyll官方网站(英文) <a href="https://jekyllrb.com/" title="https://jekyllrb.com/">https://jekyllrb.com/</a></li>
+  <li>jekyll网站(中文) <a href="http://jekyllcn.com/docs/quickstart/" title="http://jekyllcn.com/docs/quickstart/">http://jekyllcn.com/docs/quickstart/</a></li>
+  <li>liquid官方网站(英文) <a href="http://shopify.github.io/liquid/basics/introduction/" title="http://shopify.github.io/liquid/basics/introduction/">http://shopify.github.io/liquid/basics/introduction/</a></li>
+  <li>liquid网站(中文) <a href="https://liquid.bootcss.com/basics/types/" title="https://liquid.bootcss.com/basics/types/">https://liquid.bootcss.com/basics/types/</a></li>
+</ul>
+
+<p>这里给出了英文和中文文档地址，如果是实力派那就看英文，如果跟小菜一样，英文太水，那就看中文文档 (好好看文档哦)，这里感谢一下翻译英文文档的同志。</p>
+
+<h4 id="文件结构">文件结构</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/
+|-- .sass-cache  #sass缓存
+|-- _drafts    #草稿箱
+|-- _includes  #可以复用的模板
+|-- _layouts   #布局模板
+|-- _plugins   #插件 
+|-- _posts     #帖子文件，以后写的文章都要放在这里
+|-- _sass      #sass文件，个人用来存放sass组件
+     |-- base
+         |--- _reset.scss
+     |-- button.scss 
+|-- _site      #站点，一旦 Jekyll 完成转换，就会将生成的页面放在这里（默认）。最好将这个目录放进你的 .gitignore 文件中
+|-- assets     #存放静态资源文件，一般是img,css,iconfont,js等
+      |-- css	
+           |-- test.scss	  
+|-- category   #个人添加的，后期用来分类文章
+|-- script   
+|-- .gitignore  #在git提交时忽略的文件或文件夹
+|-- .travis.yml
+|-- _config.yml #保存配置数据。很多配置选项都可以直接在命令行中进行设置，但是如果你把那些配置写在这儿，你就不用非要去记住那些命令了。
+|-- 404.md   #404 后缀md 就是用md语法写的文件，最后就转成html文件
+|-- about.md 
+|-- CNAME    #添加自己域名时已经见过
+|-- CODE_OF_CONDUCT.md
+|-- contact.md
+|-- CONTRIBUTING.md
+|-- explain.txt  #小菜的说明文档(给自己看的)
+|-- favicon.ico  
+|-- Gemfile 
+|-- Gemfile.lock
+|-- index.html
+|-- jekyll-theme-cayman-blog.gemspec
+|-- LICENSE  #协议
+|-- README.md  #github说明文档
+</code></pre></div></div>
+
+<p>这里提下，修改sass前阅读下 jekyll<a href="http://jekyllcn.com/docs/assets/" title="sass处理">sass处理</a> 这里简单举个例子 assets/css/test.scss 要使用 _sass/button.scss 组件，那么在assets/css/test.scss这样写</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="o">---</span>
+<span class="o">---</span>
+
+<span class="vi">@import</span> <span class="s1">'botton'</span><span class="p">;</span></code></pre></figure>
+
+<p>注意：文件的编码格式</p>
+
+<h1 id="3添加分页">3.添加分页</h1>
+
+<p>分页不是很难，jekyll官方文档就有，点击<a href="http://jekyllcn.com/docs/pagination/" title="jekyll分页">jekyll分页</a>。还参考了一片帖子，在此奉上。</p>
+
+<ul>
+  <li>白召策的博客 <a href="http://bamzc.top/2016/11/03/jekyll-paginate">http://bamzc.top/2016/11/03/jekyll-paginate</a></li>
+</ul>
+
+<p>不过他的分类分页我是没实现，你可以尝试下，如果分类分页成功请留言给我。</p>
+
+<p><code class="language-plaintext highlighter-rouge">在 Jekyll 3 中，需要在 gems 中安装 jekyll-paginate 插件，并添加到你的 Gemfile 和 _config.yml 中。在 Jekyll 2 中，分页是标准功能。</code>官方文档中这句话很重要，这里面说了这么几点</p>
+
+<blockquote>
+  <ul>
+    <li>jekyll 3 需要在 gems 中安装 jekyll-paginate    #小菜不知道怎么安装，见识少是硬伤啊！</li>
+    <li>添加到 Gemfile   #居然忽视了这个单词，导致碰壁多次，实在是该打</li>
+    <li>添加到 _config.yml</li>
+  </ul>
+</blockquote>
+
+<p>配置添加</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ jekyll -v    #查看jekyll版本 3以上就按下面操作
+
+1. _config.yml 配置添加
+	gems: [jekyll-paginate,pager,pagination]   #添加插件
+	paginate: 7   #开启分页
+	paginate_path: "blog/page:num"  #首页分页
+
+2. Gemfile 配置添加
+	gem 'jekyll-paginate', '~&gt; 1.1'
+	gem 'pager', '~&gt; 1.0', '&gt;= 1.0.1'
+	gem 'pagination', '~&gt; 0.3.3'	
+
+3. 在`根目录`新建_plugins文件夹（有就不用了）放入 pagination.rb、pager.rb两个文件，
+地址：https://github.com/Bamzc/jekyll-paginate-plugin
+	
+
+</code></pre></div></div>
+<p>好了之后运行下<code class="language-plaintext highlighter-rouge">jekyll server</code> 没报错就继续。在<a href="http://jekyllcn.com/docs/pagination/" title="jekyll分页">jekyll分页</a> 复制最后一段分页代码，然后重新运行下就好。样式的自己去调喽！官方文档还是很全的的，我也没有什么要啰嗦的。</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+{% if paginator.total_pages &gt; 1 %}
+&lt;div class="pagination"&gt;
+  {% if paginator.previous_page %}
+    &lt;a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}"&gt;&amp;laquo; Prev&lt;/a&gt;
+  {% else %}
+    &lt;span&gt;&amp;laquo; Prev&lt;/span&gt;
+  {% endif %}
+
+  {% for page in (1..paginator.total_pages) %}
+    {% if page == paginator.page %}
+      &lt;em&gt;{{ page }}&lt;/em&gt;
+    {% elsif page == 1 %}
+      &lt;a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}"&gt;{{ page }}&lt;/a&gt;
+    {% else %}
+      &lt;a href="{{ site.paginate_path | prepend: site.baseurl | replace: '//', '/' | replace: ':num', page }}"&gt;{{ page }}&lt;/a&gt;
+    {% endif %}
+  {% endfor %}
+
+  {% if paginator.next_page %}
+    &lt;a href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}"&gt;Next &amp;raquo;&lt;/a&gt;
+  {% else %}
+    &lt;span&gt;Next &amp;raquo;&lt;/span&gt;
+  {% endif %}
+&lt;/div&gt;
+{% endif %}
+
+</code></pre></div></div>
+
+<h1 id="4打标签添加分类">4.打标签、添加分类</h1>
+
+<p>添加分类的思路是在每篇帖子上添加一个标签，这样就区分开了每个帖子</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/
+|-- _posts
+     |--javascript
+        |-- 2017-05-12-java.md  #帖子命名就不说了，要按要求来
+        |-- 2017-05-13-jq插件.md  
+     |--- jekyll 	
+</code></pre></div></div>
+
+<p>每篇帖子开头在 — 之间是元信息，这里可以定义变量，例如 2017-05-12-java.md</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---
+layout: post  #布局
+title: 菜鸟级jekyll教程(1)   #标题
+tagline: 用jekyll在github上搭建一个属于自己的博客
+category: javascript      #分类
+---
+</code></pre></div></div>
+<p>这里重点就看 <code class="language-plaintext highlighter-rouge">category</code> 后面写着要分类的名称</p>
+
+<p>接下来在<code class="language-plaintext highlighter-rouge">根目录</code>新建一个文件夹，名字随意起了，这里<code class="language-plaintext highlighter-rouge">category</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/
+|--- category 
+      |--- javascript
+            |-- index.md 
+      |--- jekyll
+            |-- index.md
+</code></pre></div></div>
+<p>这里的文件结构要和 <code class="language-plaintext highlighter-rouge">_posts</code> 文件结构对应起来，只是在每个分类下面建立一个index.md文件，这个页面就是分类文章的列表，样式布局都要自己搞了，自己动手，丰衣足食。</p>
+
+<p>重新运行<code class="language-plaintext highlighter-rouge">jekyll server</code>后，去查看_site -&gt; category -&gt; javascript文件夹有没有生成 index.html文件，有那就完成了</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+&lt;div class="article-cat google-shadow"&gt;
+    &lt;h3 class="article-title"&gt;&lt;span&gt;&lt;i class="iconfont wali-icon-fenlei"&gt;&lt;/i&gt;&lt;/span&gt; 文章分类&lt;/h3&gt;
+    &lt;div class="article-content"&gt;
+       {% assign cat = page.url | split: "/" | last %}
+       {% for category in site.categories %}
+          {% assign pcat = category | first %}
+          {% if pcat == cat %}
+          &lt;a href="/category/{{ category | first }}/" class="wali-tags wali-tags-active"&gt;{{ category | first }} ({{ category | last | size }})&lt;/a&gt;
+          {% else %}
+          &lt;a href="/category/{{ category | first }}/" class="wali-tags"&gt;{{ category | first }} ({{ category | last | size }})&lt;/a&gt;
+          {% endif %}
+      {% endfor %}
+    &lt;/div&gt;
+&lt;/div&gt;
+
+</code></pre></div></div>
+<h1 id="5添加访问量">5.添加访问量</h1>
+
+<p>这篇博客写的很详细，我也是照着教程一步到位，相信你也可以的。文档很详细，我也就没有必要把人家的东西腾过来，还是非常感谢博主的。</p>
+
+<ul>
+  <li>咀嚼之味 <a href="http://jerryzou.com/posts/introduction-to-hit-kounter/" title="http://jerryzou.com/posts/introduction-to-hit-kounter/">http://jerryzou.com/posts/introduction-to-hit-kounter/</a></li>
+</ul>
+
+<h1 id="6添加评论">6.添加评论</h1>
+
+<p>小菜在网上搜了搜，发现很多帖子都建议用多说，不过小菜用的时候，多说评论在国内已经关闭，国内可以用畅言（必须是备案的域名）、友言等等。小菜选择Gitment，Gitment作者实现的一款基于 GitHub Issues 的评论系统搭建出来。</p>
+
+<ul>
+  <li>孙士权的个人博客 <a href="https://imsun.net/posts/gitment-introduction/" title="https://imsun.net/posts/gitment-introduction/">https://imsun.net/posts/gitment-introduction/</a></li>
+</ul>
+
+<p>文档也写的很好，毕竟是作者嘛！本来是没小菜什么事情的，但是小菜还是遇到了点问题，这里主要说下遇到的问题。</p>
+
+<p>如果你没有OAuth Application ，那么点击<a href="https://github.com/settings/applications/new" title="https://github.com/settings/applications/new">注册OAuth application</a>注册一个，你的博客域名是 http://example.com</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Homepage URL 
+http://example.com
+
+Authorization callback URL
+http://example.com
+</code></pre></div></div>
+<p>我个人把它两填成一样的。保存后，你会得到一个 client ID 和一个 client secret，这个将被用于之后的用户登录。然后就将下面代码复制，补充参数即可</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="dl">"</span><span class="s2">container</span><span class="dl">"</span><span class="o">&gt;&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span><span class="o">&lt;</span><span class="nx">link</span> <span class="nx">rel</span><span class="o">=</span><span class="dl">"</span><span class="s2">stylesheet</span><span class="dl">"</span> <span class="nx">href</span><span class="o">=</span><span class="dl">"</span><span class="s2">https://imsun.github.io/gitment/style/default.css</span><span class="dl">"</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="dl">"</span><span class="s2">https://imsun.github.io/gitment/dist/gitment.browser.js</span><span class="dl">"</span><span class="o">&gt;&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span><span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+<span class="kd">var</span> <span class="nx">gitment</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Gitment</span><span class="p">({</span>
+  <span class="na">id</span><span class="p">:</span> <span class="dl">'</span><span class="s1">页面 ID</span><span class="dl">'</span><span class="p">,</span> <span class="c1">// 可选。默认为 location.href</span>
+  <span class="na">owner</span><span class="p">:</span> <span class="dl">'</span><span class="s1">你的 GitHub ID</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">repo</span><span class="p">:</span> <span class="dl">'</span><span class="s1">存储评论的 repo</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">oauth</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">client_id</span><span class="p">:</span> <span class="dl">'</span><span class="s1">你的 client ID</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">client_secret</span><span class="p">:</span> <span class="dl">'</span><span class="s1">你的 client secret</span><span class="dl">'</span><span class="p">,</span>
+  <span class="p">},</span>
+<span class="p">})</span>
+<span class="nx">gitment</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="dl">'</span><span class="s1">container</span><span class="dl">'</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span></code></pre></div></div>
+<p>这段代码不复杂，但是得要知道这几个参数什么意思,假设github 账号是：<code class="language-plaintext highlighter-rouge">xiaocai</code>  仓库名：<code class="language-plaintext highlighter-rouge">blog</code> 那么这里就是</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//https://api.github.com/users/xiaocai, 回车后就可以看到 id</span>
+<span class="nx">id</span><span class="p">:</span>       
+<span class="c1">//github 登录名，和上面username </span>
+<span class="nx">owner</span><span class="p">:</span> <span class="dl">"</span><span class="s2">xiaocai</span><span class="dl">"</span><span class="p">,</span>    
+<span class="nx">repo</span><span class="p">:</span> <span class="dl">"</span><span class="s2">blog</span><span class="dl">"</span><span class="p">,</span>
+<span class="c1">//这个就是上一步申请的client_id</span>
+<span class="nx">client_id</span><span class="p">:</span>          
+<span class="c1">//这个就是上一步申请的client_secret</span>
+<span class="nx">client_secret</span><span class="p">:</span>      
+</code></pre></div></div>
+
+<p>到这里你就可以提交代码了，然后到你的博客帖子去看有没有评论。</p>
+
+<p>小菜不知道repo是什么意思，用了有道翻译，结果翻译回购，瞬间就懵逼了，心里那个心酸啊，后悔没好好学习英文，在这折腾了好久，还好瞅了瞅作者的代码。<a href="https://github.com/imsun/gitment" title="https://github.com/imsun/gitment">作者github地址</a></p>
+
+<p><img src="http://localhost:4002/assets/image/blog/blog_comment_01.png" alt="代码" /></p>
+
+<p>然后找了找 github api文档才确定那两个值，试了试才成功的。</p>
+
+<h1 id="7htmlscss压缩">7.html、scss压缩</h1>
+
+<p>html压缩和css压缩好处相信大家都知道，压缩后文件变小，网络加载速度就会变快。博主文档写的很好，小菜没有遇到坑点，所以就跳过了</p>
+
+<ul>
+  <li>饮冰先生 <a href="https://myanbin.github.io/post/compress-html-in-jekyll.html" title="https://myanbin.github.io/post/compress-html-in-jekyll.html">https://myanbin.github.io/post/compress-html-in-jekyll.html</a></li>
+</ul>
+
+<h1 id="8静态资源加速">8.静态资源加速</h1>
+
+<p>这个是小菜自己加的，github是国外的相比访问国内站点资源可能要慢些。小菜就把图片，生成后的css文件，以及后面要扩展的js等等都放在国内的服务器上，这样速度就会快很多。配置只需修改 <code class="language-plaintext highlighter-rouge">_config.yml</code>文件</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//本地时
+baseurl: "/" 
+
+//提交github时
+baseurl: "http://www.xiaocai.com"  #资源地址，请填写自己的资源地址
+</code></pre></div></div>
+<p>在七牛注册个人账户，注册后好像有10G的免费空间，看着不多，不过对于我们这种博客之类足矣。
+小菜七牛邀请码 <a href="https://portal.qiniu.com/signup?code=3lbflphzy1owi" title="https://portal.qiniu.com/signup?code=3lbflphzy1owi">https://portal.qiniu.com/signup?code=3lbflphzy1owi</a></p>
+
+<h1 id="9添加小绿标">9.添加小绿标</h1>
+
+<p>先说说小菜遇到的问题，总结起来 英文太水，服务器知识太少，满满的硬伤。添加小绿标其实就是添加SSL，一个https证书。回到第2个功能点，当我们输入https://example.com访问我们的站点，被提示为不安全。虽然GitHub Page 支持https，但是自定义域名的就需要使用第三方网站的证书了。</p>
+
+<ul>
+  <li>开源小喵Airth <a href="https://zhuanlan.zhihu.com/p/22667528" title="https://zhuanlan.zhihu.com/p/22667528">https://zhuanlan.zhihu.com/p/22667528</a></li>
+  <li>易极 <a href="http://www.jianshu.com/p/92b6d4a6ecd5" title="http://www.jianshu.com/p/92b6d4a6ecd5">https://zhuanlan.zhihu.com/p/22667528</a></li>
+</ul>
+
+<p>参考这两篇帖子，如果在稍微懂点服务器知识，那么个人觉得一步到位是完全没有问题的，小菜就遇到了</p>
+
+<p><img src="http://localhost:4002/assets/image/blog/blog_ssl_01.png" alt="ssl" /></p>
+
+<p>到这一看，跟博主不一样，sb了一把，小菜在国内搜了搜ssl证书，发现有几个免费的，找了一个又拍ssl教程，就去又拍注册了个账号，过程中看到cdn做活动，20元100G,时长3个月，手贱了一个把就给买了，本以为就要好了，结果在最后又拍绑定的域名要备案，是要备案，不是实名认证，想当初去阿里买服务器的时候，就是要备案，因为太麻烦结果就放弃了选择了一个香港服务器，这次又要备案，想了想可能以后还是有用所以去阿里给域名备了案，备案好麻烦，在填写好了资料要提交时，阿里有个产品认证，好像必须购买自家产品，又被卡脖子了。花了300个大洋购买了一年服务器使用权。现在还在苦逼的资料审核中。。。</p>
+
+<p>不过在这个过程中，小菜脑瓜子一闪好像有点明白了什么，上面没有激活，是因为没有修改dns,所以立马去了阿里云后台，找到域名列表</p>
+
+<p><img src="http://localhost:4002/assets/image/blog/blog_ssl_02.png" alt="ssl" /></p>
+
+<p><img src="http://localhost:4002/assets/image/blog/blog_ssl_03.png" alt="ssl" /></p>
+
+<p>点击修改，然后将上面给的dns填写进去，保存过一段时间就ok了，然后等到Cloudflare 中变为激活状态，继续前进就好了。</p>
+
+<p>回过头来，全是小菜的心酸史啊！至此，就应该安心的写博客了。</p>
+
+<p>如果觉得小菜设计的博客还凑合，或者勉强能用，那就去github 拷贝一个，然后自己在修改下样式或者功能。</p>
+
+<h1 id="10-makedown-编辑">10. makedown 编辑</h1>
+
+<p>博客搭建好了，不写写东西，那不是暴殄天物。在此奉上两篇帖子</p>
+
+<ul>
+  <li>梵居闹市 <a href="http://blog.leanote.com/post/freewalk/Markdown-%E8%AF%AD%E6%B3%95%E6%89%8B%E5%86%8C#title" title="http://blog.leanote.com/post/freewalk/Markdown-%E8%AF%AD%E6%B3%95%E6%89%8B%E5%86%8C#title">http://blog.leanote.com/post/freewalk/Markdown-%E8%AF%AD%E6%B3%95%E6%89%8B%E5%86%8C#title</a></li>
+  <li>在线编辑器 <a href="http://mahua.jser.me/" title="http://mahua.jser.me/">http://mahua.jser.me/</a></li>
+</ul>
+
+<p>相信大家看完上面帖子，也就会使用makedown编辑，小菜说说开篇遇到的换行和缩进</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>* 这只是个测试的段落 &lt;br&gt; ，给想换行添加个 &lt;br&gt;标签，或 空一行就可以
+* 缩进呢在首行空两个中文全角空格，就是首先输入法切到中文，按`shit + 空格键`，切换完后在按空格键就可以了，这是个前端小技巧，因为全角空格在html解析的是中文汉字，也就是2个字节，不会被当成普通的空格
+</code></pre></div></div>
+
+<p>以上就是小菜遇到的所有坑点。至于阿里服务器嘛，小菜打算出个阿里云node环境部署。下周webpcak 单页面 多页面打包全教程… 又是一把辛酸泪。请各位看官，有钱的捧个钱场，没钱的捧个人场。</p>
+
+:ET
