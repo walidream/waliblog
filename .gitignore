@@ -7,3 +7,4 @@ Gemfile.lock
 .tmp.drivedownload
 _wp/node_modules
 _wp/yarn.lock
+.jekyll-cache/*
