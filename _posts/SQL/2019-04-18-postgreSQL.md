@@ -23,7 +23,7 @@ post_nav: ["1.安装PostgreSQL","2.远程连接测试"]
 在官网地址[传送门](https://www.postgresql.org/download/linux/redhat/ "https://www.postgresql.org/download/linux/redhat/"){:target="_blank"}
 选择好选项后会自己生成配置。
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/sql/sql_1.png)
+![ssl]({{ site.url }}/assets/image/sql/sql_1.png)
 
 ### 安装RPM
 
@@ -110,7 +110,7 @@ vi /mnt/vdb1/postgresql.conf
 
 当然，此`*`也可以改为任何你想开放的服务器IP
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/sql/sql_2.png)
+![ssl]({{ site.url }}/assets/image/sql/sql_2.png)
 
 ### 信任远程连接
 
@@ -129,7 +129,7 @@ host    all             all             0.0.0.0/24            trust
 host    all             all             0.0.0.0/0             trust
 
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/sql/sql_3.png)
+![ssl]({{ site.url }}/assets/image/sql/sql_3.png)
 
 ### 重启服务
 
@@ -179,11 +179,11 @@ yum erase postgresql96
 
 这里需要注意的是当前面的工作做完之后，一定要检查阿里云实例的数据库端口是否开放，如果没有开放，那么要允许外网访问数据库不然是连接不成功的。
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/sql/sql_6.png)
+![ssl]({{ site.url }}/assets/image/sql/sql_6.png)
 
 打开Navicat软件,新建连接，选择自己要连接的数据库类型
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/sql/sql_7.png)
+![ssl]({{ site.url }}/assets/image/sql/sql_7.png)
 
 
 

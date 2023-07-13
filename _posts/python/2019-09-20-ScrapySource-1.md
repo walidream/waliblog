@@ -34,7 +34,7 @@ Scrapy在开源爬虫框架中名声很大，几乎用Python写爬虫的人，�
 
 因为使用比较简单，使用Scrapy官网上的例子来说明如何构建爬虫：
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/python/python_23.png)
+![ssl]({{ site.url }}/assets/image/python/python_23.png)
 
 简单来说构建和运行一个爬虫只需完成以下几步：
 - 使用`scrapy startproject`创建爬虫模板或自己编写爬虫脚本
@@ -46,7 +46,7 @@ Scrapy在开源爬虫框架中名声很大，几乎用Python写爬虫的人，�
 
 # 2.架构
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/python/python_22.png)
+![ssl]({{ site.url }}/assets/image/python/python_22.png)
 
 # 3.核心组件
 
@@ -76,7 +76,7 @@ Scrapy有以下几大组件：
 
 我在读完源码后，整理出一个更详细的架构图，其中展示了更多相关组件的细节:
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/python/python_24.png)
+![ssl]({{ site.url }}/assets/image/python/python_24.png)
 
 这里需要说明一下图中的`Scrapyer`，其实这也是在源码的一个核心类，但官方架构图中没有展示出来，这个类其实是处于`Engine`、`Spiders`、`Pipeline`之间，是连通这3个组件的桥梁，后面在文章中会具体讲解。
 
@@ -85,7 +85,7 @@ Scrapy有以下几大组件：
 
 涉及到的一些核心类如下：
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/python/python_25.png)
+![ssl]({{ site.url }}/assets/image/python/python_25.png)
 
 其中标没有样式的`黑色文字`是类的核心`属性`，`黄色样式`的文字都是`核心方法`。
 

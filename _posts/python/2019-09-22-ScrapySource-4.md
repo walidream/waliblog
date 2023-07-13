@@ -949,9 +949,9 @@ def _itemproc_finished(self, output, item, response, spider):
 
 总结一下整个运行流程，还是用这两张图表示再清楚不过：
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/python/python_22.png)
+![ssl]({{ site.url }}/assets/image/python/python_22.png)
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/python/python_24.png)
+![ssl]({{ site.url }}/assets/image/python/python_24.png)
 
 
 Scrapy整体给我的感觉是，虽然它提供的只是单机版的爬虫框架，但我们可以通过编写更多的插件和替换某些组件，来定制化自己的爬虫，从而来实现更强大的功能，例如分布式、代理调度、并发控制、可视化、监控等等功能，都是非常方便的！

@@ -38,33 +38,33 @@ Google Cloud Platform (以下简称GCP)是Google提供的云平台, 可以用来
 
 ### 创建VM实例
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_6.png)
+![ssl]({{ site.url }}/assets/image/server/server_6.png)
 
 `导航菜单` → `Compute Engine` → `VM实例`
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_7.png)
+![ssl]({{ site.url }}/assets/image/server/server_7.png)
 
 点击 `创建`（项目名称选填）
 
 ### 试用 Cloud Platform
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_8.png)
+![ssl]({{ site.url }}/assets/image/server/server_8.png)
 
 点击 `同意并继续`
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_9.png)
+![ssl]({{ site.url }}/assets/image/server/server_9.png)
 
 按空填写信息，完成后点击 `开始免费试用`, 信用卡用于人机校验，注册时会暂扣$1，会自动退回至账户
 
 ### 创建虚拟机实例
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_10.png)
+![ssl]({{ site.url }}/assets/image/server/server_10.png)
 
 点击 `创建`
 
 ### 自定义实例配置
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_11.png)
+![ssl]({{ site.url }}/assets/image/server/server_11.png)
 
 填写实例 `名称`
 
@@ -72,7 +72,7 @@ Google Cloud Platform (以下简称GCP)是Google提供的云平台, 可以用来
 
 内核 及 内存 选择最低配置（如还需其他服务可自行定义参数）
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_12.png)
+![ssl]({{ site.url }}/assets/image/server/server_12.png)
 
 更改 启动磁盘 系统为 centos7
 
@@ -80,30 +80,30 @@ Google Cloud Platform (以下简称GCP)是Google提供的云平台, 可以用来
 
 点击 `创建`
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_13.png)
+![ssl]({{ site.url }}/assets/image/server/server_13.png)
 
 
 # 4.防火墙规则
 
 ### 新建防火墙规则
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_14.png)
+![ssl]({{ site.url }}/assets/image/server/server_14.png)
 
 `导航菜单` → `VPC 网络` → `防火墙规则`
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_15.png)
+![ssl]({{ site.url }}/assets/image/server/server_15.png)
 
 点击 `创建防火墙规则`
 
 ### 自定义规则配置
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_16.png)
+![ssl]({{ site.url }}/assets/image/server/server_16.png)
 
 `名称` `按规则自定义``
 
 `目标` `网络中的所有实例`
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_17.png)
+![ssl]({{ site.url }}/assets/image/server/server_17.png)
 
 来源ip地址范围 `0.0.0.0/0`
 
@@ -111,7 +111,7 @@ Google Cloud Platform (以下简称GCP)是Google提供的云平台, 可以用来
 
 点击 `创建`
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_18.png)
+![ssl]({{ site.url }}/assets/image/server/server_18.png)
 
 刚刚定义好的防火墙规则
 
@@ -119,15 +119,15 @@ Google Cloud Platform (以下简称GCP)是Google提供的云平台, 可以用来
 
 ### 配置VPC网络
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_19.png)
+![ssl]({{ site.url }}/assets/image/server/server_19.png)
 
 `导航菜单` → `VPC 网络` → `VPC 网络` → `default`
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_20.png)
+![ssl]({{ site.url }}/assets/image/server/server_20.png)
 
 点击 `修改`
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_21.png)
+![ssl]({{ site.url }}/assets/image/server/server_21.png)
 
 勾选 `自动` 及 全局 `复选框`
 
@@ -138,21 +138,21 @@ Google Cloud Platform (以下简称GCP)是Google提供的云平台, 可以用来
 
 ### 负载平衡
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_22.png)
+![ssl]({{ site.url }}/assets/image/server/server_22.png)
 
 `导航菜单` → `网络服务` → `负载均衡`
 
 ### 创建负载平衡器
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_23.png)
+![ssl]({{ site.url }}/assets/image/server/server_23.png)
 
 ### UDP负载平衡
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_24.png)
+![ssl]({{ site.url }}/assets/image/server/server_24.png)
 
 点击 开始配置
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_25.png)
+![ssl]({{ site.url }}/assets/image/server/server_25.png)
 
 勾选 `从互联网到我的VM`（默认）
 
@@ -160,7 +160,7 @@ Google Cloud Platform (以下简称GCP)是Google提供的云平台, 可以用来
 
 ### 后端配置
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_26.png)
+![ssl]({{ site.url }}/assets/image/server/server_26.png)
 
 `名称` 按规则自定义填写
 
@@ -170,7 +170,7 @@ Google Cloud Platform (以下简称GCP)是Google提供的云平台, 可以用来
 
 ### 前端配置
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_27.png)
+![ssl]({{ site.url }}/assets/image/server/server_27.png)
 
 `名称` 按规则自定义填写
 
@@ -180,21 +180,21 @@ Google Cloud Platform (以下简称GCP)是Google提供的云平台, 可以用来
 
 点击 `创建`
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_28.png)
+![ssl]({{ site.url }}/assets/image/server/server_28.png)
 
 # 7.登陆服务器
 
 如果需要用第三方工具登录google服务器，请查看小菜的这篇博客[用ssh工具xShell连接google云服务器](/server/2019/04/18/connectionGoogleCloud.html "server/2019/04/18/connectionGoogleCloud.html"){:target="_blank"}
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_29.png)
+![ssl]({{ site.url }}/assets/image/server/server_29.png)
 
 `导航菜单` → `Compute Engine` → `VM实例`
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_30.png)
+![ssl]({{ site.url }}/assets/image/server/server_30.png)
 
 点击 `SSH`
 
-![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_31.png)
+![ssl]({{ site.url }}/assets/image/server/server_31.png)
 
 
 
