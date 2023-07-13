@@ -1,4 +1,4 @@
-I"�Q<p>字符串是由零个或多个字符组成的有限序列，它是编程语言中表示文本的数据类型。字符串是一种<code class="language-plaintext highlighter-rouge">序列类型</code>，因此也支持序列类型的各种操作。</p>
+I"�Q<p>字符串是由零个或多个字符组成的有限序列，它是编程语言中表示文本的数据类型。字符串是一种<code class="language-plaintext highlighter-rouge">序列类型</code>，因此也支持序列类型的各种操作。</p>
 
 <p>在python中用单引号(<code class="language-plaintext highlighter-rouge">''</code>)、双引号(<code class="language-plaintext highlighter-rouge">""</code>)、和三引号(<code class="language-plaintext highlighter-rouge">''' '''</code> | <code class="language-plaintext highlighter-rouge">""" """</code>)包起来的内容表示字符串。</p>
 
@@ -37,10 +37,10 @@ hello world'''</span>
 
 <p>原始字符串：所有的字符串都是直接按照字面的意思来使用，没有转义特殊或不能打印的字符。用<code class="language-plaintext highlighter-rouge">r</code>或<code class="language-plaintext highlighter-rouge">R</code>来表示原始字符串。</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="s">r'C:\Windows\System32\cmd'</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="sa">r</span><span class="s">'C:\Windows\System32\cmd'</span>
 <span class="s">'C:</span><span class="se">\\</span><span class="s">Windows</span><span class="se">\\</span><span class="s">System32</span><span class="se">\\</span><span class="s">cmd'</span>
 
-<span class="o">&gt;&gt;&gt;</span> <span class="s">R'C:\Windows\System32\cmd'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="sa">R</span><span class="s">'C:\Windows\System32\cmd'</span>
 <span class="s">'C:</span><span class="se">\\</span><span class="s">Windows</span><span class="se">\\</span><span class="s">System32</span><span class="se">\\</span><span class="s">cmd'</span>
 </code></pre></div></div>
 
@@ -380,7 +380,7 @@ hello world'''</span>
 <h3 id="encode">encode()</h3>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="s">'jupyter notebook'</span><span class="p">.</span><span class="n">encode</span><span class="p">()</span>
-<span class="s">b'jupyter notebook'</span>
+<span class="sa">b</span><span class="s">'jupyter notebook'</span>
 </code></pre></div></div>
 
 :ET

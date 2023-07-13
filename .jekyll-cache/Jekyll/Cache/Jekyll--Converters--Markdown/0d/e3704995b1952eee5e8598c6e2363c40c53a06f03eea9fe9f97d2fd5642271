@@ -1,4 +1,4 @@
-I"�G<p>在小菜初学<code class="language-plaintext highlighter-rouge">scrapy</code>时，从google上发现了几篇非常不错的文章，未经博主同意擅自将博主的文章收藏，主要怕日后看时，找不到此文章。小菜在这里向博主致敬，希望看到这篇帖子的小伙伴能够阅读原贴。</p>
+I"H<p>在小菜初学<code class="language-plaintext highlighter-rouge">scrapy</code>时，从google上发现了几篇非常不错的文章，未经博主同意擅自将博主的文章收藏，主要怕日后看时，找不到此文章。小菜在这里向博主致敬，希望看到这篇帖子的小伙伴能够阅读原贴。</p>
 
 <ul>
   <li><a href="http://kaito-kidd.com/2016/11/01/scrapy-code-analyze-architecture/" title="http://kaito-kidd.com/2016/11/01/scrapy-code-analyze-architecture/">Kaito 博主</a></li>
@@ -109,7 +109,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_body</span>
     <span class="k">def</span> <span class="nf">_set_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">body</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="p">.</span><span class="n">_body</span> <span class="o">=</span> <span class="s">b''</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">_body</span> <span class="o">=</span> <span class="sa">b</span><span class="s">''</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="p">.</span><span class="n">_body</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">encoding</span><span class="p">)</span>
     <span class="n">body</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_get_body</span><span class="p">,</span> <span class="n">obsolete_setter</span><span class="p">(</span><span class="n">_set_body</span><span class="p">,</span> <span class="s">'body'</span><span class="p">)</span>
@@ -446,7 +446,7 @@
 </span>        <span class="n">fp</span> <span class="o">=</span> <span class="n">hashlib</span><span class="p">.</span><span class="n">sha1</span><span class="p">()</span>
         <span class="n">fp</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">method</span><span class="p">))</span>
         <span class="n">fp</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">canonicalize_url</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">url</span><span class="p">)))</span>
-        <span class="n">fp</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">body</span> <span class="ow">or</span> <span class="s">b''</span><span class="p">)</span>
+        <span class="n">fp</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">body</span> <span class="ow">or</span> <span class="sa">b</span><span class="s">''</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">include_headers</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="n">include_headers</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="n">request</span><span class="p">.</span><span class="n">headers</span><span class="p">:</span>

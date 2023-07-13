@@ -1,4 +1,4 @@
-I"\{<p>本小节介绍了鸭子模型、抽象基类、类变量和实例变量、python中类的继承顺序、对象的私有属性、对象的自省机制、super函数。</p>
+I"�{<p>本小节介绍了鸭子模型、抽象基类、类变量和实例变量、python中类的继承顺序、对象的私有属性、对象的自省机制、super函数。</p>
 
 <h1 id="1鸭子类型和多态">1.鸭子类型和多态</h1>
 
@@ -224,7 +224,7 @@
 <span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">__mro__</span><span class="p">)</span>
 
 <span class="c1"># 输出
-</span><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="o">&lt;</span><span class="k">class</span> <span class="err">'</span><span class="nc">__main__</span><span class="p">.</span><span class="n">A</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="s">B'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">C</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">D</span><span class="s">'&gt;, &lt;class '</span><span class="nb">object</span><span class="s">'&gt;)
+</span><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="o">&lt;</span><span class="k">class</span> <span class="err">'</span><span class="nc">__main__</span><span class="p">.</span><span class="n">A</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="sa">B</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">C</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">D</span><span class="s">'&gt;, &lt;class '</span><span class="nb">object</span><span class="s">'&gt;)
 </span></code></pre></div></div>
 
 <p><img src="http://walidream.com:9999/blogImage/python/python_64.png" alt="ssl" /></p>
@@ -251,7 +251,7 @@
 <span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">__mro__</span><span class="p">)</span>
 
 <span class="c1"># 输出
-</span><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="o">&lt;</span><span class="k">class</span> <span class="err">'</span><span class="nc">__main__</span><span class="p">.</span><span class="n">A</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="s">B'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">D</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">C</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">E</span><span class="s">'&gt;, &lt;class '</span><span class="nb">object</span><span class="s">'&gt;)
+</span><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="o">&lt;</span><span class="k">class</span> <span class="err">'</span><span class="nc">__main__</span><span class="p">.</span><span class="n">A</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="sa">B</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">D</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">C</span><span class="s">'&gt;, &lt;class '</span><span class="n">__main__</span><span class="p">.</span><span class="n">E</span><span class="s">'&gt;, &lt;class '</span><span class="nb">object</span><span class="s">'&gt;)
 </span></code></pre></div></div>
 
 <h1 id="5私有属性">5.私有属性</h1>

@@ -1,4 +1,4 @@
-I"c<h1 id="1常见的恶意行为">1.常见的恶意行为</h1>
+I"c<h1 id="1常见的恶意行为">1.常见的恶意行为</h1>
 
 <ul>
   <li>爬虫行为</li>
@@ -188,13 +188,13 @@ php-fpm -D #守护进程
 	<span class="nv">$name</span><span class="o">=</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'username'</span><span class="p">];</span>
 	<span class="nv">$pwd</span><span class="o">=</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'password'</span><span class="p">];</span>
 	<span class="nv">$sql</span><span class="o">=</span><span class="s2">"select * from users where username=’</span><span class="nv">$name</span><span class="s2">' and password='</span><span class="nv">$pwd</span><span class="s2">'"</span><span class="p">;</span>
-	<span class="k">echo</span> <span class="nv">$sql</span><span class="o">.</span><span class="s2">"&lt;br/&gt;&lt;br/&gt;"</span><span class="p">;</span>
+	<span class="k">echo</span> <span class="nv">$sql</span><span class="mf">.</span><span class="s2">"&lt;br/&gt;&lt;br/&gt;"</span><span class="p">;</span>
 	<span class="nv">$query</span><span class="o">=</span><span class="nb">mysql_query</span><span class="p">(</span><span class="nv">$sql</span><span class="p">);</span>
 	<span class="nv">$arr</span><span class="o">=</span><span class="nb">mysql_fetch_array</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
 	<span class="k">if</span><span class="p">(</span><span class="nv">$arr</span><span class="p">){</span>
 		<span class="k">echo</span> <span class="s2">"login success!</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
 		<span class="k">echo</span> <span class="nv">$arr</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
-		<span class="k">echo</span> <span class="nv">$arr</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="s2">"&lt;br/&gt;"</span><span class="p">;</span>
+		<span class="k">echo</span> <span class="nv">$arr</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="mf">.</span><span class="s2">"&lt;br/&gt;"</span><span class="p">;</span>
 	<span class="p">}</span><span class="k">else</span><span class="p">{</span>
 		<span class="k">echo</span> <span class="s2">"login failed"</span><span class="p">;</span>
 	<span class="p">}</span>

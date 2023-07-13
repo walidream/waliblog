@@ -1,4 +1,4 @@
-I"�F<p>Python也包含有 <code class="language-plaintext highlighter-rouge">集合</code> 类型。集合是由<code class="language-plaintext highlighter-rouge">不重复元素</code>组成的<code class="language-plaintext highlighter-rouge">无序</code>的集。它的基本用法包括成员检测和消除重复元素。集合对象也支持像 联合，交集，差集，对称差分等数学运算。</p>
+I"G<p>Python也包含有 <code class="language-plaintext highlighter-rouge">集合</code> 类型。集合是由<code class="language-plaintext highlighter-rouge">不重复元素</code>组成的<code class="language-plaintext highlighter-rouge">无序</code>的集。它的基本用法包括成员检测和消除重复元素。集合对象也支持像 联合，交集，差集，对称差分等数学运算。</p>
 
 <p>花括号或 set() 函数可以用来创建集合。注意：<code class="language-plaintext highlighter-rouge">要创建一个空集合你只能用 set() 而不能用 {}，因为后者是创建一个空字典，这种数据结构我们会在下一节进行讨论</code>。</p>
 
@@ -21,12 +21,12 @@ set()
 
 &gt;&gt;&gt; a = set('</span><span class="n">abracadabra</span><span class="s">')
 &gt;&gt;&gt; a
-{'</span><span class="n">d</span><span class="s">', 'b', '</span><span class="n">a</span><span class="s">', 'r', '</span><span class="n">c</span><span class="s">'}
+{'</span><span class="n">d</span><span class="s">', '</span><span class="sa">b</span><span class="s">', '</span><span class="n">a</span><span class="s">', '</span><span class="sa">r</span><span class="s">', '</span><span class="n">c</span><span class="s">'}
 
 # 列表推导式
 &gt;&gt;&gt; a = {x for x in '</span><span class="n">abracadabra</span><span class="s">' if x not in '</span><span class="n">abc</span><span class="s">'}
 &gt;&gt;&gt; a
-{'r', '</span><span class="n">d</span><span class="s">'}
+{'</span><span class="sa">r</span><span class="s">', '</span><span class="n">d</span><span class="s">'}
 </span></code></pre></div></div>
 
 <h1 id="2集合方法">2.集合方法</h1>

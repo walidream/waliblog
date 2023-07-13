@@ -1,4 +1,4 @@
-I"}<p>在小菜初学<code class="language-plaintext highlighter-rouge">scrapy</code>时，从google上发现了几篇非常不错的文章，未经博主同意擅自将博主的文章收藏，主要怕日后看时，找不到此文章。小菜在这里向博主致敬，希望看到这篇帖子的小伙伴能够阅读原贴。</p>
+I"�<p>在小菜初学<code class="language-plaintext highlighter-rouge">scrapy</code>时，从google上发现了几篇非常不错的文章，未经博主同意擅自将博主的文章收藏，主要怕日后看时，找不到此文章。小菜在这里向博主致敬，希望看到这篇帖子的小伙伴能够阅读原贴。</p>
 
 <ul>
   <li><a href="http://kaito-kidd.com/2016/11/01/scrapy-code-analyze-architecture/" title="http://kaito-kidd.com/2016/11/01/scrapy-code-analyze-architecture/">Kaito 博主</a></li>
@@ -31,7 +31,7 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">scrapy.cmdline</span> <span class="kn">import</span> <span class="n">execute</span>
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
-    <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="s">r'(-script\.pyw|\.exe)?$'</span><span class="p">,</span> <span class="s">''</span><span class="p">,</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s">'(-script\.pyw|\.exe)?$'</span><span class="p">,</span> <span class="s">''</span><span class="p">,</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">sys</span><span class="p">.</span><span class="nb">exit</span><span class="p">(</span><span class="n">execute</span><span class="p">())</span>
 </code></pre></div></div>
 

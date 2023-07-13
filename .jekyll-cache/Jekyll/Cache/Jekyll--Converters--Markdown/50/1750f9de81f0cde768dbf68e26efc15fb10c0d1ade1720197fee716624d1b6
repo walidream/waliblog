@@ -1,4 +1,4 @@
-I"�R<p>正则表达式是一个特殊的字符序列，它能帮助你方便的检查一个字符串是否与某种模式匹配。在python中使用正则需要先引入正则模块<code class="language-plaintext highlighter-rouge">re</code>。</p>
+I"�R<p>正则表达式是一个特殊的字符序列，它能帮助你方便的检查一个字符串是否与某种模式匹配。在python中使用正则需要先引入正则模块<code class="language-plaintext highlighter-rouge">re</code>。</p>
 
 <ul>
   <li><a href="https://docs.python.org/zh-cn/3/library/re.html" title="https://docs.python.org/zh-cn/3/library/re.html" target="_blank">python 正则表达式官方文档</a></li>
@@ -285,7 +285,7 @@
 <p>当我们匹配一个路径时<code class="language-plaintext highlighter-rouge">c:\\test</code>，假如需要匹配文本中<code class="language-plaintext highlighter-rouge">\</code>,那么使用编程语言表示的正则表达式里将需要4个反斜杠”\“：前两个和后两个分别用于在编程语言里转义成反斜杠，转换成两个反斜杠后再在正则表达式里转义成一个反斜杠。</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#添加r
-</span><span class="n">ret</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="s">r"c:\\test"</span><span class="p">,</span><span class="s">'c:</span><span class="se">\\</span><span class="s">test'</span><span class="p">).</span><span class="n">group</span><span class="p">()</span>
+</span><span class="n">ret</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s">"c:\\test"</span><span class="p">,</span><span class="s">'c:</span><span class="se">\\</span><span class="s">test'</span><span class="p">).</span><span class="n">group</span><span class="p">()</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">ret</span>
 <span class="s">'c:</span><span class="se">\\</span><span class="s">test'</span>
 
