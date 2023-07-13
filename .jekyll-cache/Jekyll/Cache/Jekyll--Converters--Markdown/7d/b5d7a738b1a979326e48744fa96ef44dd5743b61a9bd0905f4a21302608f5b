@@ -1,2 +1,0 @@
-I"�<p>不知道大家记不记得，之前我们配置样式，在命令窗口中运行webpack打包然后在<code class="language-plaintext highlighter-rouge">dist</code>目录中打开本地<code class="language-plaintext highlighter-rouge">index.html</code>。在html中我们手动引入了<code class="language-plaintext highlighter-rouge">main.js</code>文件。当我们需要打包多个js文件时，我们手动引入js文件是非常繁琐的一件事，有没有什么配置可以帮我们做这件事呢？<code class="language-plaintext highlighter-rouge">HtmlWebpackPlugin</code>就可为帮助我们自动引入打包好的文件。</p>
-:ET

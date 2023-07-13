@@ -1,2 +1,0 @@
-I"�<p>小菜之前在webpack配置中区分开发环境和生产环境，但是在源代码中还不能区分当前是开发环境还是生产环境。我们可能会遇到这种情况，如在开发的时候请求地址<code class="language-plaintext highlighter-rouge">http://www.waliblog.com/login</code>但是项目上线后，请求地址就变成<code class="language-plaintext highlighter-rouge">http://www.baidu.com/login</code>。我们需要完成这种操作，需要用到<a href="https://webpack.docschina.org/plugins/define-plugin/" title="https://webpack.docschina.org/plugins/define-plugin/" target="_blank">DefinePlugin 文档</a>插件</p>
-:ET

@@ -1,3 +1,0 @@
-I"�<p>这小节小菜将记录三种虚拟主机的配置，第一种是nginx虚拟主机<code class="language-plaintext highlighter-rouge">单网卡多IP配置</code>，第二种是nginx虚拟主机基于<code class="language-plaintext highlighter-rouge">多端口配置</code>，第三种是nginx虚拟主机基于<code class="language-plaintext highlighter-rouge">多域名配置</code>来实现
-小菜将一一举例，企业中长用到的还是后两种方法。</p>
-:ET

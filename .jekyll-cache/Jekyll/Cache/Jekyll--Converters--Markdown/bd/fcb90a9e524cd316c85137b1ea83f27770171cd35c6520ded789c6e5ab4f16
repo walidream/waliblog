@@ -1,2 +1,0 @@
-I"�<p>视图函数返回与普通函数的返回不同，视图函数返回的是一个<code class="language-plaintext highlighter-rouge">response</code>对象。</p>
-:ET

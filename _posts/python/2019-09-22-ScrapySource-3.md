@@ -109,7 +109,7 @@ class Spider(object_ref):
 - start_urls：定义种子URL；
 - custom_settings：从字面意思可以看出，爬虫自定义配置，会覆盖配置文件的配置项；
 
-![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_27.png)
+![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/python/python_27.png)
 
 
 # 2.引擎
@@ -145,7 +145,7 @@ class ExecutionEngine(object):
 
 在这里能看到，进行了核心组件的定义和初始化，包括：`Scheduler`、`Downloader`、`Scrapyer`，其中Scheduler只进行了类定义，没有实例化。
 
-![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_28.png)
+![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/python/python_28.png)
 
 
 # 3.调度器
@@ -276,7 +276,7 @@ LifoMemoryQueue = queue.LifoMemoryQueue
 
 如果你想追究这些队列是如何实现的，可以参考scrapy作者写的`scrapy/queuelib`模块。
 
-![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_29.png)
+![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/python/python_29.png)
 
 # 6.下载器
 
@@ -466,7 +466,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
 中间件的职责是什么？从这里能大概看出，从某个组件流向另一个组件时，会经过一系列中间件，每个中间件都定义了自己的处理流程，相当于一个个管道，输入时可以针对数据进行处理，然后送达到另一个组件，另一个组件处理完逻辑后，又经过这一系列中间件，这些中间件可再针对这个响应结果进行处理，最终输出。
 
 
-![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_30.png)
+![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/python/python_30.png)
 
 
 # 9.Scraper
@@ -567,7 +567,7 @@ class ItemPipelineManager(MiddlewareManager):
 
 从Scraper的初始化能够看到，它管理着`Spiders`和`Pipeline`相关的交互逻辑。
 
-![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_31.png)
+![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/python/python_31.png)
 
 到这里，所有组件：`引擎`、`下载器`、`调度器`、`爬虫类`、`输出处理器`都依次初始化完成，每个核心组件下其实都包含一些小的组件在里面，帮助处理某一环节的各种流程。
 

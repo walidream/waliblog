@@ -1,2 +1,0 @@
-I"><p><code class="language-plaintext highlighter-rouge">Tree Shaking</code>从字面上理解就是<code class="language-plaintext highlighter-rouge">树摇晃</code>。就是当我们在一个js文件中写入了多个导出的方法，但是引用时只使用了一部分，其他方法不应该被打包进来。</p>
-:ET

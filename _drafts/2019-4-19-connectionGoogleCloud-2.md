@@ -19,7 +19,7 @@ group_tag: google云服务器
 
 # 1.登录google服务器
 
-![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_1.png)
+![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_1.png)
 
 ### 切换到root角色
 
@@ -57,31 +57,31 @@ passwd root  #设置root密码后直接可以用root账户登录
 
 # 2.xshell工具用户密码登录
 
-![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_32.png)
+![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_32.png)
 
 # 3.xshell工具ssh登录
 
 ### 生成ssh
 
-![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_2.png)
+![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_2.png)
 
 
 ### 添加密钥到google云上
 
 > 菜单 — 计算引擎 — 元数据 — SSH秘钥 — 修改 — 添加一项
 
-![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_3.png)
+![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_3.png)
 
 
 > 粘贴刚才从xshell复制的秘钥。在末尾添加 [空格][用户名] 这里就是“ google”，保存即可。
 
 
-![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_4.png)
+![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_4.png)
 
 
 ### 用xshell连接
 
-![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_5.png)
+![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/server/server_5.png)
 
 连上之后，输入命令 sudo -i切换到root用户.
 

@@ -175,7 +175,7 @@ def execute(argv=None, settings=None):
 
 主要的运行流程已经加好注释，这里我总结出了每个流程执行过程：
 
-![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_26.png)
+![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/python/python_26.png)
 
 # 3.流程解析
 

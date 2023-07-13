@@ -1,2 +1,0 @@
-I"6<p>在上面一节中，我们把最基本的webpack环境搭建起来了，这一小节，小菜教大家写一个最基本的webpack配置。没有<code class="language-plaintext highlighter-rouge">loader</code>,<code class="language-plaintext highlighter-rouge">module</code>,<code class="language-plaintext highlighter-rouge">resolve</code>,<code class="language-plaintext highlighter-rouge">server</code>模块，只有<code class="language-plaintext highlighter-rouge">entry</code>,<code class="language-plaintext highlighter-rouge">output</code>模块。</p>
-:ET

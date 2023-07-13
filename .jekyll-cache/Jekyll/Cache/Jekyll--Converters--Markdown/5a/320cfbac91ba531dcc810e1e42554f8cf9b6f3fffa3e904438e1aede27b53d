@@ -1,2 +1,0 @@
-I"-<p>websocket实现在HTTP连接的基础上，并<code class="language-plaintext highlighter-rouge">通过HTTP中的Upgrade</code>协议头将连接从HTTP升级到Websocket。这样就可以实现多次双向通讯，直到连接被关闭。小菜推荐有兴趣的小伙伴去看下这篇博客</p>
-:ET

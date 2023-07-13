@@ -28,8 +28,8 @@ host: 127.0.0.1
 port: 4002
 baseurl: "/"    #网站的根路径 
 url: "https://waliblog.com" #change this to the base hostname & protocol for your site
-publicPath: "" #'https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage' #公共路径
-imgUrl: "https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage"
+publicPath: "" #'https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image' #公共路径
+imgUrl: "https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image"
 
 google_analytics:
 # cayman-blog date format

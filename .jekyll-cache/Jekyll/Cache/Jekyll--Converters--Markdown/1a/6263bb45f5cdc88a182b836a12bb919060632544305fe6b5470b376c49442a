@@ -1,2 +1,0 @@
-I"�<p>在之前代的demo中看到<code class="language-plaintext highlighter-rouge">app.run()</code>，然后启动一个应用程序，通过<code class="language-plaintext highlighter-rouge">localhost:5000</code>就能访问我们的视图函数。我们每次更改代码就需要手动重启，还有就是外网不能访问，或者同局域网其他机器不能访问，这些原因都藏在<code class="language-plaintext highlighter-rouge">app.run()</code>方法参数中。</p>
-:ET

@@ -1,2 +1,0 @@
-I"�<p>nginx日志类型有两种，第一种是<code class="language-plaintext highlighter-rouge">error.log</code>日志，第二种是<code class="language-plaintext highlighter-rouge">access_log</code>日志。error.log是记录错误，access_log用来指定日志文件的存放路径、格式（把定义的log_format 跟在后面）和缓存大小；如果不想启用日志则access_log off ;</p>
-:ET

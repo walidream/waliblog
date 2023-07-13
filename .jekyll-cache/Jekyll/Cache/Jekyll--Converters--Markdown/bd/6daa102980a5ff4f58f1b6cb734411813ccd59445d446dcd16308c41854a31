@@ -1,2 +1,0 @@
-I"`<p>大多数面向对象语言都不支持多重继承，因为这会导致著名的<a href="https://en.wikipedia.org/wiki/Diamond_problem" title="https://en.wikipedia.org/wiki/Diamond_problem">Diamond problem</a>， 而 Python 虽然形式上支持多重继承，但其实现机制却是利用 mixin，从而有效 地避免了 Diamond problem。</p>
-:ET

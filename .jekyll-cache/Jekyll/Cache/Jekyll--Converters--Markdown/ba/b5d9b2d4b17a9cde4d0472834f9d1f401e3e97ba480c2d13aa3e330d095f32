@@ -1,2 +1,0 @@
-I"F<p>Scrapy是通过<code class="language-plaintext highlighter-rouge">scrapy</code> 命令行工具进行控制的。 这里我们称之为 <code class="language-plaintext highlighter-rouge">Scrapy tool</code>以用来和子命令进行区分。 对于子命令，我们称为 “command” 或者 “Scrapy commands”。</p>
-:ET

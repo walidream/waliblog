@@ -1,2 +1,0 @@
-I"'<p>前段时间在做项目中遇到一个关于弹窗由小变大的动画，以前做这些动画时就用animate，只需要写个方法，然后把动画名称往里一扔就完事。但在小程序不知道怎么用。去官方文档找了找，看到官方提供一个API <code class="language-plaintext highlighter-rouge">wx.createAnimation(OBJECT)</code>试着把官方的demo复制下来在本地看看。在使用过程中总觉得比较别扭，很不顺手，可能是小菜还没找到正确的使用方法。总之就是不习惯。</p>
-:ET

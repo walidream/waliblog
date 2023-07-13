@@ -17,7 +17,7 @@ group_tag: python Error
 
 - [博主 df0128](https://blog.csdn.net/df0128/article/details/89565651 "https://blog.csdn.net/df0128/article/details/89565651")
 
-![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_60.png)
+![ssl](https://raw.githubusercontent.com/walidream/waliblog/gh-pages/static/image/python/python_60.png)
 
 多方查找后发现原因在于没有安装postgresql插件，故，先使用如下命令安装插件:
 

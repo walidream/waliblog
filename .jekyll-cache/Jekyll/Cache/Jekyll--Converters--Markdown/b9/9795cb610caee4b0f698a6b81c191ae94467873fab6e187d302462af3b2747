@@ -1,2 +1,0 @@
-I"�<p>本小节讲解<code class="language-plaintext highlighter-rouge">dict的abc继承关系</code>，根据继承关系，如果想要实现一个dict数据结构，需要实现<code class="language-plaintext highlighter-rouge">Mapping</code>类对应的魔法函数。<code class="language-plaintext highlighter-rouge">dict子类</code>中将当我们需要继承dict时候，不应该继承python原生dict，而应该继承<code class="language-plaintext highlighter-rouge">collections</code>下提供<code class="language-plaintext highlighter-rouge">UserDict</code>类。最后介绍dict的实现原理，已经dict的优缺点。</p>
-:ET

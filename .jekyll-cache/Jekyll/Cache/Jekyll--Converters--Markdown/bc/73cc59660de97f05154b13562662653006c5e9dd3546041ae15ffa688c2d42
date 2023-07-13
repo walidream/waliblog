@@ -1,2 +1,0 @@
-I"<p>Vim可以在尾行模式下使用<code class="language-plaintext highlighter-rouge">:substitute</code>命令将指定的字符替换成其他目标字符，通常使用该命令的缩写格式<code class="language-plaintext highlighter-rouge">:s</code>进行操作</p>
-:ET

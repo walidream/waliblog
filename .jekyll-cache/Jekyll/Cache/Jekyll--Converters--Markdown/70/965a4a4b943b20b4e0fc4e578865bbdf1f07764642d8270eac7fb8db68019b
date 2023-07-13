@@ -1,2 +1,0 @@
-I"<p>Item Loaders 提供了一种便捷的方式填充抓取到的:<code class="language-plaintext highlighter-rouge">Items</code>。虽然 <code class="language-plaintext highlighter-rouge">Items</code> 可以使用自带的类字典形式 <code class="language-plaintext highlighter-rouge">API</code> 填充，但是 <code class="language-plaintext highlighter-rouge">Items Loaders</code> 提供了更便捷的 API，可以分析原始数据并对 <code class="language-plaintext highlighter-rouge">Item</code> 进行赋值。</p>
-:ET

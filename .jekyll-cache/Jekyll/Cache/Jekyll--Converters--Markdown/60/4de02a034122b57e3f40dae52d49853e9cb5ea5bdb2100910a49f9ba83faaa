@@ -1,2 +1,0 @@
-I"�<p>现在基本每个网站在<code class="language-plaintext highlighter-rouge">登录</code>或<code class="language-plaintext highlighter-rouge">注册</code>时都会要求输入验证码才能进行后续操作，在爬知乎时，小菜就遇到了这个问题，所以单独将云打码识别验证码记录一下。<code class="language-plaintext highlighter-rouge">云打码</code>属于第三方平台，所以识别需要收费,费用个人觉得还可以接受。</p>
-:ET

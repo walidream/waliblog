@@ -1,2 +1,0 @@
-I"�<p>正则表达式是一个特殊的字符序列，它能帮助你方便的检查一个字符串是否与某种模式匹配。在python中使用正则需要先引入正则模块<code class="language-plaintext highlighter-rouge">re</code>。</p>
-:ET

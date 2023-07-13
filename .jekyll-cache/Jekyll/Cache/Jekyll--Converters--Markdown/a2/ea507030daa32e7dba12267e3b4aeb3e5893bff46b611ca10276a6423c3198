@@ -1,2 +1,0 @@
-I"-<p>小菜一直用webstrom编辑器开发前端，今天遇到了问题，就是在创建文件时，只要创建名为<code class="language-plaintext highlighter-rouge">index.vue</code>文件就会识别成<code class="language-plaintext highlighter-rouge">txt</code>文件。一开始以为编辑器有问题，卸了安装最新的<code class="language-plaintext highlighter-rouge">webstrom</code>发现问题还是一样，而且界面不好看。于是把旧的webstrom安装上了。折腾了几个小时。终于搞清楚问题，在此记录。</p>
-:ET

@@ -1,2 +1,0 @@
-I"y<p>当<code class="language-plaintext highlighter-rouge">Item</code> 在 <code class="language-plaintext highlighter-rouge">Spider</code>中被收集之后，它将会被传递到 <code class="language-plaintext highlighter-rouge">Item Pipeline</code>，一些组件会按照一定的顺序执行对 <code class="language-plaintext highlighter-rouge">Item</code> 的处理</p>
-:ET

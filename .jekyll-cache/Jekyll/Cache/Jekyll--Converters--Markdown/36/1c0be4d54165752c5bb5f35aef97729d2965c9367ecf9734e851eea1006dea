@@ -1,2 +1,0 @@
-I"�<p><code class="language-plaintext highlighter-rouge">enum</code>模块定义了一个具备可迭代性和可比较性的枚举类型。 它可以为值创建具有良好定义的标识符，而不是直接使用字面上的字符串或者整数</p>
-:ET
