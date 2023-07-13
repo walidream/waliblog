@@ -21,13 +21,13 @@ group_tag: cordova 教程
 
 先去[微信开放平台](https://open.weixin.qq.com/ "https://open.weixin.qq.com/")查看自己申请的应用
 
-![ssl](http://walidream.com:9999/blogImage/mobile/mobile_2.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/mobile/mobile_2.png)
 
 找到`应用签名`和`包名`。微信官方提供的[签名生成工具](https://res.wx.qq.com/open/zh_CN/htmledition/res/dev/download/sdk/Gen_Signature_Android2.apk "https://res.wx.qq.com/open/zh_CN/htmledition/res/dev/download/sdk/Gen_Signature_Android2.apk")如果不相信呢，小菜这里放个[微信资源下载链接](https://developers.weixin.qq.com/doc/oplatform/Downloads/Android_Resource.html "https://developers.weixin.qq.com/doc/oplatform/Downloads/Android_Resource.html")
 
 下载完签名工具后，输入开放平台的应用包名，然后看生成的应用签名和开放平台上的应用签名是否一致。如果不一致，请将开放平台的应用签名修改为`最新生成的应用签名`
 
-![ssl](http://walidream.com:9999/blogImage/mobile/mobile_3.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/mobile/mobile_3.png)
 
 
 

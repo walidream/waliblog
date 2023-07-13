@@ -29,7 +29,7 @@ SET t.t_name = '催永元'
 WHERE
 	t.t_id IN ( SELECT c.t_id FROM course c INNER JOIN teacher t ON t.t_id = c.t_id WHERE c.c_name = 'php' )
 ```
-![ssl](http://walidream.com:9999/blogImage/server/server_44.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_44.png)
 
 # 2.join优化子查询
 ```sql
@@ -46,7 +46,7 @@ SELECT C.c_name, T.t_name
 FROM course C
 LEFT JOIN teacher T on C.t_id = T.t_id;
 ```
-![ssl](http://walidream.com:9999/blogImage/server/server_45.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_45.png)
 
 # 3.join优化聚合查询
 
@@ -62,7 +62,7 @@ FROM
 WHERE
 	sc.s_score = ( SELECT MAX( t.s_score ) FROM score t WHERE t.c_id = sc.c_id )
 ```
-![ssl](http://walidream.com:9999/blogImage/server/server_46.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_46.png)
 
 # 4.如何实现分组选择
 
@@ -93,7 +93,7 @@ ORDER BY
 	s_score DESC
 ```
 
-![ssl](http://walidream.com:9999/blogImage/server/server_47.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_47.png)
 
 
 # 5.行转列
@@ -104,7 +104,7 @@ FROM student st, course c, score sc
 WHERE sc.s_id = st.s_id 
 AND sc.c_id = c.c_id
 ```
-![ssl](http://walidream.com:9999/blogImage/server/server_48.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_48.png)
 
 转换成下面的效果
 
@@ -131,7 +131,7 @@ GROUP BY
 	sc.s_id
 ```
 
-![ssl](http://walidream.com:9999/blogImage/server/server_49.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_49.png)
 
 
 #### 动态行转列
@@ -158,4 +158,4 @@ EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 ```
 
-![ssl](http://walidream.com:9999/blogImage/server/server_50.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_50.png)

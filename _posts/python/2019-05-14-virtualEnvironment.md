@@ -26,18 +26,18 @@ python: select interpreter
 
 输入完成后，会出现已有的虚拟环境，选择想要切换的环境
 
-![ssl](http://walidream.com:9999/blogImage/python/python_32.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_32.png)
 
 
 # 2.pycharm切换虚拟环境
 
 打开`pycharm`编辑器，选择`file` - >`settings`
 
-![ssl](http://walidream.com:9999/blogImage/python/python_33.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_33.png)
 
-![ssl](http://walidream.com:9999/blogImage/python/python_34.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_34.png)
 
-![ssl](http://walidream.com:9999/blogImage/python/python_52.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_52.png)
 
 选择`Existing environment` -> `interpreter`，添加自己想要的虚拟环境。
 

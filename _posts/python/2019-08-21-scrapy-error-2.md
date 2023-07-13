@@ -31,7 +31,7 @@ class XcfSpider(scrapy.Spider):
 
 在`parse()`方法内部打一个断点，重新运行爬虫。
 
-![ssl](http://walidream.com:9999/blogImage/python/python_36.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_36.png)
 
 看到输出信息中有一个403的状态码，正常的请求中`response`状态码是200。在生成项目时，有一个设置项目`settings.py`文件。能够找到这段代码
 
@@ -53,7 +53,7 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, lik
 
 然后重启项目
 
-![ssl](http://walidream.com:9999/blogImage/python/python_37.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_37.png)
 
 
 发现进入`parse()`方法，代码在断点处停下来

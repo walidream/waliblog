@@ -37,7 +37,7 @@ conda install -c conda-forge scrapy
 scrapy startproject tutorial
 ```
 
-![ssl](http://walidream.com:9999/blogImage/python/python_20.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_20.png)
 
 #### 解决方案
 
@@ -48,7 +48,7 @@ python -m scrapy startproject tutorial
 ```
 问题就解决了。
 
-![ssl](http://walidream.com:9999/blogImage/python/python_21.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/python/python_21.png)
 
 个人推测，出现这个问题是因为有些小伙伴在安装anaconda之前，在python官网下载安装python。导致anaconda中的python环境与python官网python环境冲突
 ```txt

@@ -26,11 +26,11 @@ group_tag: google云服务器
 
 在开始之前，先建议大家好好浏览一下[v2ray官网](https://www.v2ray.com/chapter_00/install.html "https://www.v2ray.com/chapter_00/install.html"){:target="_blank"}，默认大家都浏览过了，下面我们就要开车了
 
-![ssl](http://walidream.com:9999/blogImage/server/server_51.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_51.png)
 
 先登录到google云服务上，小菜这里使用的`xshell`没有安装过的小伙伴请看上一小节。
 
-![ssl](http://walidream.com:9999/blogImage/server/server_52.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_52.png)
 
 成功连接`google云服务器`
 
@@ -72,7 +72,7 @@ bash <(curl -L -s https://install.direct/go.sh)
 
 [v2ray在线配置生成器](https://intmainreturn0.com/v2ray-config-gen/# "https://intmainreturn0.com/v2ray-config-gen/#"){:target="_blank"}点击打开
 
-![ssl](http://walidream.com:9999/blogImage/server/server_53.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_53.png)
 
 ```
 vim /etc/v2ray/config.json
@@ -199,27 +199,27 @@ firewall-cmd --reload
 # 2.win10客户端配置
 
 下面就是`v2ray客户端`大家选择其中一个
-![ssl](http://walidream.com:9999/blogImage/server/server_55.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_55.png)
 
 [v2ray客户端下载地址 https://github.com/v2ray/v2ray-core/releases](https://github.com/v2ray/v2ray-core/releases "https://github.com/v2ray/v2ray-core/releases"){:target="_blank"}小菜下载的是这个
 
 下载完成后，在windowns系统下解压下载zip文件
 
-![ssl](http://walidream.com:9999/blogImage/server/server_56.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_56.png)
 
 #### 配置客户端配置
 
-![ssl](http://walidream.com:9999/blogImage/server/server_57.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_57.png)
 
 客户端配置好了之后，打开客户端的`config.json`文件，清空`config.json`文件里的内容，将上面客户端的配置粘贴进去，保存退出
 
-![ssl](http://walidream.com:9999/blogImage/server/server_58.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_58.png)
 
 首先windows客户端软件它不是一个图形界面，就是一个命令窗口，打开就可以了
 
-![ssl](http://walidream.com:9999/blogImage/server/server_59.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_59.png)
 
-![ssl](http://walidream.com:9999/blogImage/server/server_54.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_54.png)
 
 `注意：打开v2ray.exe之后请不要关闭窗口`
 
@@ -227,7 +227,7 @@ firewall-cmd --reload
 
 打开[chrome 网上应用店](https://chrome.google.com/webstore/category/extensions?hl=zh-CN "https://chrome.google.com/webstore/category/extensions?hl=zh-CN"){:target="_blank"}，在`chrom商店`中搜索代理
 
-![ssl](http://walidream.com:9999/blogImage/server/server_60.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_60.png)
 
 将代理工具`添加到chrome`
 
@@ -235,21 +235,21 @@ firewall-cmd --reload
 
 右键点击浏览器右上角 Proxy SwitchyOmega 蓝色圆圈图标，选择“选项”，在配置页面，点击“代理”，选择你使用的代理协议，填写相关选项，保存。
 
-![ssl](http://walidream.com:9999/blogImage/server/server_61.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_61.png)
 
-![ssl](http://walidream.com:9999/blogImage/server/server_62.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_62.png)
 
 左键点击Proxy SwitchyOmega图标，可以看到直接连接、系统代理和proxy选项，选择Proxy
 
-![ssl](http://walidream.com:9999/blogImage/server/server_63.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_63.png)
 
 #### 测试
 
 打开`chrome`浏览器，输入`youtube`，可以看到成功打开`youtube`
 
-![ssl](http://walidream.com:9999/blogImage/server/server_64.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_64.png)
 
 最后晒一张谷歌云服务器的网速
 
-![ssl](http://walidream.com:9999/blogImage/server/server_65.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/server/server_65.png)
 

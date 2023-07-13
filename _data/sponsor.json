@@ -3,21 +3,21 @@
 	"patron":[
 		{
 			"name":"yagm",
-			"portrait":"http://walidream.com:9999/blogImage/portrait/wxid_1193____1114.png",
+			"portrait":"https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/portrait/wxid_1193____1114.png",
 			"type":"wechat",
 			"accountID":"wxid_119309191114",
 			"account":"wxid_1193****1114",
 		},
 		{
 			"name":"邓鹏飞",
-			"portrait":"http://walidream.com:9999/blogImage/portrait/wxid_1190____1123.png",
+			"portrait":"https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/portrait/wxid_1190____1123.png",
 			"type":"wechat",
 			"accountID":"wxid_119012341123",
 			"account":"wxid_1190****1123",
 		},
 		{
 			"name":"wali",
-			"portrait":"http://walidream.com:9999/blogImage/portrait/zfbid_1110____4234.jpg",
+			"portrait":"https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/portrait/zfbid_1110____4234.jpg",
 			"type":"zhifubao",
 			"accountID":"zfbid_111042454234",
 			"account":"zfbid_1110****4234",

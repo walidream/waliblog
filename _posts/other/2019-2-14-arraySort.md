@@ -40,13 +40,13 @@ post_nav: ["1.排序算法说明","2.冒泡排序BubbleSort","3.选择排序Sele
 
 排序对比
 
-![ssl](http://walidream.com:9999/blogImage/other/other_1.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/other/other_1.png)
 
 图片名词解释： n: 数据规模 k:“桶”的个数 In-place: 占用常数内存，不占用额外内存 Out-place: 占用额外内存
 
 排序分类
 
-![ssl](http://walidream.com:9999/blogImage/other/other_2.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/other/other_2.png)
 
 # 2.冒泡排序BubbleSort
 
@@ -128,11 +128,11 @@ function bubbleSort3(arr3) {
 
 三种方法耗时对比：
 
-![ssl](http://walidream.com:9999/blogImage/other/other_3.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/other/other_3.png)
 
 `冒泡排序动图演示:`
 
-![ssl](http://walidream.com:9999/blogImage/other/other_4.gif)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/other/other_4.gif)
 
 #### 算法分析
 
@@ -190,7 +190,7 @@ console.log(selectionSort(arr));//[2, 3, 4, 5, 15, 19, 26, 27, 36, 38, 44, 46, 4
 
 `选择排序动图演示：`
 
-![ssl](http://walidream.com:9999/blogImage/other/other_5.gif)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/other/other_5.gif)
 
 #### 算法分析
 
@@ -275,11 +275,11 @@ console.log(binaryInsertionSort(arr));//[2, 3, 4, 5, 15, 19, 26, 27, 36, 38, 44,
 
 改进前后对比：
 
-![ssl](http://walidream.com:9999/blogImage/other/other_6.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/other/other_6.png)
 
 插入排序动图演示:
 
-![ssl](http://walidream.com:9999/blogImage/other/other_7.gif)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/other/other_7.gif)
 
 #### 算法分析
 
@@ -332,7 +332,7 @@ console.log(shellSort(arr));//[2, 3, 4, 5, 15, 19, 26, 27, 36, 38, 44, 46, 47, 4
 
 `希尔排序图示（图片来源网络）：`
 
-![ssl](http://walidream.com:9999/blogImage/other/other_8.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/other/other_8.png)
 
 #### 算法分析
 
@@ -394,7 +394,7 @@ var arr=[3,44,38,5,47,15,36,26,27,2,46,4,19,50,48];
 console.log(mergeSort(arr));
 ```
 
-![ssl](http://walidream.com:9999/blogImage/other/other_9.gif)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/other/other_9.gif)
 
 #### 算法分析
 
@@ -473,7 +473,7 @@ console.log(quickSort2(arr));//[2, 3, 4, 5, 15, 19, 26, 27, 36, 38, 44, 46, 47, 
 
 `快速排序动图演示：`
 
-![ssl](http://walidream.com:9999/blogImage/other/other_10.gif)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/other/other_10.gif)
 
 #### 算法分析
 
@@ -553,7 +553,7 @@ console.log(heapSort(arr));//[10, 13, 20, 22, 30, 31, 35, 46, 60, 65, 65, 77, 81
 
 `堆排序动图演示：`
 
-![ssl](http://walidream.com:9999/blogImage/other/other_11.gif)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/other/other_11.gif)
 
 #### 算法分析
 
@@ -606,7 +606,7 @@ var arr = [2, 2, 3, 8, 7, 1, 2, 2, 2, 7, 3, 9, 8, 2, 1, 4, 2, 4, 6, 9, 2];
 console.log(countingSort(arr)); //[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 6, 7, 7, 8, 8, 9, 9]
 ```
 
-![ssl](http://walidream.com:9999/blogImage/other/other_12.gif)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/other/other_12.gif)
 
 #### 算法分析
 
@@ -678,7 +678,7 @@ console.log(bucketSort(arr,4));//[2, 3, 4, 5, 15, 19, 26, 27, 36, 38, 44, 46, 47
 
 桶排序图示（图片来源网络）：
 
-![ssl](http://walidream.com:9999/blogImage/other/other_13.png)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/other/other_13.png)
 
 #### 算法分析
 
@@ -749,7 +749,7 @@ console.log(radixSort(arr,2)); //[2, 3, 4, 5, 15, 19, 26, 27, 36, 38, 44, 46, 47
 
 `基数排序LSD动图演示：`
 
-![ssl](http://walidream.com:9999/blogImage/other/other_14.gif)
+![ssl](https://raw.githubusercontent.com/walidream/blogimage/master/waliblogImage/other/other_14.gif)
 
 #### 算法分析
 
