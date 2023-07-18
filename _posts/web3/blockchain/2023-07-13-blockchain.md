@@ -61,8 +61,8 @@ Solidity 合约是以`.sol`为后缀的文件，无法直接执行，需要编�
 一个[以太坊帐户](https://ethereum.org/zh/developers/docs/accounts/)是一个具有以太币 (ETH) 余额的实体，可以在以太坊上发送交易。 帐户可以由用户控制，也可以作为智能合约部署。
 
 以太坊有两种帐户类型：
-- [外部所有的帐户 (EOA) – 由任何拥有私钥的人控制]
-- [合约帐户 — 部署到网络上的智能合约，由代码控制。]
+- 外部所有的帐户 (EOA) – 由任何拥有私钥的人控制
+- 合约帐户 — 部署到网络上的智能合约，由代码控制。
 
 具体查看第20页 [EVM](https://takenobu-hs.github.io/downloads/ethereum_evm_illustrated.pdf)
 这两种帐户类型都能：`接收、持有和发送 ETH 和 token`, `与已部署的智能合约进行交互`。
