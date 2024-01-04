@@ -90,6 +90,7 @@ Geth 这样的以太坊客户端将处理此签名过程。
 raw|是采用[递归长度前缀 (RLP)](https://ethereum.org/zh/developers/docs/data-structures-and-encoding/rlp/) 编码形式的签名交易|
 tx|是已签名交易的 JSON 形式。|
 
+- [RLP解码](https://toolkit.abdk.consulting/ethereum#rlp)
 ```
 {
   "jsonrpc": "2.0",
